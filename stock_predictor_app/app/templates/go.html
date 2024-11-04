@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Plotly JS -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Custom CSS -->
+    <style>
+        /* Full-screen background with gradient */
+        body {
+            background: linear-gradient(to right, #000000, #3a3c3d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        /* Centering the content box */
+        .content-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Styling for the predicted price */
+        .predicted-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff9800;
+            margin: 20px 0;
+        }
+
+        /* Back button styling */
+        .btn-custom {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            transition: 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #ff5722;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Plotly chart container styling */
+        #chart {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="content-box">
+    <h1>Stock Prediction for {{ ticker }}</h1>
+    <p class="predicted-price">Predicted Price for Tomorrow: ${{ "%.2f"|format(prediction) }}</p>
+    
+    <div id="chart"></div>
+
+    <a href="{{ url_for('index') }}" class="btn btn-custom mt-4">Go Back</a>
+</div>
+
+<script>
+    // Data for Plotly chart
+    var actual_prices = {{ actual_prices | tojson }};
+    var predicted_prices = {{ predicted_prices | tojson }};
+    var dates = {{ dates | tojson }};
+
+    var trace1 = {
+        x: dates,
+        y: actual_prices,
+        mode: 'lines',
+        name: 'Actual Prices',
+        line: { color: '#1f77b4', width: 2 }
+    };
+
+    var trace2 = {
+        x: dates,
+        y: predicted_prices,
+        mode: 'lines',
+        name: 'Predicted Prices',
+        line: { color: '#ff9800', dash: 'dashdot', width: 2 }
+    };
+
+    var data = [trace1, trace2];
+
+    var layout = {
+        title: 'Stock Price Prediction vs Actual Prices',
+        xaxis: { title: 'Date', tickformat: '%Y-%m-%d' },
+        yaxis: { title: 'Price ($)' },
+        plot_bgcolor: 'rgba(0, 0, 0, 0)',
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+        font: { color: 'white' },
+    };
+
+    Plotly.newPlot('chart', data, layout);
+</script>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>
