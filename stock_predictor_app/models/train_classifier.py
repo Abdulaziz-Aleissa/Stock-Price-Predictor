@@ -5,16 +5,29 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import sys
-
+import os
 # Function to load data from the SQLite database
 def load_data(database_filepath):
+    """
+    Loads data from an SQLite database.
+
+    Parameters:
+    database_filepath (str): Path to the SQLite database file.
+
+    Returns:
+    X (pd.DataFrame): Features for training.
+    y (pd.Series): Target variable (next day's stock price).
+    """
     engine = create_engine(f'sqlite:///{database_filepath}')
-    table_name = f"{database_filepath.split('/')[-1].replace('.db', '')}_table"
+    table_name = f"{os.path.basename(database_filepath).replace('.db', '')}_table"
+    print(f"Loading data from table: {table_name}")
+    
     df = pd.read_sql_table(table_name, engine)
     df.columns = df.columns.astype(str)
     X = df.drop(columns=['Tomorrow'])
-    y = df['Tomorrow']  # Target is now the "Tomorrow" column, representing the next day's price
+    y = df['Tomorrow']
     return X, y
+
 
 # Function to build the regression model with GridSearchCV for hyperparameter tuning
 def build_model():
