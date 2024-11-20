@@ -1,113 +1,67 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Price Predictor</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        /* Full-screen background with gradient */
-        body {
-            background: linear-gradient(to right, #000000, #3a3c3d);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-        }
-
-        /* Centering the content box */
-        .content-box {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Loading message styling */
-        #loading-message {
-            display: none;
-            font-size: 1.1rem;
-            margin-top: 20px;
-        }
-
-        /* Custom Go button styling */
-        .btn-custom {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-size: 1.1rem;
-            transition: 0.3s ease;
-        }
-
-        .btn-custom:hover {
-            background-color: #ff5722;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Fancy loading animation */
-        .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            justify-self: center;
-            margin-top: 15px;
-            color: #ff9800;
-        }
-
-        /* Additional styling for text and labels */
-        label {
-            font-weight: bold;
-            font-size: 1rem;
-            color: #a97c7b;
-        }
-
-        h1 {
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-    </style>
-    <script>
-        function showLoadingMessage() {
-            document.getElementById("loading-message").style.display = "block";
-            document.getElementById("loading-animation").style.display = "inline-block";
-        }
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-
-<div class="content-box">
-    <h1>Stock Price Predictor</h1>
-    <p>Enter the stock ticker symbol below to get the predicted price for tomorrow.</p>
-
-    <!-- Loading message with animated spinner -->
-    <p id="loading-message">
-        We are creating a model to predict the stock for you. Please wait. Estimated time: 2-4 minutes.
-    </p>
-    <div id="loading-animation" class="spinner-border" role="status" style="display: none;">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-    
-    <!-- Form for entering stock ticker -->
-    <form action="{{ url_for('predict') }}" method="post" onsubmit="showLoadingMessage()">
-        <div class="mb-3">
-            <label for="ticker" class="form-label">Stock Ticker (e.g., LCID, NVDA):</label>
-            <input type="text" id="ticker" name="ticker" class="form-control text-center" required>
+    <div class="theme-switch">
+        <div class="switch-track">
+            <div class="switch-icons">
+                <div class="sun">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                <div class="moon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+            </div>
+            <div class="switch-circle"></div>
         </div>
-        <button type="submit" class="btn btn-custom mt-3">Go</button>
-    </form>
-</div>
+    </div>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <div class="content-box">
+        <div class="search-container">
+            <h1 class="main-title">Stock Price Predictor</h1>
+            
+            <form action="{{ url_for('predict') }}" method="post" onsubmit="showLoadingMessage()" class="search-form">
+                <div class="search-group">
+                    <input type="text" id="ticker" name="ticker" class="form-control" placeholder="Enter stock ticker symbol..." required>
+                    <button type="submit" class="predict-btn">
+                        <span class="btn-text">PREDICT</span>
+                        <div class="btn-loader d-none">
+                            <div class="spinner-border spinner-border-sm"></div>
+                        </div>
+                    </button>
+                </div>
+            </form>
 
+            <div class="mt-4">
+                {% if not current_user.is_authenticated %}
+                <p>
+                    <a href="{{ url_for('login') }}" class="btn btn-custom me-2">Login</a>
+                    <a href="{{ url_for('signup') }}" class="btn btn-outline-custom">Sign Up</a>
+                </p>
+                {% else %}
+                <p>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-custom me-2">Dashboard</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-custom">Logout</a>
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        function showLoadingMessage() {
+            document.querySelector('.btn-text').classList.add('d-none');
+            document.querySelector('.btn-loader').classList.remove('d-none');
+        }
+    </script>
 </body>
 </html>

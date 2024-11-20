@@ -1,119 +1,262 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Result</title>
-    <!-- Bootstrap CSS -->
+    <title>Prediction Results - Stock Price Predictor</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Plotly JS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- Custom CSS -->
-    <style>
-        /* Full-screen background with gradient */
-        body {
-            background: linear-gradient(to right, #000000, #3a3c3d);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-        }
-
-        /* Centering the content box */
-        .content-box {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-
-        /* Styling for the predicted price */
-        .predicted-price {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ff9800;
-            margin: 20px 0;
-        }
-
-        /* Back button styling */
-        .btn-custom {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-size: 1.1rem;
-            transition: 0.3s ease;
-        }
-
-        .btn-custom:hover {
-            background-color: #ff5722;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Plotly chart container styling */
-        #chart {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-        }
-    </style>
 </head>
 <body>
+    <div class="theme-switch">
+        <div class="switch-track">
+            <div class="switch-icons">
+                <div class="sun">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                <div class="moon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+            </div>
+            <div class="switch-circle"></div>
+        </div>
+    </div>
 
-<div class="content-box">
-    <h1>Stock Prediction for {{ ticker }}</h1>
-    <p class="predicted-price">Predicted Price for Tomorrow: ${{ "%.2f"|format(prediction) }}</p>
-    
-    <div id="chart"></div>
+    <div class="content-box">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>{{ ticker }} Stock Analysis</h1>
+            <div class="text-end">
+                <span class="fs-5">Last Updated: {{ current_time }}</span>
+            </div>
+        </div>
 
-    <a href="{{ url_for('index') }}" class="btn btn-custom mt-4">Go Back</a>
-</div>
+        <div class="row">
+            <!-- Prediction Section -->
+            <div class="col-md-8">
+                <div class="metrics-card">
+                    <div class="price-prediction">
+                        ${{ "%.2f"|format(prediction) }}
+                    </div>
+                    <div class="prediction-change {{ 'positive-change' if prediction > actual_prices[-1] else 'negative-change' }}">
+                        {{ "%.2f"|format((prediction - actual_prices[-1]) / actual_prices[-1] * 100) }}% 
+                        {{ "▲" if prediction > actual_prices[-1] else "▼" }}
+                    </div>
+                    <div class="prediction-details">
+                        <p>Current Price: ${{ "%.2f"|format(actual_prices[-1]) }}</p>
+                        <p>Predicted Change: ${{ "%.2f"|format(prediction - actual_prices[-1]) }}</p>
+                    </div>
+                </div>
+            </div>
 
-<script>
-    // Data for Plotly chart
-    var actual_prices = {{ actual_prices | tojson }};
-    var predicted_prices = {{ predicted_prices | tojson }};
-    var dates = {{ dates | tojson }};
+            <!-- Market Context -->
+            {% if market_context %}
+            <div class="col-md-4">
+                <div class="metrics-card">
+                    <h4>Market Overview</h4>
+                    <div class="market-data">
+                        <p>Day Range: ${{ market_context.day_low }} - ${{ market_context.day_high }}</p>
+                        <p>Volume: {{ '{:,}'.format(market_context.volume) }}</p>
+                        <p>P/E Ratio: {{ '%.2f'|format(market_context.pe_ratio) if market_context.pe_ratio != 'N/A' else 'N/A' }}</p>
+                        <p>Market Cap: ${{ '{:,.0f}'.format(market_context.market_cap/1000000) }}M</p>
+                        <p>52W High: ${{ market_context.year_high }}</p>
+                        <p>52W Low: ${{ market_context.year_low }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
 
-    var trace1 = {
-        x: dates,
-        y: actual_prices,
-        mode: 'lines',
-        name: 'Actual Prices',
-        line: { color: '#1f77b4', width: 2 }
-    };
+        <!-- Chart Controls -->
+        <div class="time-selector">
+            <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
+            <button class="time-btn" onclick="updateTimeframe('3M')">3M</button>
+            <button class="time-btn" onclick="updateTimeframe('6M')">6M</button>
+            <button class="time-btn" onclick="updateTimeframe('1Y')">1Y</button>
+            <button class="time-btn" onclick="updateTimeframe('ALL')">ALL</button>
+        </div>
 
-    var trace2 = {
-        x: dates,
-        y: predicted_prices,
-        mode: 'lines',
-        name: 'Predicted Prices',
-        line: { color: '#ff9800', dash: 'dashdot', width: 2 }
-    };
+        <div id="chart"></div>
+        
+        <div class="actions mt-4">
+            {% if current_user.is_authenticated %}
+            <button class="btn btn-custom me-2" data-bs-toggle="modal" data-bs-target="#addToPortfolioModal">
+                Add to Portfolio
+            </button>
+            <button class="btn btn-custom me-2" data-bs-toggle="modal" data-bs-target="#addToWatchlistModal">
+                Add to Watchlist
+            </button>
+            <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#setPriceAlertModal">
+                Set Price Alert
+            </button>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline-custom float-end">Back to Search</a>
+        </div>
+    </div>
 
-    var data = [trace1, trace2];
+    <!-- Add to Portfolio Modal -->
+    <div class="modal fade" id="addToPortfolioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add {{ ticker }} to Portfolio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('add_to_portfolio') }}" method="POST">
+                        <input type="hidden" name="symbol" value="{{ ticker }}">
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="shares" placeholder="Number of Shares" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="purchase_price" placeholder="Purchase Price" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">Add to Portfolio</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    var layout = {
-        title: 'Stock Price Prediction vs Actual Prices',
-        xaxis: { title: 'Date', tickformat: '%Y-%m-%d' },
-        yaxis: { title: 'Price ($)' },
-        plot_bgcolor: 'rgba(0, 0, 0, 0)',
-        paper_bgcolor: 'rgba(0, 0, 0, 0)',
-        font: { color: 'white' },
-    };
+    <!-- Add to Watchlist Modal -->
+    <div class="modal fade" id="addToWatchlistModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add {{ ticker }} to Watchlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('add_to_watchlist') }}" method="POST">
+                        <input type="hidden" name="symbol" value="{{ ticker }}">
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="target_price" placeholder="Target Price" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">Add to Watchlist</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    Plotly.newPlot('chart', data, layout);
-</script>
+    <!-- Set Price Alert Modal -->
+    <div class="modal fade" id="setPriceAlertModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Price Alert for {{ ticker }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('add_alert') }}" method="POST">
+                        <input type="hidden" name="symbol" value="{{ ticker }}">
+                        <div class="mb-3">
+                            <select class="form-control" name="condition" required>
+                                <option value="above">Price Goes Above</option>
+                                <option value="below">Price Goes Below</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" name="target_price" placeholder="Target Price" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">Set Alert</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    <script>
+        const dates = {{ dates | tojson }};
+        const actualPrices = {{ actual_prices | tojson }};
+        const predictedPrices = {{ predicted_prices | tojson }};
+        
+        function createChart(startIndex = 0) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            const trace1 = {
+                x: dates.slice(startIndex),
+                y: actualPrices.slice(startIndex),
+                mode: 'lines',
+                name: 'Actual Prices',
+                line: { color: '#1f77b4', width: 2 }
+            };
 
+            const trace2 = {
+                x: dates.slice(startIndex),
+                y: predictedPrices.slice(startIndex),
+                mode: 'lines',
+                name: 'Predicted Prices',
+                line: { color: '#ff9800', dash: 'dashdot', width: 2 }
+            };
+
+            const layout = {
+                title: 'Stock Price Prediction vs Actual Prices',
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { 
+                    color: isDark ? '#e0e0e0' : '#1a202c',
+                },
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                },
+                yaxis: {
+                    title: 'Price ($)',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                },
+                showlegend: true,
+                legend: {
+                    x: 0,
+                    y: 1,
+                    bgcolor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
+                }
+            };
+
+            Plotly.newPlot('chart', [trace1, trace2], layout);
+        }
+
+        function updateTimeframe(timeframe) {
+            let startIndex = 0;
+            const totalDays = dates.length;
+
+            switch(timeframe) {
+                case '1M':
+                    startIndex = Math.max(totalDays - 30, 0);
+                    break;
+                case '3M':
+                    startIndex = Math.max(totalDays - 90, 0);
+                    break;
+                case '6M':
+                    startIndex = Math.max(totalDays - 180, 0);
+                    break;
+                case '1Y':
+                    startIndex = Math.max(totalDays - 365, 0);
+                    break;
+                case 'ALL':
+                    startIndex = 0;
+                    break;
+            }
+
+            createChart(startIndex);
+            
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        createChart();
+
+        // Update chart when theme changes
+        document.querySelector('.theme-switch').addEventListener('click', () => {
+            setTimeout(createChart, 100);
+        });
+    </script>
 </body>
 </html>
