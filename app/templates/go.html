@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results - Stock Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div class="theme-switch">
+        <div class="switch-track">
+            <div class="switch-icons">
+                <div class="sun">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                <div class="moon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+            </div>
+            <div class="switch-circle"></div>
+        </div>
+    </div>
+
+    <div class="content-box">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>{{ ticker }} Stock Analysis</h1>
+            <div class="text-end">
+            
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="metrics-card">
+                    <div class="current-price">
+                        <h4>Current Price</h4>
+                        <div class="price-value">${{ "%.2f"|format(current_price) }}</div>
+                        
+                    </div>
+                    
+                    <div class="prediction-section mt-4">
+                        <h4>Tomorrow's Prediction</h4>
+                        <div class="price-prediction">${{ "%.2f"|format(prediction) }}</div>
+                        <div class="prediction-change {{ 'positive-change' if price_change_pct > 0 else 'negative-change' }}">
+                            {{ "%.2f"|format(price_change_pct) }}% 
+                            {{ "▲" if price_change_pct > 0 else "▼" }}
+                        </div>
+                        <div class="prediction-details">
+                            Predicted Change: ${{ "%.2f"|format(prediction - current_price) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if market_context %}
+            <div class="col-md-4">
+                <div class="metrics-card">
+                    <h4>Market Overview</h4>
+                    <div class="market-data">
+                        <p>Day Range: ${{ market_context.day_low }} - ${{ market_context.day_high }}</p>
+                        <p>Volume: {{ '{:,}'.format(market_context.volume) }}</p>
+                        <p>P/E Ratio: {{ '%.2f'|format(market_context.pe_ratio) if market_context.pe_ratio != 'N/A' else 'N/A' }}</p>
+                        <p>Market Cap: ${{ '{:,.0f}'.format(market_context.market_cap/1000000) }}M</p>
+                        <p>52W High: ${{ market_context.year_high }}</p>
+                        <p>52W Low: ${{ market_context.year_low }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="time-selector">
+            <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
+            <button class="time-btn" onclick="updateTimeframe('3M')">3M</button>
+            <button class="time-btn" onclick="updateTimeframe('6M')">6M</button>
+            <button class="time-btn" onclick="updateTimeframe('1Y')">1Y</button>
+            <button class="time-btn" onclick="updateTimeframe('ALL')">ALL</button>
+        </div>
+
+        <div id="chart"></div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-custom">Back to Search</a>
+        </div>
+    </div>
+
+    <script>
+        const dates = {{ dates | tojson }};
+        const actualPrices = {{ actual_prices | tojson }};
+        const predictedPrices = {{ predicted_prices | tojson }};
+        
+        function createChart(startIndex = 0) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            const trace1 = {
+                x: dates.slice(startIndex),
+                y: actualPrices.slice(startIndex),
+                mode: 'lines',
+                name: 'Actual Prices',
+                line: { color: '#1f77b4', width: 2 }
+            };
+
+            const trace2 = {
+                x: dates.slice(startIndex),
+                y: predictedPrices.slice(startIndex),
+                mode: 'lines',
+                name: 'Predicted Prices',
+                line: { color: '#ff9800', dash: 'dashdot', width: 2 }
+            };
+
+            const layout = {
+                title: 'Stock Price Prediction vs Actual Prices',
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { 
+                    color: isDark ? '#e0e0e0' : '#1a202c',
+                },
+                xaxis: {
+                    title: 'Date',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                },
+                yaxis: {
+                    title: 'Price ($)',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                },
+                showlegend: true,
+                legend: {
+                    x: 0,
+                    y: 1,
+                    bgcolor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)'
+                }
+            };
+
+            Plotly.newPlot('chart', [trace1, trace2], layout);
+        }
+
+        function updateTimeframe(timeframe) {
+            let startIndex = 0;
+            const totalDays = dates.length;
+
+            switch(timeframe) {
+                case '1M': startIndex = Math.max(totalDays - 30, 0); break;
+                case '3M': startIndex = Math.max(totalDays - 90, 0); break;
+                case '6M': startIndex = Math.max(totalDays - 180, 0); break;
+                case '1Y': startIndex = Math.max(totalDays - 365, 0); break;
+                case 'ALL': startIndex = 0; break;
+            }
+
+            createChart(startIndex);
+            
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        createChart();
+
+        // Update chart when theme changes
+        document.querySelector('.theme-switch').addEventListener('click', () => {
+            setTimeout(createChart, 100);
+        });
+    </script>
+</body>
+</html>
