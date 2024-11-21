@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 import os
 import pandas as pd
 import numpy as np
-from data.process_data import load_data, clean_data, save_data
+from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
@@ -25,7 +25,7 @@ from models.train_classifier import (
 )
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
-
+from sklearn.impute import SimpleImputer
 
 
 
@@ -60,14 +60,17 @@ atexit.register(lambda: scheduler.shutdown())
 def get_current_price(symbol):
     try:
         stock = yf.Ticker(symbol)
-        price = stock.info.get('regularMarketPrice')
-        if price is None or price == 0:
-            hist = stock.history(period="1d")
-            if not hist.empty:
-                return hist['Close'].iloc[-1]
-        return price
+        # Get real-time price during market hours
+        real_time_price = stock.info.get('regularMarketPrice')
+        if real_time_price:
+            return real_time_price
+        # If market closed, get latest closing price
+        hist = stock.history(period="1d", interval="1m")
+        if not hist.empty:
+            return hist['Close'].iloc[-1]
+        return None
     except Exception as e:
-        logger.error(f"Error fetching price for {symbol}: {str(e)}")
+        logger.error(f"Error getting price: {str(e)}")
         return None
 
 def check_price_alerts():
@@ -128,6 +131,7 @@ def get_market_context(ticker):
 def index():
     return render_template('main.html')
 
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -151,20 +155,20 @@ def predict():
         else:
             logger.info(f"Training new model for {stock_ticker}")
             
-            # Get and process data
             if not os.path.exists(database_filepath):
                 df = load_data(stock_ticker)
                 df = clean_data(df)
                 save_data(df, database_filepath)
             
-            # Load and prepare data for training
             X, y = load_db_data(database_filepath)
             
-            # Scale features
+            # Handle any NaN values in training data
+            if X.isna().any().any():
+                X = X.fillna(0)
+            
             scaler = StandardScaler()
             X_scaled = scaler.fit_transform(X)
             
-            # Train model
             X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2)
             
             model = GradientBoostingRegressor(
@@ -184,15 +188,38 @@ def predict():
             }
             joblib.dump(model_data, model_filepath)
 
-        # Make predictions
-        df = load_data(stock_ticker)
-        df = clean_data(df)
-        
+        # Get fresh data with current price
+        try:
+            stock = yf.Ticker(stock_ticker)
+            df = stock.history(period="max")
+            if df.empty:
+                return render_template('error.html', error="No data available for this stock")
+                
+            # Get current price and latest data
+            current_price = get_current_price(stock_ticker)
+            if not current_price:
+                return render_template('error.html', error="Could not fetch current price")
+            
+            df = clean_data(df)
+            
+            # Update the latest price
+            df.iloc[-1, df.columns.get_loc('Close')] = current_price
+            
+        except Exception as e:
+            logger.error(f"Error fetching stock data: {str(e)}")
+            return render_template('error.html', error="Error fetching stock data")
+            
         # Prepare features
         X = df.drop(columns=['Tomorrow'])
-        dates = df['Date'].dt.strftime('%Y-%m-%d').tolist()
+        dates = df['Date'].dt.strftime('%Y-%m-%d %H:%M').tolist()
+        
         if 'Date' in X.columns:
             X = X.drop(columns=['Date'])
+            
+        # Final check for NaN values
+        if X.isna().any().any():
+            X = X.fillna(0)
+            logger.info("Filled remaining NaN values with 0")
         
         # Scale features and make predictions
         X_scaled = scaler.transform(X)
@@ -201,11 +228,28 @@ def predict():
         
         # Get actual prices
         actual_prices = df['Close'].tolist()
+        
+        # Add tomorrow's date
+        tomorrow = datetime.now() + timedelta(days=1)
+        tomorrow_date = tomorrow.strftime('%Y-%m-%d')
+        dates.append(tomorrow_date)
+        actual_prices.append(None)  # No actual price for tomorrow
+        predicted_prices.append(tomorrow_prediction)
+
+        # Calculate change percentage
+        price_change_pct = ((tomorrow_prediction - current_price) / current_price) * 100
+
+        logger.info(f"Prediction complete for {stock_ticker}")
+        logger.info(f"Current Price: ${current_price:.2f}")
+        logger.info(f"Tomorrow's Prediction: ${tomorrow_prediction:.2f}")
+        logger.info(f"Expected Change: {price_change_pct:.2f}%")
 
         return render_template(
             'go.html',
             ticker=stock_ticker,
             prediction=round(tomorrow_prediction, 2),
+            current_price=round(current_price, 2),
+            price_change_pct=round(price_change_pct, 2),
             dates=dates,
             actual_prices=actual_prices,
             predicted_prices=predicted_prices,
@@ -221,6 +265,7 @@ def predict():
     except Exception as e:
         logger.error(f"Error in prediction: {str(e)}")
         return render_template('error.html', error=str(e))
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():

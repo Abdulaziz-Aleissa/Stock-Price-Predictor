@@ -5,7 +5,7 @@ import numpy as np
 import sys
 import os
 import logging
-
+from datetime import datetime, timedelta
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -40,6 +40,9 @@ def calculate_technical_indicators(df):
         logger.error(f"Error calculating technical indicators: {str(e)}")
         raise
 
+
+
+
 def load_data(stock_name):
     """
     Fetches historical stock data with error handling
@@ -47,12 +50,14 @@ def load_data(stock_name):
     try:
         logger.info(f"Fetching data for {stock_name}")
         stock = yf.Ticker(stock_name)
-        df = stock.history(period="max")
+        # Use end date as tomorrow to ensure we have latest data
+        end_date = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+        df = stock.history(period="max", end=end_date)
         
         if df.empty:
             raise ValueError(f"No data found for ticker {stock_name}")
             
-        logger.info(f"Successfully fetched {len(df)} records")
+        logger.info(f"Successfully fetched {len(df)} records, latest date: {df.index[-1]}")
         return df
         
     except Exception as e:
@@ -61,35 +66,49 @@ def load_data(stock_name):
 
 def clean_data(df):
     """
-    Prepares stock data by calculating various technical indicators
+    Prepares stock data with NaN handling
     """
     try:
-        logger.info("Cleaning and processing data")
-        
         # Ensure datetime index
         df.index = pd.to_datetime(df.index)
         
-        # Basic price metrics
-        df['Price_Change'] = df['Close'].pct_change()
-        df['Volume_Change'] = df['Volume'].pct_change()
+        # Basic calculations
+        df['Price_Change'] = df['Close'].pct_change().fillna(0)
+        df['Volume_Change'] = df['Volume'].pct_change().fillna(0)
         df['High_Low_Range'] = df['High'] - df['Low']
-        df['Daily_Return'] = df['Close'].pct_change()
-        df['Volatility'] = df['Daily_Return'].rolling(window=20).std()
+        df['Daily_Return'] = df['Close'].pct_change().fillna(0)
         
-        # Technical indicators
-        df = calculate_technical_indicators(df)
+        # Handle rolling calculations
+        df['Volatility'] = df['Daily_Return'].rolling(window=20).std().fillna(0)
+        df['SMA_20'] = df['Close'].rolling(window=20).mean().fillna(method='bfill').fillna(df['Close'])
+        df['SMA_50'] = df['Close'].rolling(window=50).mean().fillna(method='bfill').fillna(df['Close'])
         
-        # Target variable
+        # RSI
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean().fillna(0)
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean().fillna(0)
+        rs = gain / loss
+        df['RSI'] = 100 - (100 / (1 + rs))
+        df['RSI'] = df['RSI'].fillna(50)  # Neutral RSI for NaN values
+        
+        # MACD
+        exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+        exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+        df['MACD'] = (exp1 - exp2).fillna(0)
+        df['MACD_Signal'] = df['MACD'].ewm(span=9, adjust=False).mean().fillna(0)
+        
+        # Target variable - shifted close price
         df["Tomorrow"] = df['Close'].shift(-1)
         
-        # Save date before resetting index
+        # Save date
         df['Date'] = df.index
         
-        # Clean up
-        df = df.dropna()
-        df.reset_index(drop=True, inplace=True)
+        # Drop the last row as it will have NaN in Tomorrow
+        df = df.iloc[:-1].copy()
         
-        logger.info("Data processing completed")
+        # Final check for any remaining NaN
+        df = df.fillna(0)
+        
         return df
         
     except Exception as e:
