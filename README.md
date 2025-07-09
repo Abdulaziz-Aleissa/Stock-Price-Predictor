@@ -1,6 +1,6 @@
 # Stock Price Predictor
 
-A Flask web application that predicts the next day's stock price for a given ticker symbol. This project uses historical stock data, data cleaning, and a machine learning regression model to forecast prices. Users can enter a stock ticker, and the application displays a predicted price along with a graph comparing historical prices and the predicted trend.
+A Flask web application that predicts the next day's stock price for a given ticker symbol. This project uses historical stock data, data cleaning, and a deep learning regression model to forecast prices. Users can enter a stock ticker, and the application displays a predicted price along with a graph comparing historical prices and the predicted trend. as well as a live up-to-date portfolio management with a watchlist, notification and compare features.
 ---
 
 # Table of Contents
