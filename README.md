@@ -40,7 +40,7 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ---
 
 ### 🔹 Login Page
-<img src="Screenshots/signInPage.png" width="700"/>
+<img src="Screenshots/logInPage.png" width="700"/>
 
 ---
 
