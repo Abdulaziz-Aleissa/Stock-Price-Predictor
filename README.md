@@ -20,32 +20,27 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ## 🖼️ Screenshots
 
 ### 🔹 Home Page – Ticker Search + Auth
-<img src="Screenshots/mainPage.png" width="700"/>
+<img src="screenshots/mainPage.png" width="700"/>
 
 ---
 
 ### 🔹 Stock Analysis – Prediction, Chart & Market Data
-<img src="Screenshots/resaultPage.png" width="700"/>
-
----
-
-### 🔹 Loading / Processing Page
-<img src="Screenshots/processing-pag.png" width="700"/>
+<img src="screenshots/resaultPage.png" width="700"/>
 
 ---
 
 ### 🔹 Sign Up / Create Account
-<img src="Screenshots/signUpPage.png" width="700"/>
+<img src="screenshots/signUpPage.png" width="700"/>
 
 ---
 
 ### 🔹 Login Page
-<img src="Screenshots/logInPage.png" width="700"/>
+<img src="screenshots/logInPage.png" width="700"/>
 
 ---
 
 ### 🔹 Dashboard – Portfolio, Watchlist, Alerts, Comparison
-<img src="Screenshots/dashboardPage.png" width="700"/>
+<img src="screenshots/dashboardPage.png" width="700"/>
 
 ---
 
@@ -56,7 +51,7 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 | Flask         | Backend web framework                |
 | yfinance      | Fetching real-time stock data        |
 | SQLAlchemy    | SQLite database interaction          |
-| scikit-learn  | ML model (Random Forest Regressor)   |
+| scikit-learn  | ML model (GradientBoostingRegressor) |
 | pandas        | Data cleaning and manipulation       |
 | Plotly        | Interactive graphs and comparisons   |
 | Bootstrap     | Responsive dark-themed UI            |
@@ -66,6 +61,32 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ## 🚀 Getting Started
 
 ### 1. Clone the repository
+type the code below in your terminal to clone this repository:
 ```bash
 git clone https://github.com/Abdulaziz-Aleissa/stock_predictor_app.git
+```
+### 2. Navigate to the repository
+type the code below in your terminal to navigate to the repository:
+```bash
 cd stock_predictor_app
+```
+
+### 3. Install dependencies
+type the code below in your terminal to install dependencies:
+```bash
+pip install -r requirements.txt
+pip install --upgrade yfinance
+pip install Flask yfinance sqlalchemy pandas scikit-learn plotly
+```
+
+
+### 4. start the application
+type the code below in your terminal to start the application:
+```bash
+python -m app.run
+```
+
+
+# License
+
+This project is open-source and is a gift of knowledge, created to empower and inspire others. You are free to use, modify, and share this project.
