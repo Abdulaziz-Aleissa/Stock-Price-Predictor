@@ -20,12 +20,12 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ## 🖼️ Screenshots
 
 ### 🔹 Home Page – Ticker Search + Auth
-<img src="Screenshots/main-page.png" width="700"/>
+<img src="Screenshots/mainPage.png" width="700"/>
 
 ---
 
 ### 🔹 Stock Analysis – Prediction, Chart & Market Data
-<img src="Screenshots/resault-page.png" width="700"/>
+<img src="Screenshots/resaultPage.png" width="700"/>
 
 ---
 
@@ -35,17 +35,17 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ---
 
 ### 🔹 Sign Up / Create Account
-<img src="Screenshots/signup-page.png" width="700"/>
+<img src="Screenshots/signUpPage.png" width="700"/>
 
 ---
 
 ### 🔹 Login Page
-<img src="Screenshots/login-page.png" width="700"/>
+<img src="Screenshots/signInPage.png" width="700"/>
 
 ---
 
 ### 🔹 Dashboard – Portfolio, Watchlist, Alerts, Comparison
-<img src="Screenshots/dashboard-page.png" width="700"/>
+<img src="Screenshots/dashboardPage.png" width="700"/>
 
 ---
 
