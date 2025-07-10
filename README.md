@@ -20,7 +20,7 @@ Built with real-time data (via `yfinance`), a trained ML model (GradientBoosting
 ## 🖼️ Screenshots
 
 ### 🔹 Home Page – Ticker Search + Auth
-<img src="Screenshots/main-pag.png" width="700"/>
+<img src="Screenshots/main-page.png" width="700"/>
 
 ---
 
