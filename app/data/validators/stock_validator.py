@@ -27,7 +27,7 @@ class StockValidator:
         ticker = ticker.strip().upper()
         
         # Check length
-        if len(ticker) < VALIDATION_RULES['TICKER_MIN_LENGTH']:
+        if len(ticker) < 1:  # Allow single character tickers
             return False
         
         if len(ticker) > VALIDATION_RULES['TICKER_MAX_LENGTH']:
