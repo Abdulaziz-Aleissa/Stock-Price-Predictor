@@ -1,0 +1,1 @@
+"""Core module containing exceptions and constants."""

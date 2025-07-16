@@ -1,0 +1,1 @@
+"""API module containing routes and middleware."""
