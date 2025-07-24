@@ -158,6 +158,219 @@
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calculator-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calculator-inputs {
+            flex: 1;
+        }
+        
+        .calculator-actions {
+            margin-top: auto;
+            padding-top: 20px;
+        }
+
+        /* Financial Advisor Bot */
+        .advisor-bot {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .advisor-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .advisor-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), #00d4aa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .advisor-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .advisor-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .chat-container {
+            height: 400px;
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--input-bg);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message-bot {
+            align-self: flex-start;
+            background: var(--accent);
+            color: white;
+            border-bottom-left-radius: 6px;
+        }
+
+        .message-user {
+            align-self: flex-end;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-bottom-right-radius: 6px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 25px;
+            padding: 12px 20px;
+            resize: none;
+            font-family: inherit;
+            max-height: 100px;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
+        }
+
+        .chat-send-btn {
+            background: var(--accent);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .chat-send-btn:hover {
+            background: #0e7490;
+            transform: scale(1.05);
+        }
+
+        .chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 10px 18px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingAnimation {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .quick-questions {
+            margin-top: 20px;
+        }
+
+        .quick-question-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .quick-question-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
 
         .calculator-header {
@@ -427,31 +640,37 @@
                     <!-- Compound Interest Calculator -->
                     <div class="col-lg-6 col-md-12 mb-4">
                         <div class="calculator-card">
-                            <div class="calculator-header">
-                                <i class="fas fa-chart-line"></i> Compound Interest Calculator
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Initial Investment</label>
-                                <input type="number" class="form-control" id="principal" value="10000" placeholder="Enter amount">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Monthly Contribution</label>
-                                <input type="number" class="form-control" id="monthly" value="500" placeholder="Monthly addition">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Annual Interest Rate (%)</label>
-                                <input type="number" class="form-control" id="rate" value="7" step="0.1" placeholder="Expected return">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Investment Period (Years)</label>
-                                <input type="number" class="form-control" id="years" value="30" placeholder="Time horizon">
-                            </div>
-                            <button class="btn-calculate" onclick="calculateCompound()">
-                                <i class="fas fa-calculator"></i> Calculate Growth
-                            </button>
-                            <div id="compoundResult" class="result-box">
-                                <div class="result-value"></div>
-                                <div class="result-details"></div>
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-chart-line"></i> Compound Interest Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="mb-3">
+                                        <label class="form-label">Initial Investment</label>
+                                        <input type="number" class="form-control" id="principal" value="10000" placeholder="Enter amount">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Monthly Contribution</label>
+                                        <input type="number" class="form-control" id="monthly" value="500" placeholder="Monthly addition">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Annual Interest Rate (%)</label>
+                                        <input type="number" class="form-control" id="rate" value="7" step="0.1" placeholder="Expected return">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Investment Period (Years)</label>
+                                        <input type="number" class="form-control" id="years" value="30" placeholder="Time horizon">
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculateCompound()">
+                                        <i class="fas fa-calculator"></i> Calculate Growth
+                                    </button>
+                                    <div id="compoundResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -459,23 +678,29 @@
                     <!-- P/E Ratio Calculator -->
                     <div class="col-lg-6 col-md-12 mb-4">
                         <div class="calculator-card">
-                            <div class="calculator-header">
-                                <i class="fas fa-balance-scale"></i> P/E Ratio Calculator
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Stock Price</label>
-                                <input type="number" class="form-control" id="stockPrice" value="100" placeholder="Current price">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Earnings Per Share</label>
-                                <input type="number" class="form-control" id="eps" value="5" step="0.01" placeholder="Annual EPS">
-                            </div>
-                            <button class="btn-calculate" onclick="calculatePE()">
-                                <i class="fas fa-chart-bar"></i> Analyze Valuation
-                            </button>
-                            <div id="peResult" class="result-box">
-                                <div class="result-value"></div>
-                                <div class="result-details"></div>
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-balance-scale"></i> P/E Ratio Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="mb-3">
+                                        <label class="form-label">Stock Price</label>
+                                        <input type="number" class="form-control" id="stockPrice" value="100" placeholder="Current price">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Earnings Per Share</label>
+                                        <input type="number" class="form-control" id="eps" value="5" step="0.01" placeholder="Annual EPS">
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculatePE()">
+                                        <i class="fas fa-chart-bar"></i> Analyze Valuation
+                                    </button>
+                                    <div id="peResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -483,27 +708,33 @@
                     <!-- Emergency Fund Calculator -->
                     <div class="col-lg-6 col-md-12 mb-4">
                         <div class="calculator-card">
-                            <div class="calculator-header">
-                                <i class="fas fa-shield-alt"></i> Emergency Fund Calculator
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Monthly Expenses</label>
-                                <input type="number" class="form-control" id="monthlyExpenses" value="4000" placeholder="Total monthly costs">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Job Stability</label>
-                                <select class="form-control" id="jobStability">
-                                    <option value="3">Stable job (3 months)</option>
-                                    <option value="6">Moderate stability (6 months)</option>
-                                    <option value="12">Unstable job (12 months)</option>
-                                </select>
-                            </div>
-                            <button class="btn-calculate" onclick="calculateEmergencyFund()">
-                                <i class="fas fa-shield-alt"></i> Calculate Fund
-                            </button>
-                            <div id="emergencyResult" class="result-box">
-                                <div class="result-value"></div>
-                                <div class="result-details"></div>
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-shield-alt"></i> Emergency Fund Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="mb-3">
+                                        <label class="form-label">Monthly Expenses</label>
+                                        <input type="number" class="form-control" id="monthlyExpenses" value="4000" placeholder="Total monthly costs">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Job Stability</label>
+                                        <select class="form-control" id="jobStability">
+                                            <option value="3">Stable job (3 months)</option>
+                                            <option value="6">Moderate stability (6 months)</option>
+                                            <option value="12">Unstable job (12 months)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculateEmergencyFund()">
+                                        <i class="fas fa-shield-alt"></i> Calculate Fund
+                                    </button>
+                                    <div id="emergencyResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -511,34 +742,89 @@
                     <!-- Retirement Calculator -->
                     <div class="col-lg-6 col-md-12 mb-4">
                         <div class="calculator-card">
-                            <div class="calculator-header">
-                                <i class="fas fa-piggy-bank"></i> Retirement Calculator
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Current Age</label>
-                                <input type="number" class="form-control" id="currentAge" value="30" placeholder="Your current age">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Retirement Age</label>
-                                <input type="number" class="form-control" id="retirementAge" value="65" placeholder="Desired retirement age">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Monthly Savings</label>
-                                <input type="number" class="form-control" id="monthlySavings" value="1000" placeholder="Monthly contribution">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Expected Annual Return (%)</label>
-                                <input type="number" class="form-control" id="returnRate" value="7" step="0.1" placeholder="Expected return">
-                            </div>
-                            <button class="btn-calculate" onclick="calculateRetirement()">
-                                <i class="fas fa-chart-pie"></i> Plan Retirement
-                            </button>
-                            <div id="retirementResult" class="result-box">
-                                <div class="result-value"></div>
-                                <div class="result-details"></div>
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-piggy-bank"></i> Retirement Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Age</label>
+                                        <input type="number" class="form-control" id="currentAge" value="30" placeholder="Your current age">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Retirement Age</label>
+                                        <input type="number" class="form-control" id="retirementAge" value="65" placeholder="Desired retirement age">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Monthly Savings</label>
+                                        <input type="number" class="form-control" id="monthlySavings" value="1000" placeholder="Monthly contribution">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Expected Annual Return (%)</label>
+                                        <input type="number" class="form-control" id="returnRate" value="7" step="0.1" placeholder="Expected return">
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculateRetirement()">
+                                        <i class="fas fa-chart-pie"></i> Plan Retirement
+                                    </button>
+                                    <div id="retirementResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Financial Advisor Bot Section -->
+            <div class="advisor-bot">
+                <div class="advisor-header">
+                    <div class="advisor-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h3 class="advisor-title">Financial Advisor Assistant</h3>
+                        <p class="advisor-subtitle">Ask me anything about investing, financial planning, and market strategies</p>
+                    </div>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-message message-bot">
+                            <div>Hi! I'm your AI Financial Advisor. I can help you understand investments, calculate returns, explain financial concepts, and provide guidance on financial planning. What would you like to know?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input-group">
+                            <textarea class="chat-input" id="chatInput" placeholder="Ask me about investing, taxes, retirement planning..." rows="1"></textarea>
+                            <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-questions">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 10px;">Quick questions:</p>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('How do I start investing?')">
+                        How do I start investing?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What is diversification?')">
+                        What is diversification?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('How much should I save for retirement?')">
+                        How much should I save for retirement?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What are the best investment accounts?')">
+                        What are the best investment accounts?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('How do I calculate compound interest?')">
+                        How do I calculate compound interest?
+                    </button>
                 </div>
             </div>
         </div>
@@ -825,6 +1111,238 @@
                 Safe Monthly Withdrawal (4% rule): ${formatCurrency(Math.round(monthlyWithdrawal))}
             `;
         }
+
+        // Financial Advisor Bot Functions
+        let isTyping = false;
+
+        // Knowledge base for financial advice
+        const financialKnowledge = {
+            'start investing': {
+                keywords: ['start', 'begin', 'investing', 'investment', 'beginner'],
+                response: `To start investing, follow these steps:
+                
+1. **Build an emergency fund** - Save 3-6 months of expenses
+2. **Pay off high-interest debt** - Credit cards, personal loans
+3. **Choose an investment account** - ${currentMarket === 'saudi' ? 'Tadawul brokerage account or mutual funds' : '401(k), IRA, or taxable brokerage'}
+4. **Start with diversified funds** - ${currentMarket === 'saudi' ? 'Saudi equity funds or diversified portfolios' : 'Index funds or ETFs covering broad markets'}
+5. **Invest consistently** - Set up automatic monthly contributions
+
+Remember: Start small, stay consistent, and think long-term!`
+            },
+            'diversification': {
+                keywords: ['diversification', 'diversify', 'spread', 'risk'],
+                response: `Diversification means spreading your investments across different:
+
+• **Asset classes** - Stocks, bonds, real estate
+• **Geographic regions** - ${currentMarket === 'saudi' ? 'Saudi, GCC, international markets' : 'US, international, emerging markets'}
+• **Sectors** - Technology, healthcare, finance, energy
+• **Company sizes** - Large-cap, mid-cap, small-cap stocks
+
+Benefits:
+✓ Reduces overall portfolio risk
+✓ Smoother returns over time
+✓ Protection against single investment failures
+
+The saying goes: "Don't put all your eggs in one basket!"`
+            },
+            'retirement': {
+                keywords: ['retirement', 'retire', 'pension', 'old age'],
+                response: `Retirement planning guidelines:
+
+**How much to save:**
+• Save 10-15% of your income for retirement
+• Use the 4% withdrawal rule for planning
+• ${currentMarket === 'saudi' ? 'Consider GOSI benefits in your calculations' : 'Maximize employer 401(k) match'}
+
+**Where to invest:**
+• ${currentMarket === 'saudi' ? 'Long-term savings accounts, mutual funds, Tadawul stocks' : '401(k), Traditional/Roth IRA, taxable accounts'}
+• Focus on growth investments when young
+• Gradually shift to conservative investments as you age
+
+**Start early:** Time is your biggest advantage due to compound interest!`
+            },
+            'compound interest': {
+                keywords: ['compound', 'interest', 'growth', 'calculation'],
+                response: `Compound interest is "earning interest on your interest"
+
+**Formula:** A = P(1 + r/n)^(nt)
+• A = Final amount
+• P = Principal (initial investment)
+• r = Annual interest rate (as decimal)
+• n = Number of times interest compounds per year
+• t = Time in years
+
+**Example:** ${formatCurrency(10000)} at 7% annually for 30 years:
+${formatCurrency(10000)} × (1.07)^30 = ${formatCurrency(76123)}
+
+The magic happens over time - the longer you invest, the more powerful compounding becomes!`
+            },
+            'accounts': {
+                keywords: ['account', 'accounts', 'where', 'invest'],
+                response: currentMarket === 'saudi' ? 
+                `**Saudi Investment Accounts:**
+
+• **Tadawul Direct** - Trade individual stocks
+• **Bank Investment Accounts** - Managed portfolios
+• **Mutual Funds** - Diversified, professionally managed
+• **Islamic Investment Funds** - Sharia-compliant options
+• **Regular Savings** - High-yield savings accounts
+
+**Best for beginners:** Start with mutual funds or bank investment products for diversification and professional management.` :
+                `**US Investment Accounts:**
+
+• **401(k)** - Employer-sponsored, often with matching
+• **Traditional IRA** - Tax-deductible contributions
+• **Roth IRA** - Tax-free growth and withdrawals
+• **Taxable Brokerage** - No contribution limits, more flexibility
+• **HSA** - Triple tax advantage for healthcare
+
+**Priority order:** 401(k) match → High-interest debt → IRA → Taxable account`
+            }
+        };
+
+        function findBestResponse(question) {
+            const lowerQuestion = question.toLowerCase();
+            
+            for (const [topic, data] of Object.entries(financialKnowledge)) {
+                if (data.keywords.some(keyword => lowerQuestion.includes(keyword))) {
+                    return data.response;
+                }
+            }
+            
+            // Default responses for common patterns
+            if (lowerQuestion.includes('tax')) {
+                return currentMarket === 'saudi' ? 
+                `**Saudi Tax Information:**
+                
+• No personal income tax in Saudi Arabia
+• Zakat may apply to certain investments (2.5% annually)
+• Capital gains from Tadawul trading are generally tax-free
+• Always consult with a local tax advisor for personal situations` :
+                `**US Tax Basics:**
+                
+• Long-term capital gains (>1 year): 0%, 15%, or 20% rates
+• Short-term capital gains (<1 year): Taxed as ordinary income
+• Traditional IRA/401(k): Tax-deferred growth
+• Roth IRA/401(k): Tax-free growth
+                
+Consult a tax professional for personalized advice.`;
+            }
+            
+            if (lowerQuestion.includes('risk')) {
+                return `**Investment Risk Management:**
+                
+• **Diversification** - Spread investments across different assets
+• **Time horizon** - Longer investing periods reduce risk
+• **Asset allocation** - Balance stocks, bonds, and cash
+• **Emergency fund** - Keep 3-6 months expenses in cash
+• **Don't invest money you need within 5 years**
+                
+Risk and return are related - higher potential returns typically mean higher risk.`;
+            }
+            
+            // Generic helpful response
+            return `I'd be happy to help you with financial questions! I can provide information about:
+
+• Investment basics and strategies
+• Retirement planning
+• Compound interest calculations  
+• Account types and tax implications
+• Risk management and diversification
+• ${currentMarket === 'saudi' ? 'Saudi/Islamic finance principles' : 'US tax-advantaged accounts'}
+
+Try asking about specific topics like "How do I start investing?" or "What is diversification?"
+
+*Disclaimer: This is educational information only, not personalized financial advice.*`;
+        }
+
+        function addMessage(message, isUser = false) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isUser ? 'message-user' : 'message-bot'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.innerHTML = message.replace(/\n/g, '<br>');
+            messageDiv.appendChild(contentDiv);
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <span>Financial Advisor is typing</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const question = input.value.trim();
+            
+            if (!question || isTyping) return;
+            
+            // Add user message
+            addMessage(question, true);
+            input.value = '';
+            
+            // Show typing indicator
+            isTyping = true;
+            sendBtn.disabled = true;
+            showTypingIndicator();
+            
+            // Simulate thinking time
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+            
+            // Remove typing indicator and add response
+            removeTypingIndicator();
+            const response = findBestResponse(question);
+            addMessage(response);
+            
+            isTyping = false;
+            sendBtn.disabled = false;
+        }
+
+        function askQuickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        // Chat input handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatInput = document.getElementById('chatInput');
+            
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Auto-resize textarea
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+        });
     </script>
 </body>
 </html>
