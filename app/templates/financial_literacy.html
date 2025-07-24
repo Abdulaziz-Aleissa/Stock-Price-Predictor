@@ -8120,14 +8120,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Show market selector on page load
             document.getElementById('marketSelector').style.display = 'flex';
-            
-            // Debug: Try to populate videos immediately for testing
-            console.log('DOM loaded, testing video population');
-            if (window.populateVideos) {
-                console.log('populateVideos function exists');
-            } else {
-                console.error('populateVideos function not found!');
-            }
         });
 
         // Market selection
@@ -8158,12 +8150,8 @@
 
         // Content population
         function populateVideos() {
-            console.log('populateVideos called for market:', currentMarket);
             const videoGrid = document.getElementById('videoGrid');
             const videos = marketData[currentMarket].videos;
-            
-            console.log('Video grid element:', videoGrid);
-            console.log('Videos data:', videos);
             
             if (!videoGrid) {
                 console.error('Video grid element not found!');
@@ -8186,8 +8174,6 @@
                     </div>
                 </div>
             `).join('');
-            
-            console.log('Videos populated successfully:', videos.length, 'videos');
         }
 
         // Level-based education content
