@@ -8120,6 +8120,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Show market selector on page load
             document.getElementById('marketSelector').style.display = 'flex';
+            
+            // Debug: Try to populate videos immediately for testing
+            console.log('DOM loaded, testing video population');
+            if (window.populateVideos) {
+                console.log('populateVideos function exists');
+            } else {
+                console.error('populateVideos function not found!');
+            }
         });
 
         // Market selection
@@ -8909,8 +8917,8 @@ The saying goes: "Don't put all your eggs in one basket!"`
 • n = Number of times interest compounds per year
 • t = Time in years
 
-**Example:** ${formatCurrency(10000)} at 7% annually for 30 years:
-${formatCurrency(10000)} × (1.07)^30 = ${formatCurrency(76123)}
+**Example:** $10,000 at 7% annually for 30 years:
+$10,000 × (1.07)^30 = $76,123
 
 The magic happens over time - the longer you invest, the more powerful compounding becomes!`
             },
@@ -8943,7 +8951,7 @@ The magic happens over time - the longer you invest, the more powerful compoundi
 **Formula:** P/E = Stock Price ÷ Earnings Per Share (EPS)
 
 **What it means:**
-• Shows how much investors pay for each ${formatCurrency(1)} of company earnings
+• Shows how much investors pay for each $1 of company earnings
 • Higher P/E = investors expect higher future growth
 • Lower P/E = may indicate undervalued stock or poor prospects
 
