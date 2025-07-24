@@ -151,6 +151,158 @@
             display: block;
         }
 
+        /* Learning Level Cards */
+        .level-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+            transition: all 0.3s ease;
+        }
+
+        .beginner-level:before { background: linear-gradient(90deg, #28a745, #34ce57); }
+        .intermediate-level:before { background: linear-gradient(90deg, #ffc107, #ffcd39); }
+        .advanced-level:before { background: linear-gradient(90deg, #dc3545, #e9606f); }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+
+        .level-card.active {
+            border-color: var(--accent);
+            background: rgba(52, 144, 220, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(52, 144, 220, 0.2);
+        }
+
+        .level-header {
+            margin-bottom: 20px;
+        }
+
+        .level-header i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .beginner-level .level-header i { color: #28a745; }
+        .intermediate-level .level-header i { color: #ffc107; }
+        .advanced-level .level-header i { color: #dc3545; }
+
+        .level-header h4 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .level-card p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .level-progress {
+            margin-top: auto;
+        }
+
+        /* Level Content Areas */
+        .level-content {
+            display: none;
+        }
+
+        .level-content.active {
+            display: block;
+        }
+
+        .concept-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 25px;
+        }
+
+        .concept-section h5 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .concept-section h5 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+
+        .concept-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .concept-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .concept-list li:last-child {
+            border-bottom: none;
+        }
+
+        .concept-list li strong {
+            color: var(--text-primary);
+        }
+
+        .resource-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .resource-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            background: var(--accent-dark);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .resource-link i {
+            margin-right: 5px;
+        }
+
         /* Calculator Cards */
         .calculator-card {
             background: var(--card-bg);
@@ -624,10 +776,52 @@
             <!-- Financial Concepts Section -->
             <div class="mb-5">
                 <h2 class="mb-4" style="color: var(--text-primary);">
-                    <i class="fas fa-book"></i> Financial Concepts
+                    <i class="fas fa-graduation-cap"></i> Financial Education Center
                 </h2>
-                <div id="conceptsGrid">
-                    <!-- Concepts will be populated by JavaScript -->
+                
+                <!-- Learning Levels -->
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-3">
+                        <div class="level-card beginner-level" onclick="showLevel('beginner')">
+                            <div class="level-header">
+                                <i class="fas fa-seedling"></i>
+                                <h4>Beginner</h4>
+                            </div>
+                            <p>Start your investment journey with basic concepts and fundamental principles</p>
+                            <div class="level-progress">
+                                <span class="badge bg-success">Foundation Level</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="level-card intermediate-level" onclick="showLevel('intermediate')">
+                            <div class="level-header">
+                                <i class="fas fa-chart-line"></i>
+                                <h4>Intermediate</h4>
+                            </div>
+                            <p>Build on basics with advanced strategies and market analysis techniques</p>
+                            <div class="level-progress">
+                                <span class="badge bg-warning">Growth Level</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="level-card advanced-level" onclick="showLevel('advanced')">
+                            <div class="level-header">
+                                <i class="fas fa-trophy"></i>
+                                <h4>Advanced</h4>
+                            </div>
+                            <p>Master complex investment strategies and professional-level techniques</p>
+                            <div class="level-progress">
+                                <span class="badge bg-danger">Expert Level</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Areas for Each Level -->
+                <div id="levelContent">
+                    <!-- Content will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -776,6 +970,123 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- What If Investment Calculator -->
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="calculator-card">
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-lightbulb"></i> What If Investment Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="mb-3">
+                                        <label class="form-label">Instead of buying...</label>
+                                        <select class="form-control" id="purchaseType">
+                                            <option value="flagship_phone">Latest Flagship Phone (ر.س 4,500)</option>
+                                            <option value="luxury_watch">Luxury Watch (ر.س 15,000)</option>
+                                            <option value="designer_bag">Designer Bag (ر.س 8,000)</option>
+                                            <option value="gaming_setup">Gaming Setup (ر.س 12,000)</option>
+                                            <option value="vacation">Luxury Vacation (ر.س 20,000)</option>
+                                            <option value="custom">Custom Amount</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3" id="customAmountDiv" style="display: none;">
+                                        <label class="form-label">Custom Amount</label>
+                                        <input type="number" class="form-control" id="customAmount" placeholder="Enter custom amount">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Investment Date</label>
+                                        <select class="form-control" id="investmentDate">
+                                            <option value="1">1 year ago</option>
+                                            <option value="2">2 years ago</option>
+                                            <option value="3">3 years ago</option>
+                                            <option value="5">5 years ago</option>
+                                            <option value="10">10 years ago</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Stock/Investment</label>
+                                        <select class="form-control" id="stockChoice">
+                                            <option value="sabic">SABIC (2010) - 8% Annual Return</option>
+                                            <option value="aramco">Saudi Aramco (2380) - 12% Annual Return</option>
+                                            <option value="rajhi">Al Rajhi Bank (1120) - 10% Annual Return</option>
+                                            <option value="snb">Saudi National Bank (1180) - 9% Annual Return</option>
+                                            <option value="sp500">S&P 500 Index - 10% Annual Return</option>
+                                            <option value="tesla">Tesla (TSLA) - 25% Annual Return</option>
+                                            <option value="apple">Apple (AAPL) - 15% Annual Return</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculateWhatIf()">
+                                        <i class="fas fa-magic"></i> See What Could Have Been
+                                    </button>
+                                    <div id="whatIfResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rent vs Buy Calculator -->
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="calculator-card">
+                            <div class="calculator-content">
+                                <div class="calculator-header">
+                                    <i class="fas fa-home"></i> Rent vs Buy Decision Calculator
+                                </div>
+                                <div class="calculator-inputs">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 style="color: var(--text-primary); margin-bottom: 15px;">
+                                                <i class="fas fa-key"></i> Renting Option
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">Monthly Rent</label>
+                                                <input type="number" class="form-control" id="monthlyRent" value="3000" placeholder="Monthly rent">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Annual Rent Increase (%)</label>
+                                                <input type="number" class="form-control" id="rentIncrease" value="3" step="0.1" placeholder="Yearly increase">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 style="color: var(--text-primary); margin-bottom: 15px;">
+                                                <i class="fas fa-home"></i> Buying Option
+                                            </h6>
+                                            <div class="mb-3">
+                                                <label class="form-label">Home Price</label>
+                                                <input type="number" class="form-control" id="homePrice" value="800000" placeholder="Purchase price">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Down Payment (%)</label>
+                                                <input type="number" class="form-control" id="downPayment" value="20" placeholder="Down payment %">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Mortgage Rate (%)</label>
+                                                <input type="number" class="form-control" id="mortgageRate" value="4.5" step="0.1" placeholder="Interest rate">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Time Period (Years)</label>
+                                        <input type="number" class="form-control" id="timePeriod" value="10" placeholder="Analysis period">
+                                    </div>
+                                </div>
+                                <div class="calculator-actions">
+                                    <button class="btn-calculate" onclick="calculateRentVsBuy()">
+                                        <i class="fas fa-balance-scale"></i> Compare Options
+                                    </button>
+                                    <div id="rentBuyResult" class="result-box">
+                                        <div class="result-value"></div>
+                                        <div class="result-details"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -849,28 +1160,170 @@
                     { title: 'Vision 2030 Investment Opportunities', duration: '18:20', icon: 'rocket' },
                     { title: 'GOSI Retirement Planning', duration: '14:15', icon: 'calendar-alt' }
                 ],
-                concepts: [
-                    {
-                        title: 'Understanding Tadawul',
-                        icon: 'building',
-                        content: 'The Saudi Stock Exchange (Tadawul) is the primary securities exchange in Saudi Arabia. Learn about trading hours (10:00 AM - 3:00 PM), settlement procedures, and how to participate in IPOs.'
+                educationLevels: {
+                    beginner: {
+                        title: 'Beginner Level',
+                        description: 'Master the fundamentals of investing and financial planning',
+                        sections: [
+                            {
+                                title: 'Understanding Money & Banking',
+                                icon: 'coins',
+                                concepts: [
+                                    'What is money and how does it work?',
+                                    'Saudi banking system and Islamic banking principles',
+                                    'Types of bank accounts (checking, savings, investment)',
+                                    'Understanding interest (riba) vs profit sharing in Islamic finance',
+                                    'How to read bank statements and manage accounts'
+                                ],
+                                resources: [
+                                    { title: 'SAMA Banking Guide', link: '#', icon: 'book' },
+                                    { title: 'Islamic Finance Basics', link: '#', icon: 'mosque' },
+                                    { title: 'Personal Banking Worksheet', link: '#', icon: 'file-alt' }
+                                ]
+                            },
+                            {
+                                title: 'Introduction to Investing',
+                                icon: 'seedling',
+                                concepts: [
+                                    'What is investing and why should you invest?',
+                                    'Difference between saving and investing',
+                                    'Understanding risk and return in Sharia-compliant investing',
+                                    'Basic investment vehicles: Sukuk, Islamic funds, stocks',
+                                    'How Tadawul (Saudi Stock Exchange) works'
+                                ],
+                                resources: [
+                                    { title: 'Tadawul Beginner Guide', link: '#', icon: 'chart-line' },
+                                    { title: 'Islamic Investment Principles', link: '#', icon: 'balance-scale' },
+                                    { title: 'Investment Goals Planner', link: '#', icon: 'target' }
+                                ]
+                            },
+                            {
+                                title: 'Basic Financial Planning',
+                                icon: 'calculator',
+                                concepts: [
+                                    'Creating a personal budget and expense tracking',
+                                    'Building an emergency fund (3-6 months expenses)',
+                                    'Understanding debt and how to manage it Islamically',
+                                    'Setting short-term and long-term financial goals',
+                                    'Introduction to Zakat and its impact on investments'
+                                ],
+                                resources: [
+                                    { title: 'Budget Planning Template', link: '#', icon: 'table' },
+                                    { title: 'Emergency Fund Calculator', link: '#', icon: 'shield-alt' },
+                                    { title: 'Zakat Investment Guide', link: '#', icon: 'hand-holding-heart' }
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        title: 'Islamic Finance Principles',
-                        icon: 'balance-scale',
-                        content: 'Sharia-compliant investing prohibits interest (riba), gambling (maysir), and excessive uncertainty (gharar). Explore Sukuk bonds, Islamic mutual funds, and halal investment screening.'
+                    intermediate: {
+                        title: 'Intermediate Level',
+                        description: 'Build advanced strategies and market analysis skills',
+                        sections: [
+                            {
+                                title: 'Advanced Investment Strategies',
+                                icon: 'chart-line',
+                                concepts: [
+                                    'Portfolio diversification across sectors and asset classes',
+                                    'Understanding market cycles and timing',
+                                    'Technical analysis basics for stock evaluation',
+                                    'Fundamental analysis: reading financial statements',
+                                    'Vision 2030 investment opportunities and sectors'
+                                ],
+                                resources: [
+                                    { title: 'Portfolio Management Guide', link: '#', icon: 'briefcase' },
+                                    { title: 'Technical Analysis Course', link: '#', icon: 'chart-area' },
+                                    { title: 'Vision 2030 Investment Map', link: '#', icon: 'map' }
+                                ]
+                            },
+                            {
+                                title: 'Risk Management',
+                                icon: 'shield-alt',
+                                concepts: [
+                                    'Types of investment risks and how to mitigate them',
+                                    'Position sizing and portfolio allocation strategies',
+                                    'Stop-loss strategies in Islamic investing',
+                                    'Insurance as risk management (Takaful)',
+                                    'Currency risk in international investments'
+                                ],
+                                resources: [
+                                    { title: 'Risk Assessment Tool', link: '#', icon: 'tachometer-alt' },
+                                    { title: 'Takaful vs Insurance Guide', link: '#', icon: 'umbrella' },
+                                    { title: 'Risk Management Checklist', link: '#', icon: 'clipboard-check' }
+                                ]
+                            },
+                            {
+                                title: 'Market Analysis & Research',
+                                icon: 'search',
+                                concepts: [
+                                    'How to research and analyze Saudi companies',
+                                    'Understanding market indicators and economic factors',
+                                    'Using financial ratios for stock valuation',
+                                    'Sector analysis: oil, petrochemicals, banking, real estate',
+                                    'Global market influences on Saudi markets'
+                                ],
+                                resources: [
+                                    { title: 'Company Analysis Framework', link: '#', icon: 'building' },
+                                    { title: 'Economic Indicators Dashboard', link: '#', icon: 'chart-pie' },
+                                    { title: 'Sector Analysis Reports', link: '#', icon: 'industry' }
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        title: 'Saudi Banking System',
-                        icon: 'university',
-                        content: 'Major Saudi banks include Al Rajhi Bank, Saudi National Bank (SNB), and SABB. Learn about investment accounts, Islamic certificates of deposit, and local brokerage services.'
-                    },
-                    {
-                        title: 'Vision 2030 Sectors',
-                        icon: 'industry',
-                        content: 'Saudi Vision 2030 focuses on tourism, entertainment, renewable energy, and technology. Discover investment opportunities in NEOM, Red Sea Project, and Public Investment Fund initiatives.'
+                    advanced: {
+                        title: 'Advanced Level', 
+                        description: 'Master complex strategies and professional techniques',
+                        sections: [
+                            {
+                                title: 'Advanced Portfolio Management',
+                                icon: 'trophy',
+                                concepts: [
+                                    'Modern Portfolio Theory and asset allocation models',
+                                    'Alternative investments: REITs, commodities, private equity',
+                                    'International diversification while maintaining Sharia compliance',
+                                    'Tax optimization strategies for high-net-worth individuals',
+                                    'Estate planning and wealth transfer in Islamic context'
+                                ],
+                                resources: [
+                                    { title: 'Advanced Portfolio Models', link: '#', icon: 'project-diagram' },
+                                    { title: 'Alternative Investment Guide', link: '#', icon: 'gem' },
+                                    { title: 'Islamic Estate Planning', link: '#', icon: 'users' }
+                                ]
+                            },
+                            {
+                                title: 'Professional Trading Strategies',
+                                icon: 'robot',
+                                concepts: [
+                                    'Advanced technical analysis and chart patterns',
+                                    'Algorithmic trading within Islamic guidelines',
+                                    'Options and derivatives (Sharia-compliant structures)',
+                                    'Market making and liquidity provision',
+                                    'Institutional investment strategies'
+                                ],
+                                resources: [
+                                    { title: 'Advanced Technical Analysis', link: '#', icon: 'chart-bar' },
+                                    { title: 'Islamic Derivatives Guide', link: '#', icon: 'cogs' },
+                                    { title: 'Professional Trading Tools', link: '#', icon: 'tools' }
+                                ]
+                            },
+                            {
+                                title: 'Business & Investment Analysis',
+                                icon: 'building',
+                                concepts: [
+                                    'DCF modeling and business valuation techniques',
+                                    'Private equity and venture capital in Saudi Arabia',
+                                    'Real estate investment analysis and REIT evaluation',
+                                    'Merger & acquisition analysis',
+                                    'Creating investment thesis and due diligence processes'
+                                ],
+                                resources: [
+                                    { title: 'DCF Modeling Course', link: '#', icon: 'calculator' },
+                                    { title: 'PE/VC Market Report', link: '#', icon: 'rocket' },
+                                    { title: 'Due Diligence Checklist', link: '#', icon: 'tasks' }
+                                ]
+                            }
+                        ]
                     }
-                ]
+                }
             },
             us: {
                 name: 'United States 🇺🇸',
@@ -882,28 +1335,170 @@
                     { title: 'ETF Investment Strategies', duration: '19:15', icon: 'layer-group' },
                     { title: 'Tax-Advantaged Investing', duration: '17:00', icon: 'receipt' }
                 ],
-                concepts: [
-                    {
-                        title: 'Stock Exchanges',
-                        icon: 'building',
-                        content: 'The New York Stock Exchange (NYSE) and NASDAQ are the primary US stock exchanges. Learn about trading hours (9:30 AM - 4:00 PM ET), market makers, and order types.'
+                educationLevels: {
+                    beginner: {
+                        title: 'Beginner Level',
+                        description: 'Master the fundamentals of investing and financial planning',
+                        sections: [
+                            {
+                                title: 'Understanding Money & Banking',
+                                icon: 'coins',
+                                concepts: [
+                                    'What is money and how does the Federal Reserve work?',
+                                    'US banking system and different types of financial institutions',
+                                    'Types of bank accounts (checking, savings, money market)',
+                                    'Understanding compound interest and APY',
+                                    'FDIC insurance and how to protect your deposits'
+                                ],
+                                resources: [
+                                    { title: 'Federal Reserve Education', link: '#', icon: 'university' },
+                                    { title: 'Banking Basics Guide', link: '#', icon: 'book' },
+                                    { title: 'Account Comparison Tool', link: '#', icon: 'balance-scale' }
+                                ]
+                            },
+                            {
+                                title: 'Introduction to Investing',
+                                icon: 'seedling',
+                                concepts: [
+                                    'What is investing and the power of compound growth?',
+                                    'Stocks, bonds, and mutual funds explained',
+                                    'Understanding risk vs return in US markets',
+                                    'How NYSE and NASDAQ exchanges work',
+                                    'Introduction to index funds and ETFs'
+                                ],
+                                resources: [
+                                    { title: 'Investing 101 Course', link: '#', icon: 'graduation-cap' },
+                                    { title: 'Stock Market Basics', link: '#', icon: 'chart-line' },
+                                    { title: 'ETF Selection Guide', link: '#', icon: 'layer-group' }
+                                ]
+                            },
+                            {
+                                title: 'Basic Financial Planning',
+                                icon: 'calculator',
+                                concepts: [
+                                    'Creating a budget with the 50/30/20 rule',
+                                    'Building an emergency fund (3-6 months expenses)',
+                                    'Understanding good debt vs bad debt',
+                                    'Credit scores and how they affect your finances',
+                                    'Setting SMART financial goals'
+                                ],
+                                resources: [
+                                    { title: 'Budget Planning Tool', link: '#', icon: 'calculator' },
+                                    { title: 'Credit Score Guide', link: '#', icon: 'credit-card' },
+                                    { title: 'Goal Setting Worksheet', link: '#', icon: 'target' }
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        title: 'Retirement Accounts',
-                        icon: 'piggy-bank',
-                        content: '401(k) plans are employer-sponsored retirement accounts with contribution limits. IRAs (Traditional and Roth) offer tax advantages for individual retirement savings.'
+                    intermediate: {
+                        title: 'Intermediate Level',
+                        description: 'Build advanced strategies and market analysis skills',
+                        sections: [
+                            {
+                                title: 'Advanced Investment Strategies',
+                                icon: 'chart-line',
+                                concepts: [
+                                    'Asset allocation and modern portfolio theory',
+                                    'Dollar-cost averaging and market timing strategies', 
+                                    'Growth vs value investing approaches',
+                                    'International diversification with global ETFs',
+                                    'Tax-loss harvesting and rebalancing strategies'
+                                ],
+                                resources: [
+                                    { title: 'Portfolio Allocation Guide', link: '#', icon: 'pie-chart' },
+                                    { title: 'Investment Strategy Comparison', link: '#', icon: 'balance-scale' },
+                                    { title: 'Rebalancing Calculator', link: '#', icon: 'sync' }
+                                ]
+                            },
+                            {
+                                title: 'Retirement & Tax Planning',
+                                icon: 'piggy-bank',
+                                concepts: [
+                                    '401(k), 403(b), and employer matching strategies',
+                                    'Traditional vs Roth IRA comparison and conversion',
+                                    'Tax-advantaged accounts: HSA, 529 plans',
+                                    'Social Security optimization strategies',
+                                    'Estate planning basics and beneficiary designations'
+                                ],
+                                resources: [
+                                    { title: '401k Optimization Guide', link: '#', icon: 'briefcase' },
+                                    { title: 'Roth Conversion Calculator', link: '#', icon: 'exchange-alt' },
+                                    { title: 'Social Security Planner', link: '#', icon: 'user-clock' }
+                                ]
+                            },
+                            {
+                                title: 'Market Analysis & Research',
+                                icon: 'search',
+                                concepts: [
+                                    'Fundamental analysis: reading financial statements',
+                                    'Technical analysis and chart patterns',
+                                    'Economic indicators and market cycles',
+                                    'Sector rotation strategies',
+                                    'Using financial ratios for stock valuation'
+                                ],
+                                resources: [
+                                    { title: 'Financial Statement Analysis', link: '#', icon: 'file-invoice-dollar' },
+                                    { title: 'Technical Analysis Tools', link: '#', icon: 'chart-area' },
+                                    { title: 'Economic Calendar', link: '#', icon: 'calendar-alt' }
+                                ]
+                            }
+                        ]
                     },
-                    {
-                        title: 'Investment Vehicles',
-                        icon: 'layer-group',
-                        content: 'Exchange-Traded Funds (ETFs), mutual funds, and individual stocks offer different risk/return profiles. Learn about expense ratios, diversification, and asset allocation.'
-                    },
-                    {
-                        title: 'Tax Implications',
-                        icon: 'receipt',
-                        content: 'Capital gains taxes apply to investment profits. Long-term gains (held >1 year) are taxed more favorably than short-term gains. Consider tax-loss harvesting strategies.'
+                    advanced: {
+                        title: 'Advanced Level',
+                        description: 'Master complex strategies and professional techniques',
+                        sections: [
+                            {
+                                title: 'Advanced Portfolio Management',
+                                icon: 'trophy',
+                                concepts: [
+                                    'Factor investing and smart beta strategies',
+                                    'Alternative investments: REITs, commodities, private equity',
+                                    'Options strategies for income and hedging',
+                                    'Tax optimization for high-net-worth individuals',
+                                    'Multi-asset portfolio construction and risk parity'
+                                ],
+                                resources: [
+                                    { title: 'Factor Investing Guide', link: '#', icon: 'project-diagram' },
+                                    { title: 'Options Strategies Manual', link: '#', icon: 'cogs' },
+                                    { title: 'Alternative Investment Analysis', link: '#', icon: 'gem' }
+                                ]
+                            },
+                            {
+                                title: 'Professional Trading & Analysis',
+                                icon: 'robot',
+                                concepts: [
+                                    'Quantitative analysis and algorithmic trading',
+                                    'Derivatives: futures, swaps, and complex instruments',
+                                    'Risk management and position sizing models',
+                                    'Market microstructure and execution algorithms',
+                                    'Behavioral finance and market psychology'
+                                ],
+                                resources: [
+                                    { title: 'Quantitative Methods Course', link: '#', icon: 'calculator' },
+                                    { title: 'Derivatives Handbook', link: '#', icon: 'random' },
+                                    { title: 'Risk Management Tools', link: '#', icon: 'shield-alt' }
+                                ]
+                            },
+                            {
+                                title: 'Business & Investment Analysis',
+                                icon: 'building',
+                                concepts: [
+                                    'DCF modeling and business valuation techniques',
+                                    'Merger & acquisition analysis',
+                                    'Private equity and venture capital evaluation',
+                                    'Real estate investment analysis and REITs',
+                                    'Creating comprehensive investment thesis'
+                                ],
+                                resources: [
+                                    { title: 'Valuation Models Library', link: '#', icon: 'chart-bar' },
+                                    { title: 'M&A Analysis Framework', link: '#', icon: 'handshake' },
+                                    { title: 'Due Diligence Checklist', link: '#', icon: 'tasks' }
+                                ]
+                            }
+                        ]
                     }
-                ]
+                }
             }
         };
 
@@ -930,9 +1525,8 @@
             // Update currency buttons
             updateCurrencyButtons();
             
-            // Populate content
-            populateVideos();
-            populateConcepts();
+            // Don't populate concepts on initial load - wait for level selection
+            showLevel('beginner'); // Show beginner by default
         }
 
         // Currency switching
@@ -965,22 +1559,47 @@
             `).join('');
         }
 
-        function populateConcepts() {
-            const conceptsGrid = document.getElementById('conceptsGrid');
-            const concepts = marketData[currentMarket].concepts;
+        // Level-based education content
+        function showLevel(level) {
+            // Update active level buttons
+            document.querySelectorAll('.level-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`.${level}-level`).classList.add('active');
             
-            conceptsGrid.innerHTML = concepts.map((concept, index) => `
-                <div class="concept-card" onclick="toggleConcept(${index})">
-                    <div class="concept-header">
-                        <i class="fas fa-${concept.icon}"></i>
-                        ${concept.title}
-                        <i class="fas fa-chevron-down ms-auto" id="chevron-${index}"></i>
+            // Show level content
+            const levelContent = document.getElementById('levelContent');
+            const levelData = marketData[currentMarket].educationLevels[level];
+            
+            levelContent.innerHTML = `
+                <div class="level-content active">
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h5><i class="fas fa-graduation-cap"></i> ${levelData.title}</h5>
+                                <p class="mb-0">${levelData.description}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="concept-content" id="content-${index}">
-                        ${concept.content}
-                    </div>
+                    ${levelData.sections.map(section => `
+                        <div class="concept-section">
+                            <h5><i class="fas fa-${section.icon}"></i> ${section.title}</h5>
+                            <ul class="concept-list">
+                                ${section.concepts.map(concept => `
+                                    <li><strong>•</strong> ${concept}</li>
+                                `).join('')}
+                            </ul>
+                            <div class="resource-links">
+                                ${section.resources.map(resource => `
+                                    <a href="${resource.link}" class="resource-link">
+                                        <i class="fas fa-${resource.icon}"></i> ${resource.title}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
+            `;
         }
 
         // Interactive functions
@@ -1111,6 +1730,175 @@
                 Safe Monthly Withdrawal (4% rule): ${formatCurrency(Math.round(monthlyWithdrawal))}
             `;
         }
+
+        // What If Investment Calculator
+        function calculateWhatIf() {
+            const purchaseType = document.getElementById('purchaseType').value;
+            const investmentDate = parseInt(document.getElementById('investmentDate').value);
+            const stockChoice = document.getElementById('stockChoice').value;
+            
+            // Get investment amount
+            let investmentAmount;
+            if (purchaseType === 'custom') {
+                investmentAmount = parseFloat(document.getElementById('customAmount').value);
+            } else {
+                const amounts = {
+                    'flagship_phone': 4500,
+                    'luxury_watch': 15000,
+                    'designer_bag': 8000,
+                    'gaming_setup': 12000,
+                    'vacation': 20000
+                };
+                investmentAmount = amounts[purchaseType];
+            }
+            
+            // Get stock return rate
+            const stockReturns = {
+                'sabic': 0.08,
+                'aramco': 0.12,
+                'rajhi': 0.10,
+                'snb': 0.09,
+                'sp500': 0.10,
+                'tesla': 0.25,
+                'apple': 0.15
+            };
+            
+            const stockNames = {
+                'sabic': 'SABIC (2010)',
+                'aramco': 'Saudi Aramco (2380)',
+                'rajhi': 'Al Rajhi Bank (1120)',
+                'snb': 'Saudi National Bank (1180)',
+                'sp500': 'S&P 500 Index',
+                'tesla': 'Tesla (TSLA)',
+                'apple': 'Apple (AAPL)'
+            };
+            
+            const returnRate = stockReturns[stockChoice];
+            const currentValue = investmentAmount * Math.pow(1 + returnRate, investmentDate);
+            const profit = currentValue - investmentAmount;
+            const profitPercentage = ((profit / investmentAmount) * 100).toFixed(1);
+            
+            // Get purchase description
+            const purchaseNames = {
+                'flagship_phone': 'Latest Flagship Phone',
+                'luxury_watch': 'Luxury Watch',
+                'designer_bag': 'Designer Bag',
+                'gaming_setup': 'Gaming Setup',
+                'vacation': 'Luxury Vacation',
+                'custom': 'Custom Purchase'
+            };
+            
+            document.getElementById('whatIfResult').style.display = 'block';
+            document.querySelector('#whatIfResult .result-value').innerHTML = `
+                <div style="color: #28a745; font-size: 1.2em; font-weight: bold;">
+                    Your ${formatCurrency(investmentAmount)} would be worth ${formatCurrency(Math.round(currentValue))} today!
+                </div>
+            `;
+            document.querySelector('#whatIfResult .result-details').innerHTML = `
+                <strong>Instead of buying:</strong> ${purchaseNames[purchaseType]}<br>
+                <strong>If invested in:</strong> ${stockNames[stockChoice]}<br>
+                <strong>Investment Period:</strong> ${investmentDate} year${investmentDate > 1 ? 's' : ''} ago<br>
+                <strong>Total Profit:</strong> ${formatCurrency(Math.round(profit))}<br>
+                <strong>Return:</strong> +${profitPercentage}%<br><br>
+                <div style="background: rgba(40, 167, 69, 0.1); padding: 10px; border-radius: 8px; margin-top: 10px;">
+                    💡 <strong>Motivation:</strong> This shows the power of investing instead of spending on depreciating assets!
+                </div>
+            `;
+        }
+
+        // Rent vs Buy Calculator
+        function calculateRentVsBuy() {
+            const monthlyRent = parseFloat(document.getElementById('monthlyRent').value);
+            const rentIncrease = parseFloat(document.getElementById('rentIncrease').value) / 100;
+            const homePrice = parseFloat(document.getElementById('homePrice').value);
+            const downPaymentPercent = parseFloat(document.getElementById('downPayment').value) / 100;
+            const mortgageRate = parseFloat(document.getElementById('mortgageRate').value) / 100;
+            const timePeriod = parseInt(document.getElementById('timePeriod').value);
+            
+            // Rent calculations
+            let totalRentCost = 0;
+            let currentRent = monthlyRent;
+            for (let year = 0; year < timePeriod; year++) {
+                totalRentCost += currentRent * 12;
+                currentRent *= (1 + rentIncrease);
+            }
+            
+            // Buy calculations
+            const downPayment = homePrice * downPaymentPercent;
+            const loanAmount = homePrice - downPayment;
+            const monthlyRate = mortgageRate / 12;
+            const totalPayments = timePeriod * 12;
+            
+            // Monthly mortgage payment (principal + interest)
+            const monthlyMortgage = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / 
+                                   (Math.pow(1 + monthlyRate, totalPayments) - 1);
+            
+            const totalMortgagePayments = monthlyMortgage * totalPayments;
+            const totalInterest = totalMortgagePayments - loanAmount;
+            
+            // Estimate home appreciation (3% annually)
+            const homeAppreciation = 0.03;
+            const futureHomeValue = homePrice * Math.pow(1 + homeAppreciation, timePeriod);
+            
+            // Total cost of buying (down payment + mortgage payments + estimated maintenance)
+            const maintenanceCost = homePrice * 0.01 * timePeriod; // 1% per year
+            const totalBuyingCost = downPayment + totalMortgagePayments + maintenanceCost;
+            
+            // Net position after selling
+            const netPositionBuying = futureHomeValue - totalBuyingCost;
+            const netPositionRenting = -totalRentCost; // Negative because it's all expense
+            
+            const difference = netPositionBuying - netPositionRenting;
+            const betterOption = difference > 0 ? 'buying' : 'renting';
+            
+            document.getElementById('rentBuyResult').style.display = 'block';
+            
+            if (betterOption === 'buying') {
+                document.querySelector('#rentBuyResult .result-value').innerHTML = `
+                    <div style="color: #28a745; font-size: 1.1em; font-weight: bold;">
+                        🏠 Buying is better by ${formatCurrency(Math.abs(Math.round(difference)))}
+                    </div>
+                `;
+            } else {
+                document.querySelector('#rentBuyResult .result-value').innerHTML = `
+                    <div style="color: #dc3545; font-size: 1.1em; font-weight: bold;">
+                        🗝️ Renting is better by ${formatCurrency(Math.abs(Math.round(difference)))}
+                    </div>
+                `;
+            }
+            
+            document.querySelector('#rentBuyResult .result-details').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>🗝️ Renting Costs:</strong><br>
+                        Total Rent: ${formatCurrency(Math.round(totalRentCost))}<br>
+                        Final Monthly Rent: ${formatCurrency(Math.round(currentRent))}<br>
+                        Net Position: ${formatCurrency(Math.round(netPositionRenting))}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>🏠 Buying Costs:</strong><br>
+                        Down Payment: ${formatCurrency(Math.round(downPayment))}<br>
+                        Total Mortgage: ${formatCurrency(Math.round(totalMortgagePayments))}<br>
+                        Home Value: ${formatCurrency(Math.round(futureHomeValue))}<br>
+                        Net Position: ${formatCurrency(Math.round(netPositionBuying))}
+                    </div>
+                </div>
+                <div style="background: rgba(23, 162, 184, 0.1); padding: 10px; border-radius: 8px; margin-top: 15px;">
+                    <strong>Analysis Period:</strong> ${timePeriod} years<br>
+                    <strong>Monthly Mortgage:</strong> ${formatCurrency(Math.round(monthlyMortgage))} vs Starting Rent: ${formatCurrency(monthlyRent)}
+                </div>
+            `;
+        }
+
+        // Handle custom amount visibility for What If calculator
+        document.getElementById('purchaseType').addEventListener('change', function() {
+            const customDiv = document.getElementById('customAmountDiv');
+            if (this.value === 'custom') {
+                customDiv.style.display = 'block';
+            } else {
+                customDiv.style.display = 'none';
+            }
+        });
 
         // Financial Advisor Bot Functions
         let isTyping = false;
