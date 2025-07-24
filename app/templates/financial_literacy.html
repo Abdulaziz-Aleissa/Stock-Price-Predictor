@@ -1086,17 +1086,32 @@
                     <button class="quick-question-btn" onclick="askQuickQuestion('How do I start investing?')">
                         How do I start investing?
                     </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What is P/E ratio?')">
+                        What is P/E ratio?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What is P/B ratio?')">
+                        What is P/B ratio?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('When should I buy stocks?')">
+                        When should I buy stocks?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('When should I sell stocks?')">
+                        When should I sell stocks?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What are financial ratios?')">
+                        What are financial ratios?
+                    </button>
                     <button class="quick-question-btn" onclick="askQuickQuestion('What is diversification?')">
                         What is diversification?
                     </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('What is technical analysis?')">
+                        What is technical analysis?
+                    </button>
+                    <button class="quick-question-btn" onclick="askQuickQuestion('Should I time the market?')">
+                        Should I time the market?
+                    </button>
                     <button class="quick-question-btn" onclick="askQuickQuestion('How much should I save for retirement?')">
                         How much should I save for retirement?
-                    </button>
-                    <button class="quick-question-btn" onclick="askQuickQuestion('What are the best investment accounts?')">
-                        What are the best investment accounts?
-                    </button>
-                    <button class="quick-question-btn" onclick="askQuickQuestion('How do I calculate compound interest?')">
-                        How do I calculate compound interest?
                     </button>
                 </div>
             </div>
@@ -8135,8 +8150,22 @@
 
         // Content population
         function populateVideos() {
+            console.log('populateVideos called for market:', currentMarket);
             const videoGrid = document.getElementById('videoGrid');
             const videos = marketData[currentMarket].videos;
+            
+            console.log('Video grid element:', videoGrid);
+            console.log('Videos data:', videos);
+            
+            if (!videoGrid) {
+                console.error('Video grid element not found!');
+                return;
+            }
+            
+            if (!videos || videos.length === 0) {
+                console.error('No videos found for market:', currentMarket);
+                return;
+            }
             
             videoGrid.innerHTML = videos.map(video => `
                 <div class="col-lg-3 col-md-6 mb-3">
@@ -8149,6 +8178,8 @@
                     </div>
                 </div>
             `).join('');
+            
+            console.log('Videos populated successfully:', videos.length, 'videos');
         }
 
         // Level-based education content
@@ -8821,7 +8852,7 @@
             }, { once: true });
         }
 
-        // Knowledge base for financial advice
+        // Knowledge base for financial advice - Enhanced with comprehensive financial metrics
         const financialKnowledge = {
             'start investing': {
                 keywords: ['start', 'begin', 'investing', 'investment', 'beginner'],
@@ -8904,6 +8935,272 @@ The magic happens over time - the longer you invest, the more powerful compoundi
 • **HSA** - Triple tax advantage for healthcare
 
 **Priority order:** 401(k) match → High-interest debt → IRA → Taxable account`
+            },
+            'pe ratio': {
+                keywords: ['pe', 'p/e', 'price to earnings', 'price earnings', 'pe ratio', 'p/e ratio'],
+                response: `**P/E Ratio (Price-to-Earnings) Explained:**
+
+**Formula:** P/E = Stock Price ÷ Earnings Per Share (EPS)
+
+**What it means:**
+• Shows how much investors pay for each ${formatCurrency(1)} of company earnings
+• Higher P/E = investors expect higher future growth
+• Lower P/E = may indicate undervalued stock or poor prospects
+
+**Interpretation Guidelines:**
+• **Low P/E (5-15):** Potentially undervalued, mature companies, value stocks
+• **Medium P/E (15-25):** Market average, balanced valuation
+• **High P/E (25+):** Growth expectations, potentially overvalued
+
+**${currentMarket === 'saudi' ? 'Tadawul' : 'US Stock'} Market Context:**
+• Compare P/E within same industry/sector
+• ${currentMarket === 'saudi' ? 'Saudi banking stocks typically have P/E 10-15' : 'Tech stocks often have higher P/E than utilities'}
+• Consider forward P/E for future earnings estimates
+
+**When to use:** Best for comparing similar companies, not standalone decision factor.`
+            },
+            'pb ratio': {
+                keywords: ['pb', 'p/b', 'price to book', 'price book', 'pb ratio', 'p/b ratio', 'book value'],
+                response: `**P/B Ratio (Price-to-Book) Explained:**
+
+**Formula:** P/B = Stock Price ÷ Book Value Per Share
+
+**What Book Value means:**
+• Company's net worth if liquidated today
+• Assets minus liabilities, divided by shares outstanding
+• Tangible book value excludes intangible assets
+
+**Interpretation Guidelines:**
+• **P/B < 1:** Stock trading below book value (potentially undervalued)
+• **P/B 1-3:** Reasonable valuation for most companies  
+• **P/B > 3:** Premium valuation, growth or intangible value expected
+
+**Best used for:**
+• Banks and financial institutions
+• Manufacturing and asset-heavy companies
+• Value investing analysis
+
+**Less useful for:**
+• Technology companies (few physical assets)
+• Service companies
+• Companies with significant intangible assets
+
+**${currentMarket === 'saudi' ? 'Saudi' : 'US'} Market tip:** Combine with ROE - high ROE can justify higher P/B ratios.`
+            },
+            'when to buy': {
+                keywords: ['when to buy', 'buy signal', 'buying opportunity', 'entry point', 'when buy'],
+                response: `**When to BUY Stocks - Key Indicators:**
+
+**Fundamental Signals:**
+• **Low P/E ratio** compared to industry average
+• **Strong earnings growth** (15%+ annually)
+• **Increasing revenue** for 2+ consecutive quarters
+• **Low debt-to-equity** ratio (<50%)
+• **ROE > 15%** indicates efficient management
+
+**Technical Signals:**
+• Stock breaks above resistance level
+• Moving averages trending upward (50-day > 200-day)
+• RSI between 30-70 (not overbought)
+• Higher trading volume on price increases
+
+**Market Conditions:**
+• ${currentMarket === 'saudi' ? 'Saudi Vision 2030 beneficiary sectors' : 'Market corrections (10-20% drops)'}
+• Economic data showing growth
+• Lower interest rates generally favor stocks
+
+**Dollar-Cost Averaging:**
+• Buy regularly regardless of price
+• Reduces timing risk
+• Builds position over time
+
+**Red Flags to Avoid:**
+• Buying after 50%+ price increases
+• FOMO (Fear of Missing Out) purchases
+• Buying without research
+
+**Remember:** Time in market beats timing the market!`
+            },
+            'when to hold': {
+                keywords: ['when to hold', 'hold signal', 'holding strategy', 'when hold', 'keep stock'],
+                response: `**When to HOLD Stocks - Stay the Course:**
+
+**Strong Hold Signals:**
+• **Business fundamentals remain strong**
+• **Revenue and earnings still growing**
+• **Competitive advantage (moat) intact**
+• **Management executing on strategy**
+• **P/E ratio still reasonable for growth rate**
+
+**Market Volatility - Keep Holding If:**
+• Short-term price drops (10-20%)
+• Broader market decline affecting all stocks
+• Temporary news events
+• Your investment thesis hasn't changed
+
+**Long-term Hold Criteria:**
+• **Quality companies:** Strong brand, market leadership
+• **Dividend growers:** Increasing payouts annually
+• **Economic moats:** High barriers to entry
+• **${currentMarket === 'saudi' ? 'Vision 2030 aligned companies' : 'Innovation leaders in growing sectors'}`
+
+**Emotional Discipline:**
+• Don't panic sell on bad news
+• Ignore daily price fluctuations
+• Focus on 3-5 year outlook
+• Reinvest dividends for compounding
+
+**Review Holdings Annually:**
+• Check if story still intact
+• Compare performance to benchmarks
+• Rebalance if needed
+
+**Warren Buffett wisdom:** "Our favorite holding period is forever" - for quality companies.`
+            },
+            'when to sell': {
+                keywords: ['when to sell', 'sell signal', 'exit strategy', 'when sell', 'take profit'],
+                response: `**When to SELL Stocks - Exit Strategies:**
+
+**Fundamental Deterioration:**
+• **Declining earnings** for 2+ consecutive quarters
+• **Loss of market share** to competitors
+• **High debt levels** threatening business
+• **Management changes/scandals**
+• **Disruption of business model**
+
+**Valuation Concerns:**
+• **P/E ratio extremely high** (2x+ industry average)
+• **Stock price 100%+ above fair value**
+• **Market cap exceeds reasonable projections**
+
+**Technical Sell Signals:**
+• Breaking below key support levels
+• Moving averages turning downward
+• RSI above 80 (severely overbought)
+• High volume on price declines
+
+**Strategic Reasons:**
+• **Rebalancing portfolio** (position too large)
+• **Tax-loss harvesting** for offset gains
+• **Better opportunities** elsewhere
+• **Need cash** for emergencies
+
+**Profit-Taking Rules:**
+• Sell 25-50% after 100% gains
+• Trim positions exceeding 10% of portfolio
+• Take profits in overvalued markets
+
+**${currentMarket === 'saudi' ? 'Saudi' : 'US'} Market Specific:**
+• ${currentMarket === 'saudi' ? 'Sector rotation away from Vision 2030 themes' : 'Fed interest rate increases hurting growth stocks'}
+
+**Don't sell because of:** Daily volatility, short-term bad news, market crashes (if fundamentals strong).`
+            },
+            'financial ratios': {
+                keywords: ['ratios', 'financial ratios', 'roe', 'roa', 'debt equity', 'current ratio', 'metrics'],
+                response: `**Key Financial Ratios for Stock Analysis:**
+
+**Profitability Ratios:**
+• **ROE (Return on Equity):** Net Income ÷ Shareholders' Equity
+  - Good: >15%, Excellent: >20%
+• **ROA (Return on Assets):** Net Income ÷ Total Assets
+  - Good: >5%, varies by industry
+• **Gross Margin:** (Revenue - COGS) ÷ Revenue
+  - Higher margins = pricing power
+
+**Liquidity Ratios:**
+• **Current Ratio:** Current Assets ÷ Current Liabilities
+  - Healthy: 1.5-3.0
+• **Quick Ratio:** (Current Assets - Inventory) ÷ Current Liabilities
+  - Good: >1.0
+
+**Leverage Ratios:**
+• **Debt-to-Equity:** Total Debt ÷ Shareholders' Equity
+  - Low risk: <50%, High risk: >100%
+• **Interest Coverage:** EBIT ÷ Interest Expenses
+  - Safe: >5x coverage
+
+**Efficiency Ratios:**
+• **Asset Turnover:** Revenue ÷ Total Assets
+  - Higher = more efficient asset use
+• **Inventory Turnover:** COGS ÷ Average Inventory
+
+**${currentMarket === 'saudi' ? 'Saudi' : 'US'} Market Benchmarks:**
+${currentMarket === 'saudi' ? '• Saudi banks: ROE 12-18%, D/E 10-15%\n• Saudi Aramco: High margins, low debt' : '• Tech companies: High ROE, low debt\n• Utilities: Lower ROE, higher debt acceptable'}
+
+**Pro tip:** Compare ratios within the same industry for meaningful analysis.`
+            },
+            'technical analysis': {
+                keywords: ['technical analysis', 'charts', 'moving average', 'rsi', 'macd', 'support', 'resistance'],
+                response: `**Technical Analysis - Reading Price Charts:**
+
+**Key Indicators:**
+• **Moving Averages:** Trend direction
+  - 50-day above 200-day = Bullish
+  - Price above MA = Support level
+• **RSI (Relative Strength Index):** Momentum
+  - Below 30 = Oversold (buy signal)
+  - Above 70 = Overbought (sell signal)
+• **MACD:** Trend changes and momentum
+  - MACD line crossing above signal = Buy
+  - Crossing below = Sell
+
+**Support & Resistance:**
+• **Support:** Price level where buying interest emerges
+• **Resistance:** Price level where selling pressure appears  
+• **Breakouts:** When price moves beyond these levels
+
+**Chart Patterns:**
+• **Head & Shoulders:** Reversal pattern (bearish)
+• **Double Bottom:** Bullish reversal
+• **Triangles:** Continuation patterns
+• **Cup & Handle:** Long-term bullish pattern
+
+**Volume Analysis:**
+• High volume confirms price movements
+• Low volume = weak signals
+• Volume spikes often precede major moves
+
+**${currentMarket === 'saudi' ? 'Tadawul' : 'US Stock'} Market Application:**
+• ${currentMarket === 'saudi' ? 'Saudi stocks: Watch for Ramadan/Eid patterns' : 'US stocks: Earnings season volatility patterns'}
+• Best timeframes: Daily for swing trading, weekly for long-term
+
+**Remember:** Technical analysis works best combined with fundamental analysis!`
+            },
+            'market timing': {
+                keywords: ['market timing', 'timing market', 'when to enter', 'market cycle', 'bull market', 'bear market'],
+                response: `**Market Timing vs. Time in Market:**
+
+**Market Cycles:**
+• **Bull Market:** Rising prices, optimism (avg. 2-5 years)
+• **Bear Market:** Declining prices, pessimism (avg. 6-18 months)
+• **Corrections:** 10-20% temporary declines
+
+**Timing Indicators:**
+• **Valuation:** P/E ratios vs historical averages
+• **Sentiment:** Fear/Greed index, VIX levels
+• **Economic:** Interest rates, inflation, GDP growth
+• **Technical:** Market breadth, momentum indicators
+
+**Dollar-Cost Averaging (Better Strategy):**
+• Invest fixed amount regularly
+• Reduces timing risk
+• Buys more shares when prices low
+• Natural discipline against emotions
+
+**${currentMarket === 'saudi' ? 'Saudi' : 'US'} Market Specific:**
+• ${currentMarket === 'saudi' ? 'Oil prices affect Tadawul significantly' : 'Fed policy drives US market cycles'}
+• ${currentMarket === 'saudi' ? 'Vision 2030 creates long-term structural growth' : 'Technology disruption creates new opportunities'}
+
+**Warren Buffett's Advice:**
+"Time in the market beats timing the market"
+
+**Best Approach:**
+1. Stay invested for long-term
+2. Add more during market drops
+3. Rebalance annually
+4. Ignore daily noise
+
+**Bottom Line:** Consistent investing beats perfect timing attempts!`
             }
         };
 
