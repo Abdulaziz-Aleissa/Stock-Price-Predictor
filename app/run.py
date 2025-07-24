@@ -183,6 +183,10 @@ def get_market_context(ticker):
 def index():
     return render_template('main.html')
 
+@app.route('/financial-literacy')
+def financial_literacy():
+    return render_template('financial_literacy.html')
+
 
 
 
