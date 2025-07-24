@@ -40,6 +40,9 @@
             </form>
 
             <div class="mt-4">
+                <p>
+                    <a href="{{ url_for('financial_literacy') }}" class="btn btn-custom me-2">📚 Financial Literacy</a>
+                </p>
                 {% if not current_user.is_authenticated %}
                 <p>
                     <a href="{{ url_for('login') }}" class="btn btn-custom me-2">Login</a>

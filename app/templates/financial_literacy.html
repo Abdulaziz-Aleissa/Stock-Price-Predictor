@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Literacy - Stock Price Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .literacy-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .section-title {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .subsection {
+            margin-bottom: 25px;
+        }
+        
+        .subsection h4 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+        }
+        
+        .concept-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .concept-list li {
+            background: var(--input-bg);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .calculator-card {
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .calculator-input {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            width: 100%;
+        }
+        
+        .calculator-result {
+            background: var(--accent);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .nav-breadcrumb {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-breadcrumb a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .key-point {
+            background: linear-gradient(135deg, var(--accent), var(--button-hover));
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .warning-box {
+            background: rgba(245, 101, 101, 0.1);
+            border: 1px solid var(--negative);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .success-box {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid var(--positive);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .interactive-element {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .interactive-element:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glossary-term {
+            font-weight: bold;
+            color: var(--accent);
+            cursor: help;
+            border-bottom: 1px dotted var(--accent);
+        }
+        
+        .table th {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        
+        .table td {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+        
+        .btn-calculate {
+            background: var(--accent);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-calculate:hover {
+            background: var(--button-hover);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-switch">
+        <div class="switch-track">
+            <div class="switch-icons">
+                <div class="sun">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                <div class="moon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </div>
+            </div>
+            <div class="switch-circle"></div>
+        </div>
+    </div>
+
+    <div class="literacy-container">
+        <div class="nav-breadcrumb">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">Financial Literacy</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="text-center mb-5">
+            <h1 class="display-4 text-primary">Financial Literacy Center</h1>
+            <p class="lead">Master the fundamentals of investing and financial planning</p>
+        </div>
+
+        <!-- Basic Financial Concepts -->
+        <div class="section-card">
+            <h2 class="section-title">📚 Basic Financial Concepts</h2>
+            
+            <div class="subsection">
+                <h4>Understanding Securities</h4>
+                <ul class="concept-list">
+                    <li>
+                        <strong><span class="glossary-term">Stocks</span>:</strong> Shares of ownership in a company. When you buy stock, you become a partial owner and have a claim on the company's assets and earnings.
+                    </li>
+                    <li>
+                        <strong><span class="glossary-term">Bonds</span>:</strong> Debt securities where you lend money to a government or corporation for a fixed period at a fixed interest rate.
+                    </li>
+                    <li>
+                        <strong><span class="glossary-term">ETFs</span>:</strong> Exchange-Traded Funds that track an index, commodity, bonds, or basket of assets like an index fund.
+                    </li>
+                    <li>
+                        <strong><span class="glossary-term">Mutual Funds</span>:</strong> Investment vehicles made up of a pool of money collected from many investors to invest in securities.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Market Capitalization & Valuation</h4>
+                <div class="key-point">
+                    <strong>Market Cap = Share Price × Outstanding Shares</strong>
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Large-cap</strong>: Companies with market cap > $10 billion (typically more stable)</li>
+                    <li><strong>Mid-cap</strong>: Companies with market cap $2-10 billion (balanced growth/stability)</li>
+                    <li><strong>Small-cap</strong>: Companies with market cap < $2 billion (higher growth potential, more volatile)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Risk vs. Return Principles</h4>
+                <div class="success-box">
+                    <strong>Golden Rule:</strong> Higher potential returns typically come with higher risk. There's no such thing as a guaranteed high-return, low-risk investment.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Conservative</strong>: Government bonds, CDs (3-5% return, low risk)</li>
+                    <li><strong>Moderate</strong>: Blue-chip stocks, index funds (6-8% return, moderate risk)</li>
+                    <li><strong>Aggressive</strong>: Growth stocks, small-caps (10%+ potential, high risk)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Diversification Strategies</h4>
+                <div class="warning-box">
+                    <strong>Warning:</strong> "Don't put all your eggs in one basket" - spreading investments across different assets reduces overall portfolio risk.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Asset Class Diversification</strong>: Stocks, bonds, real estate, commodities</li>
+                    <li><strong>Geographic Diversification</strong>: Domestic vs. international markets</li>
+                    <li><strong>Sector Diversification</strong>: Technology, healthcare, finance, etc.</li>
+                    <li><strong>Time Diversification</strong>: Dollar-cost averaging over time</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Investment Fundamentals -->
+        <div class="section-card">
+            <h2 class="section-title">💼 Investment Fundamentals</h2>
+            
+            <div class="subsection">
+                <h4>Types of Investment Accounts</h4>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Account Type</th>
+                                <th>Contribution Limit (2024)</th>
+                                <th>Tax Treatment</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>401(k)</strong></td>
+                                <td>$23,000 ($30,500 if 50+)</td>
+                                <td>Pre-tax contributions, taxed on withdrawal</td>
+                                <td>Employer matching</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Roth IRA</strong></td>
+                                <td>$7,000 ($8,000 if 50+)</td>
+                                <td>After-tax contributions, tax-free growth</td>
+                                <td>Young investors</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Traditional IRA</strong></td>
+                                <td>$7,000 ($8,000 if 50+)</td>
+                                <td>Pre-tax contributions, taxed on withdrawal</td>
+                                <td>Tax deduction now</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Taxable Account</strong></td>
+                                <td>No limit</td>
+                                <td>Capital gains tax on profits</td>
+                                <td>Flexibility needed</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Dollar-Cost Averaging</h4>
+                <div class="calculator-card interactive-element">
+                    <h5>DCA Calculator</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Monthly Investment ($):</label>
+                            <input type="number" class="calculator-input" id="dca-amount" value="500">
+                            
+                            <label>Number of Years:</label>
+                            <input type="number" class="calculator-input" id="dca-years" value="10">
+                            
+                            <label>Expected Annual Return (%):</label>
+                            <input type="number" class="calculator-input" id="dca-return" value="7" step="0.1">
+                            
+                            <button class="btn-calculate" onclick="calculateDCA()">Calculate</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="dca-result" class="calculator-result" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <strong>DCA Benefits:</strong> Reduces the impact of volatility by spreading purchases over time, potentially lowering your average cost per share.
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Asset Allocation Strategies</h4>
+                <ul class="concept-list">
+                    <li><strong>Age-Based Rule</strong>: Stock % = 100 - Your Age (e.g., at 30: 70% stocks, 30% bonds)</li>
+                    <li><strong>Conservative (60/40)</strong>: 60% stocks, 40% bonds - stable, moderate growth</li>
+                    <li><strong>Moderate (70/30)</strong>: 70% stocks, 30% bonds - balanced approach</li>
+                    <li><strong>Aggressive (80/20 or 90/10)</strong>: High stock allocation for maximum growth</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Time Horizon & Investment Goals</h4>
+                <div class="success-box">
+                    <strong>Time is your best friend:</strong> The longer your investment horizon, the more risk you can potentially take for higher returns.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Short-term (< 3 years)</strong>: Emergency fund, CDs, high-yield savings</li>
+                    <li><strong>Medium-term (3-10 years)</strong>: Conservative portfolio, target-date funds</li>
+                    <li><strong>Long-term (10+ years)</strong>: Growth stocks, aggressive portfolios for retirement</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Stock Market Education -->
+        <div class="section-card">
+            <h2 class="section-title">📈 Stock Market Education</h2>
+            
+            <div class="subsection">
+                <h4>How Stock Exchanges Work</h4>
+                <ul class="concept-list">
+                    <li><strong>NYSE (New York Stock Exchange)</strong>: Largest exchange, traditional floor trading + electronic</li>
+                    <li><strong>NASDAQ</strong>: Electronic exchange, tech-heavy companies</li>
+                    <li><strong>Market Hours</strong>: 9:30 AM - 4:00 PM ET, Monday-Friday</li>
+                    <li><strong>After Hours Trading</strong>: 4:00 PM - 8:00 PM ET (higher volatility, lower volume)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Reading Financial Statements</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="concept-list">
+                            <li><strong>Income Statement</strong>
+                                <ul>
+                                    <li>Revenue/Sales</li>
+                                    <li>Operating Expenses</li>
+                                    <li>Net Income</li>
+                                    <li>Earnings Per Share (EPS)</li>
+                                </ul>
+                            </li>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="concept-list">
+                            <li><strong>Balance Sheet</strong>
+                                <ul>
+                                    <li>Assets</li>
+                                    <li>Liabilities</li>
+                                    <li>Shareholders' Equity</li>
+                                    <li>Book Value</li>
+                                </ul>
+                            </li>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="concept-list">
+                            <li><strong>Cash Flow Statement</strong>
+                                <ul>
+                                    <li>Operating Cash Flow</li>
+                                    <li>Investing Cash Flow</li>
+                                    <li>Financing Cash Flow</li>
+                                    <li>Free Cash Flow</li>
+                                </ul>
+                            </li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Key Financial Ratios & Metrics</h4>
+                <div class="calculator-card interactive-element">
+                    <h5>P/E Ratio Calculator</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Stock Price ($):</label>
+                            <input type="number" class="calculator-input" id="stock-price" value="100" step="0.01">
+                            
+                            <label>Earnings Per Share ($):</label>
+                            <input type="number" class="calculator-input" id="eps" value="5" step="0.01">
+                            
+                            <button class="btn-calculate" onclick="calculatePE()">Calculate P/E Ratio</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="pe-result" class="calculator-result" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ratio</th>
+                                <th>Formula</th>
+                                <th>What It Measures</th>
+                                <th>Good Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>P/E Ratio</strong></td>
+                                <td>Price ÷ EPS</td>
+                                <td>How much investors pay per dollar of earnings</td>
+                                <td>15-25 (varies by industry)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>P/B Ratio</strong></td>
+                                <td>Price ÷ Book Value</td>
+                                <td>Market value vs. accounting value</td>
+                                <td>1-3</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ROE</strong></td>
+                                <td>Net Income ÷ Equity</td>
+                                <td>How efficiently company uses equity</td>
+                                <td>10-20%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Debt-to-Equity</strong></td>
+                                <td>Total Debt ÷ Equity</td>
+                                <td>Company's financial leverage</td>
+                                <td>< 1.0 (varies by industry)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Market Volatility & Cycles</h4>
+                <div class="warning-box">
+                    <strong>Important:</strong> Market volatility is normal. The S&P 500 has experienced corrections (10%+ drops) about once every 1-2 years historically.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Bull Market</strong>: Sustained upward trend (20%+ gain from recent low)</li>
+                    <li><strong>Bear Market</strong>: Sustained downward trend (20%+ drop from recent high)</li>
+                    <li><strong>Correction</strong>: 10-20% decline from recent highs</li>
+                    <li><strong>Market Cycles</strong>: Expansion → Peak → Contraction → Trough → Recovery</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Risk Management -->
+        <div class="section-card">
+            <h2 class="section-title">🛡️ Risk Management</h2>
+            
+            <div class="subsection">
+                <h4>Types of Investment Risks</h4>
+                <ul class="concept-list">
+                    <li><strong>Market Risk</strong>: Overall market movements affecting all securities</li>
+                    <li><strong>Company Risk</strong>: Specific to individual companies (earnings, management, competition)</li>
+                    <li><strong>Industry Risk</strong>: Sector-specific risks (regulation changes, technology shifts)</li>
+                    <li><strong>Interest Rate Risk</strong>: How changing rates affect bond and stock prices</li>
+                    <li><strong>Inflation Risk</strong>: Purchasing power erosion over time</li>
+                    <li><strong>Currency Risk</strong>: Exchange rate fluctuations (for international investments)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Portfolio Diversification</h4>
+                <div class="calculator-card interactive-element">
+                    <h5>Portfolio Risk Calculator</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Stock Allocation (%):</label>
+                            <input type="number" class="calculator-input" id="stock-allocation" value="70" min="0" max="100">
+                            
+                            <label>Bond Allocation (%):</label>
+                            <input type="number" class="calculator-input" id="bond-allocation" value="20" min="0" max="100">
+                            
+                            <label>Cash/Other Allocation (%):</label>
+                            <input type="number" class="calculator-input" id="cash-allocation" value="10" min="0" max="100">
+                            
+                            <button class="btn-calculate" onclick="calculatePortfolioRisk()">Analyze Portfolio</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="portfolio-result" class="calculator-result" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Emergency Fund Importance</h4>
+                <div class="key-point">
+                    <strong>Rule of Thumb:</strong> Maintain 3-6 months of living expenses in a liquid, accessible account before investing.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Stable Income</strong>: 3 months of expenses minimum</li>
+                    <li><strong>Variable Income</strong>: 6-12 months of expenses</li>
+                    <li><strong>Single Income Household</strong>: 6+ months of expenses</li>
+                    <li><strong>Where to Keep It</strong>: High-yield savings, money market, short-term CDs</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Insurance Considerations</h4>
+                <ul class="concept-list">
+                    <li><strong>Health Insurance</strong>: Essential protection against medical costs</li>
+                    <li><strong>Life Insurance</strong>: Term life for dependents (10-12x annual income)</li>
+                    <li><strong>Disability Insurance</strong>: Protects future earnings (often through employer)</li>
+                    <li><strong>Property Insurance</strong>: Home/auto protection for major assets</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Advanced Topics -->
+        <div class="section-card">
+            <h2 class="section-title">🎓 Advanced Topics</h2>
+            
+            <div class="subsection">
+                <h4>Options & Derivatives Basics</h4>
+                <div class="warning-box">
+                    <strong>Warning:</strong> Options and derivatives are complex instruments. Only trade them if you fully understand the risks.
+                </div>
+                <ul class="concept-list">
+                    <li><strong>Call Options</strong>: Right to buy a stock at a specific price (bullish strategy)</li>
+                    <li><strong>Put Options</strong>: Right to sell a stock at a specific price (bearish/protective strategy)</li>
+                    <li><strong>Covered Calls</strong>: Selling call options on stocks you own (income generation)</li>
+                    <li><strong>Protective Puts</strong>: Buying puts to protect against downside (insurance)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>ESG Investing</h4>
+                <ul class="concept-list">
+                    <li><strong>Environmental</strong>: Climate change, resource scarcity, waste management</li>
+                    <li><strong>Social</strong>: Labor practices, human rights, community impact</li>
+                    <li><strong>Governance</strong>: Board diversity, executive compensation, business ethics</li>
+                    <li><strong>Implementation</strong>: ESG funds, screening strategies, impact investing</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h4>Tax Implications of Investing</h4>
+                <div class="calculator-card interactive-element">
+                    <h5>Capital Gains Tax Calculator</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Purchase Price ($):</label>
+                            <input type="number" class="calculator-input" id="purchase-price" value="10000" step="0.01">
+                            
+                            <label>Sale Price ($):</label>
+                            <input type="number" class="calculator-input" id="sale-price" value="15000" step="0.01">
+                            
+                            <label>Holding Period:</label>
+                            <select class="calculator-input" id="holding-period">
+                                <option value="short">Short-term (< 1 year)</option>
+                                <option value="long">Long-term (> 1 year)</option>
+                            </select>
+                            
+                            <label>Tax Bracket (%):</label>
+                            <input type="number" class="calculator-input" id="tax-bracket" value="22" min="0" max="50">
+                            
+                            <button class="btn-calculate" onclick="calculateCapitalGains()">Calculate Tax</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="tax-result" class="calculator-result" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="key-point">
+                    <strong>Tax Optimization Tips:</strong>
+                    <ul style="margin: 10px 0 0 20px; color: white;">
+                        <li>Hold investments > 1 year for lower long-term capital gains rates</li>
+                        <li>Use tax-advantaged accounts (401k, IRA) for high-growth investments</li>
+                        <li>Consider tax-loss harvesting to offset gains</li>
+                        <li>Municipal bonds may be tax-free for your bracket</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h4>Retirement Planning Strategies</h4>
+                <div class="calculator-card interactive-element">
+                    <h5>Retirement Calculator</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Current Age:</label>
+                            <input type="number" class="calculator-input" id="current-age" value="30" min="18" max="100">
+                            
+                            <label>Retirement Age:</label>
+                            <input type="number" class="calculator-input" id="retirement-age" value="65" min="50" max="100">
+                            
+                            <label>Current Savings ($):</label>
+                            <input type="number" class="calculator-input" id="current-savings" value="50000">
+                            
+                            <label>Monthly Contribution ($):</label>
+                            <input type="number" class="calculator-input" id="monthly-contribution" value="500">
+                            
+                            <label>Expected Annual Return (%):</label>
+                            <input type="number" class="calculator-input" id="expected-return" value="7" step="0.1">
+                            
+                            <button class="btn-calculate" onclick="calculateRetirement()">Calculate</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="retirement-result" class="calculator-result" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <ul class="concept-list">
+                    <li><strong>4% Rule</strong>: Withdraw 4% of portfolio annually in retirement (conservative estimate)</li>
+                    <li><strong>Sequence of Returns Risk</strong>: Market crashes early in retirement can be devastating</li>
+                    <li><strong>Glide Path</strong>: Gradually reduce risk as you approach/enter retirement</li>
+                    <li><strong>Healthcare Costs</strong>: Plan for increased medical expenses in retirement</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Action Items & Resources -->
+        <div class="section-card">
+            <h2 class="section-title">🎯 Next Steps & Action Items</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Getting Started Checklist</h4>
+                    <ul class="concept-list">
+                        <li>✅ Build emergency fund (3-6 months expenses)</li>
+                        <li>✅ Pay off high-interest debt (credit cards)</li>
+                        <li>✅ Maximize employer 401(k) match</li>
+                        <li>✅ Open and fund an IRA</li>
+                        <li>✅ Start with low-cost index funds</li>
+                        <li>✅ Automate your investments</li>
+                        <li>✅ Review and rebalance annually</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Recommended Resources</h4>
+                    <ul class="concept-list">
+                        <li><strong>Books:</strong> "A Random Walk Down Wall Street", "The Bogleheads' Guide to Investing"</li>
+                        <li><strong>Websites:</strong> SEC.gov Investor.gov, Morningstar.com</li>
+                        <li><strong>Tools:</strong> Personal Capital, Mint, YNAB for budgeting</li>
+                        <li><strong>Brokers:</strong> Fidelity, Vanguard, Schwab (low-cost options)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <div class="key-point">
+                <h4>Remember: This is Educational Content Only</h4>
+                <p>This information is for educational purposes and should not be considered personalized financial advice. Always consult with a qualified financial advisor for decisions specific to your situation.</p>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{{ url_for('index') }}" class="btn btn-custom me-3">Try Stock Predictor</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-custom">Go to Dashboard</a>
+                {% else %}
+                <a href="{{ url_for('signup') }}" class="btn btn-outline-custom">Sign Up for Portfolio Tracking</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    
+    <script>
+        // Dollar-Cost Averaging Calculator
+        function calculateDCA() {
+            const monthlyAmount = parseFloat(document.getElementById('dca-amount').value);
+            const years = parseFloat(document.getElementById('dca-years').value);
+            const annualReturn = parseFloat(document.getElementById('dca-return').value) / 100;
+            
+            const months = years * 12;
+            const monthlyReturn = annualReturn / 12;
+            
+            // Future Value of Annuity formula
+            const futureValue = monthlyAmount * (((1 + monthlyReturn) ** months - 1) / monthlyReturn);
+            const totalContributions = monthlyAmount * months;
+            const totalGains = futureValue - totalContributions;
+            
+            document.getElementById('dca-result').innerHTML = `
+                <h6>DCA Results:</h6>
+                <p><strong>Total Contributions:</strong> $${totalContributions.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Investment Growth:</strong> $${totalGains.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Final Balance:</strong> $${futureValue.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Total Return:</strong> ${((totalGains / totalContributions) * 100).toFixed(1)}%</p>
+            `;
+            document.getElementById('dca-result').style.display = 'block';
+        }
+        
+        // P/E Ratio Calculator
+        function calculatePE() {
+            const price = parseFloat(document.getElementById('stock-price').value);
+            const eps = parseFloat(document.getElementById('eps').value);
+            
+            if (eps === 0) {
+                document.getElementById('pe-result').innerHTML = `
+                    <h6>P/E Ratio Result:</h6>
+                    <p>Cannot calculate P/E ratio with zero earnings</p>
+                `;
+            } else {
+                const peRatio = price / eps;
+                let interpretation = '';
+                
+                if (peRatio < 15) {
+                    interpretation = 'Potentially undervalued or slow growth';
+                } else if (peRatio <= 25) {
+                    interpretation = 'Fairly valued for most companies';
+                } else {
+                    interpretation = 'High growth expectations or potentially overvalued';
+                }
+                
+                document.getElementById('pe-result').innerHTML = `
+                    <h6>P/E Ratio Result:</h6>
+                    <p><strong>P/E Ratio:</strong> ${peRatio.toFixed(2)}</p>
+                    <p><strong>Interpretation:</strong> ${interpretation}</p>
+                `;
+            }
+            document.getElementById('pe-result').style.display = 'block';
+        }
+        
+        // Portfolio Risk Calculator
+        function calculatePortfolioRisk() {
+            const stocks = parseFloat(document.getElementById('stock-allocation').value);
+            const bonds = parseFloat(document.getElementById('bond-allocation').value);
+            const cash = parseFloat(document.getElementById('cash-allocation').value);
+            
+            const total = stocks + bonds + cash;
+            
+            if (Math.abs(total - 100) > 0.1) {
+                document.getElementById('portfolio-result').innerHTML = `
+                    <h6>Portfolio Analysis:</h6>
+                    <p style="color: #f56565;"><strong>Error:</strong> Allocations must total 100%</p>
+                    <p>Current total: ${total}%</p>
+                `;
+            } else {
+                let riskLevel = '';
+                let expectedReturn = '';
+                
+                if (stocks >= 80) {
+                    riskLevel = 'High Risk / High Reward';
+                    expectedReturn = '8-12% annually';
+                } else if (stocks >= 60) {
+                    riskLevel = 'Moderate-High Risk';
+                    expectedReturn = '6-10% annually';
+                } else if (stocks >= 40) {
+                    riskLevel = 'Moderate Risk';
+                    expectedReturn = '5-8% annually';
+                } else {
+                    riskLevel = 'Conservative';
+                    expectedReturn = '3-6% annually';
+                }
+                
+                document.getElementById('portfolio-result').innerHTML = `
+                    <h6>Portfolio Analysis:</h6>
+                    <p><strong>Risk Level:</strong> ${riskLevel}</p>
+                    <p><strong>Expected Return:</strong> ${expectedReturn}</p>
+                    <p><strong>Stocks:</strong> ${stocks}%</p>
+                    <p><strong>Bonds:</strong> ${bonds}%</p>
+                    <p><strong>Cash/Other:</strong> ${cash}%</p>
+                `;
+            }
+            document.getElementById('portfolio-result').style.display = 'block';
+        }
+        
+        // Capital Gains Tax Calculator
+        function calculateCapitalGains() {
+            const purchasePrice = parseFloat(document.getElementById('purchase-price').value);
+            const salePrice = parseFloat(document.getElementById('sale-price').value);
+            const holdingPeriod = document.getElementById('holding-period').value;
+            const taxBracket = parseFloat(document.getElementById('tax-bracket').value) / 100;
+            
+            const capitalGain = salePrice - purchasePrice;
+            
+            if (capitalGain <= 0) {
+                document.getElementById('tax-result').innerHTML = `
+                    <h6>Capital Gains Tax:</h6>
+                    <p><strong>Capital Loss:</strong> $${Math.abs(capitalGain).toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                    <p>No tax owed on losses (can offset other gains)</p>
+                `;
+            } else {
+                let taxRate = 0;
+                let taxType = '';
+                
+                if (holdingPeriod === 'short') {
+                    taxRate = taxBracket;
+                    taxType = 'Short-term (ordinary income)';
+                } else {
+                    // Simplified long-term capital gains rates
+                    if (taxBracket <= 0.12) {
+                        taxRate = 0;
+                    } else if (taxBracket <= 0.37) {
+                        taxRate = 0.15;
+                    } else {
+                        taxRate = 0.20;
+                    }
+                    taxType = 'Long-term capital gains';
+                }
+                
+                const taxOwed = capitalGain * taxRate;
+                const afterTaxGain = capitalGain - taxOwed;
+                
+                document.getElementById('tax-result').innerHTML = `
+                    <h6>Capital Gains Tax:</h6>
+                    <p><strong>Capital Gain:</strong> $${capitalGain.toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                    <p><strong>Tax Type:</strong> ${taxType}</p>
+                    <p><strong>Tax Rate:</strong> ${(taxRate * 100).toFixed(1)}%</p>
+                    <p><strong>Tax Owed:</strong> $${taxOwed.toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                    <p><strong>After-Tax Gain:</strong> $${afterTaxGain.toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                `;
+            }
+            document.getElementById('tax-result').style.display = 'block';
+        }
+        
+        // Retirement Calculator
+        function calculateRetirement() {
+            const currentAge = parseInt(document.getElementById('current-age').value);
+            const retirementAge = parseInt(document.getElementById('retirement-age').value);
+            const currentSavings = parseFloat(document.getElementById('current-savings').value);
+            const monthlyContribution = parseFloat(document.getElementById('monthly-contribution').value);
+            const annualReturn = parseFloat(document.getElementById('expected-return').value) / 100;
+            
+            const yearsToRetirement = retirementAge - currentAge;
+            const monthsToRetirement = yearsToRetirement * 12;
+            const monthlyReturn = annualReturn / 12;
+            
+            // Future value of current savings
+            const futureValueCurrent = currentSavings * ((1 + annualReturn) ** yearsToRetirement);
+            
+            // Future value of monthly contributions
+            const futureValueContributions = monthlyContribution * (((1 + monthlyReturn) ** monthsToRetirement - 1) / monthlyReturn);
+            
+            const totalRetirementSavings = futureValueCurrent + futureValueContributions;
+            const totalContributions = currentSavings + (monthlyContribution * monthsToRetirement);
+            const totalGrowth = totalRetirementSavings - totalContributions;
+            
+            // 4% rule for annual withdrawal
+            const annualWithdrawal = totalRetirementSavings * 0.04;
+            const monthlyWithdrawal = annualWithdrawal / 12;
+            
+            document.getElementById('retirement-result').innerHTML = `
+                <h6>Retirement Projection:</h6>
+                <p><strong>Years to Retirement:</strong> ${yearsToRetirement}</p>
+                <p><strong>Total Contributions:</strong> $${totalContributions.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Investment Growth:</strong> $${totalGrowth.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Retirement Balance:</strong> $${totalRetirementSavings.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+                <p><strong>Monthly Income (4% rule):</strong> $${monthlyWithdrawal.toLocaleString('en-US', {maximumFractionDigits: 0})}</p>
+            `;
+            document.getElementById('retirement-result').style.display = 'block';
+        }
+        
+        // Add smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Add hover effects for glossary terms
+        document.querySelectorAll('.glossary-term').forEach(term => {
+            term.addEventListener('mouseover', function() {
+                this.style.backgroundColor = 'var(--accent)';
+                this.style.color = 'white';
+                this.style.padding = '2px 4px';
+                this.style.borderRadius = '3px';
+            });
+            
+            term.addEventListener('mouseout', function() {
+                this.style.backgroundColor = 'transparent';
+                this.style.color = 'var(--accent)';
+                this.style.padding = '0';
+            });
+        });
+    </script>
+</body>
+</html>
