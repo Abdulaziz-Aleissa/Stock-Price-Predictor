@@ -8,277 +8,661 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        .literacy-container {
-            max-width: 1200px;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --neon-blue: #00d4ff;
+            --neon-purple: #b347d9;
+            --neon-green: #39ff14;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="light"] {
+            --glass-bg: rgba(0, 0, 0, 0.05);
+            --glass-border: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background: linear-gradient(45deg, var(--bg-primary), var(--bg-secondary));
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Futuristic Container */
+        .cyber-container {
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
         }
-        
-        .hero-section {
+
+        /* Market Selection Modal */
+        .market-selector {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .selector-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 60px;
             text-align: center;
-            padding: 60px 0;
-            background: linear-gradient(135deg, var(--accent) 0%, rgba(52, 152, 219, 0.8) 100%);
-            border-radius: 20px;
-            margin-bottom: 40px;
-            color: white;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.8s ease-out;
         }
-        
-        .hero-section h1 {
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .selector-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .market-options {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .market-option {
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .market-option:hover::before {
+            left: 100%;
+        }
+
+        .market-option:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--neon-blue);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .market-flag {
             font-size: 3rem;
-            font-weight: bold;
             margin-bottom: 20px;
         }
-        
-        .hero-section p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+
+        .market-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
         }
-        
-        .cards-grid {
+
+        .market-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Hero Section with Holographic Effect */
+        .hero-section {
+            text-align: center;
+            padding: 80px 0;
+            background: var(--primary-gradient);
+            border-radius: 30px;
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.05) 2px,
+                rgba(255, 255, 255, 0.05) 4px
+            );
+            animation: scan 4s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+        }
+
+        .market-indicator {
+            display: inline-block;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+            color: white;
+            margin-top: 20px;
+        }
+
+        /* Navigation Bar */
+        .cyber-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .nav-chip {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 24px;
+            border-radius: 50px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-chip:hover {
+            transform: translateY(-3px);
+            background: var(--success-gradient);
+            color: white;
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+
+        /* Video Section */
+        .video-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
-            margin-bottom: 40px;
         }
-        
-        .concept-card {
-            background: var(--card-bg);
+
+        .video-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
             overflow: hidden;
+            transition: all 0.4s ease;
             position: relative;
         }
-        
-        .concept-card:hover {
+
+        .video-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
-            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
-        
-        .card-header {
-            padding: 30px;
-            background: linear-gradient(135deg, var(--accent), rgba(52, 152, 219, 0.8));
-            color: white;
+
+        .video-thumbnail {
             position: relative;
+            aspect-ratio: 16/9;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
         }
-        
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
+
+        .play-button {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 24px;
+            transition: all 0.3s ease;
         }
-        
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 0;
+
+        .play-button:hover {
+            background: white;
+            transform: scale(1.1);
         }
-        
-        .card-subtitle {
-            opacity: 0.9;
-            margin-top: 8px;
-            font-size: 0.95rem;
+
+        .video-info {
+            padding: 25px;
         }
-        
-        .card-content {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
         }
-        
-        .card-content.expanded {
-            max-height: 2000px;
-            padding: 30px;
-        }
-        
-        .concept-item {
-            background: var(--input-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--accent);
-            transition: all 0.2s ease;
-        }
-        
-        .concept-item:hover {
-            transform: translateX(5px);
-            background: rgba(52, 152, 219, 0.1);
-        }
-        
-        .concept-term {
-            font-weight: bold;
-            color: var(--accent);
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-        
-        .concept-description {
+
+        .video-description {
             color: var(--text-secondary);
+            font-size: 0.95rem;
             line-height: 1.6;
         }
-        
+
+        /* Concept Cards Grid */
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .concept-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .concept-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .concept-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            padding: 30px;
+            position: relative;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success-gradient);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
         .expand-indicator {
             position: absolute;
             top: 30px;
             right: 30px;
             font-size: 1.5rem;
+            color: var(--accent);
             transition: transform 0.3s ease;
         }
-        
+
         .concept-card.expanded .expand-indicator {
             transform: rotate(180deg);
         }
-        
-        .calculator-section {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px;
-            margin: 30px 0;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+        .card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding: 0 30px;
         }
-        
-        .calculator-title {
-            color: var(--accent);
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2rem;
+
+        .concept-card.expanded .card-content {
+            max-height: 1000px;
+            padding: 0 30px 30px;
         }
-        
-        .calculator-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .calculator-card {
-            background: var(--input-bg);
+
+        .concept-item {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            padding: 25px;
-            border: 1px solid var(--border-color);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--neon-blue);
             transition: all 0.3s ease;
         }
-        
+
+        .concept-item:hover {
+            transform: translateX(10px);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .concept-term {
+            font-weight: 700;
+            color: var(--neon-blue);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .concept-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Calculator Section */
+        .calculator-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 50px 0;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .calculator-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
         .calculator-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
-        
+
         .calculator-name {
-            color: var(--accent);
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            color: var(--neon-green);
+            font-weight: 700;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        
+
         .form-control {
-            background: var(--input-bg);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
             color: var(--text-primary);
-            border-radius: 8px;
+            border-radius: 10px;
+            padding: 12px 16px;
             margin-bottom: 15px;
+            transition: all 0.3s ease;
         }
-        
+
         .form-control:focus {
-            background: var(--input-bg);
-            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--neon-blue);
             color: var(--text-primary);
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
         }
-        
+
         .btn-calculate {
-            background: var(--accent);
+            background: var(--warning-gradient);
             border: none;
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
             transition: all 0.3s ease;
             width: 100%;
         }
-        
+
         .btn-calculate:hover {
-            background: var(--button-hover);
             transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(67, 233, 123, 0.4);
         }
-        
+
         .result-box {
-            background: linear-gradient(135deg, var(--accent), rgba(52, 152, 219, 0.8));
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
             margin-top: 20px;
-            text-align: center;
+            padding: 20px;
+            background: var(--primary-gradient);
+            border-radius: 15px;
+            color: white;
             display: none;
+            animation: fadeIn 0.5s ease;
         }
-        
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .result-value {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.4rem;
+            font-weight: 700;
             margin-bottom: 10px;
         }
-        
-        .breadcrumb {
-            background: transparent;
-            padding: 0;
-            margin-bottom: 30px;
+
+        .result-details {
+            opacity: 0.9;
+            line-height: 1.5;
         }
-        
-        .breadcrumb-item a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
-        .breadcrumb-item.active {
-            color: var(--text-secondary);
-        }
-        
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 40px;
-        }
-        
-        .nav-btn {
-            background: var(--accent);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .nav-btn:hover {
-            background: var(--button-hover);
-            transform: translateY(-2px);
-            color: white;
-        }
-        
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
+            .market-options {
+                flex-direction: column;
+                gap: 20px;
             }
             
-            .hero-section h1 {
-                font-size: 2rem;
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .concepts-grid {
+                grid-template-columns: 1fr;
             }
             
             .calculator-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Currency Switcher */
+        .currency-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .currency-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .currency-btn.active {
+            background: var(--neon-blue);
+            color: white;
+        }
+
+        .currency-btn:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
+    <!-- Animated Background Particles -->
+    <div class="particles"></div>
+
+    <!-- Market Selection Modal -->
+    <div class="market-selector" id="marketSelector">
+        <div class="selector-card">
+            <div class="selector-title">
+                <i class="fas fa-globe"></i> Choose Your Market
+            </div>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 30px;">
+                Select your preferred market to get localized financial education content
+            </p>
+            <div class="market-options">
+                <div class="market-option" onclick="selectMarket('saudi')">
+                    <div class="market-flag">🇸🇦</div>
+                    <div class="market-name">Saudi Arabia</div>
+                    <div class="market-desc">Tadawul, SAR currency, local investment options</div>
+                </div>
+                <div class="market-option" onclick="selectMarket('us')">
+                    <div class="market-flag">🇺🇸</div>
+                    <div class="market-name">United States</div>
+                    <div class="market-desc">NYSE, NASDAQ, USD currency, 401k & IRA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Currency Switcher -->
+    <div class="currency-switcher">
+        <div class="currency-btn active" id="sarBtn" onclick="switchCurrency('SAR')">SAR</div>
+        <div class="currency-btn" id="usdBtn" onclick="switchCurrency('USD')">USD</div>
+    </div>
+
+    <!-- Theme Switch -->
     <div class="theme-switch">
         <div class="switch-track">
             <div class="switch-icons">
@@ -293,25 +677,14 @@
         </div>
     </div>
 
-    <div class="literacy-container">
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
-                {% if current_user.is_authenticated %}
-                <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                {% endif %}
-                <li class="breadcrumb-item active" aria-current="page">Financial Literacy</li>
-            </ol>
-        </nav>
-
-        <!-- Navigation Buttons -->
-        <div class="nav-buttons">
-            <a href="{{ url_for('index') }}" class="nav-btn">
+    <div class="cyber-container">
+        <!-- Navigation -->
+        <div class="cyber-nav">
+            <a href="{{ url_for('index') }}" class="nav-chip">
                 <i class="fas fa-home"></i> Home
             </a>
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+            <a href="{{ url_for('dashboard') }}" class="nav-chip">
                 <i class="fas fa-chart-line"></i> Dashboard
             </a>
             {% endif %}
@@ -319,229 +692,68 @@
 
         <!-- Hero Section -->
         <div class="hero-section">
-            <h1><i class="fas fa-graduation-cap"></i> Financial Literacy Center</h1>
-            <p>Master the fundamentals of investing and financial planning through interactive learning</p>
-        </div>
-
-        <!-- Main Content Cards -->
-        <div class="cards-grid">
-            <!-- Basic Financial Concepts Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-book-open card-icon"></i>
-                    <h3 class="card-title">Basic Financial Concepts</h3>
-                    <p class="card-subtitle">Understanding securities, risk vs return, and diversification</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-chart-line"></i> Stocks</div>
-                        <div class="concept-description">Shares of ownership in a company. When you buy stock, you become a partial owner and have a claim on the company's assets and earnings.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-university"></i> Bonds</div>
-                        <div class="concept-description">Debt securities where you lend money to a government or corporation for a fixed period at a fixed interest rate.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-layer-group"></i> ETFs</div>
-                        <div class="concept-description">Exchange-Traded Funds that track an index, commodity, bonds, or basket of assets like an index fund.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-balance-scale"></i> Risk vs Return</div>
-                        <div class="concept-description">Higher potential returns typically come with higher risk. There's no such thing as a guaranteed high-return, low-risk investment.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-random"></i> Diversification</div>
-                        <div class="concept-description">Spreading investments across different asset classes, sectors, and geographic regions to reduce risk.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Investment Fundamentals Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-piggy-bank card-icon"></i>
-                    <h3 class="card-title">Investment Fundamentals</h3>
-                    <p class="card-subtitle">Account types, dollar-cost averaging, and asset allocation</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-briefcase"></i> 401(k) Accounts</div>
-                        <div class="concept-description">Employer-sponsored retirement accounts with tax advantages. Many employers offer matching contributions.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-coins"></i> IRA Accounts</div>
-                        <div class="concept-description">Individual Retirement Accounts - Traditional (tax-deferred) or Roth (tax-free growth) options available.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-calendar-alt"></i> Dollar-Cost Averaging</div>
-                        <div class="concept-description">Investing a fixed amount regularly regardless of market conditions to reduce the impact of volatility.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-pie-chart"></i> Asset Allocation</div>
-                        <div class="concept-description">The mix of stocks, bonds, and other investments in your portfolio based on your goals and risk tolerance.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-clock"></i> Time Horizon</div>
-                        <div class="concept-description">How long you plan to hold investments before needing the money affects your investment strategy.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stock Market Education Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-chart-area card-icon"></i>
-                    <h3 class="card-title">Stock Market Education</h3>
-                    <p class="card-subtitle">How exchanges work, financial statements, and key ratios</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-building"></i> Stock Exchanges</div>
-                        <div class="concept-description">NYSE (traditional + electronic) and NASDAQ (fully electronic) are the major U.S. exchanges where stocks are traded.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-file-invoice-dollar"></i> Financial Statements</div>
-                        <div class="concept-description">Income Statement (revenue/expenses), Balance Sheet (assets/liabilities), and Cash Flow Statement show company health.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-calculator"></i> P/E Ratio</div>
-                        <div class="concept-description">Price-to-Earnings ratio compares stock price to earnings per share to evaluate if a stock is over/undervalued.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-wave-square"></i> Market Volatility</div>
-                        <div class="concept-description">Stock prices fluctuate due to economic conditions, company performance, and investor sentiment.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-sync-alt"></i> Market Cycles</div>
-                        <div class="concept-description">Markets go through bull (rising) and bear (falling) cycles - understanding this helps with long-term investing.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Risk Management Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-shield-alt card-icon"></i>
-                    <h3 class="card-title">Risk Management</h3>
-                    <p class="card-subtitle">Investment risks, portfolio diversification, and emergency funds</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-exclamation-triangle"></i> Market Risk</div>
-                        <div class="concept-description">Overall market movements affecting all securities. Cannot be eliminated through diversification.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-building"></i> Company Risk</div>
-                        <div class="concept-description">Risk specific to individual companies that can be reduced through diversification.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-life-ring"></i> Emergency Fund</div>
-                        <div class="concept-description">3-6 months of expenses in easily accessible savings before investing in volatile assets.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-umbrella"></i> Insurance</div>
-                        <div class="concept-description">Health, disability, and term life insurance protect against major financial risks.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-network-wired"></i> Portfolio Diversification</div>
-                        <div class="concept-description">Spread investments across asset classes, sectors, and geographic regions to reduce overall risk.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Advanced Topics Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-rocket card-icon"></i>
-                    <h3 class="card-title">Advanced Topics</h3>
-                    <p class="card-subtitle">Options, ESG investing, taxes, and retirement planning</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-cogs"></i> Options Basics</div>
-                        <div class="concept-description">Contracts giving the right (not obligation) to buy/sell stocks at specific prices. High risk - only for experienced investors.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-leaf"></i> ESG Investing</div>
-                        <div class="concept-description">Environmental, Social, and Governance factors considered alongside financial returns in investment decisions.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-receipt"></i> Tax Implications</div>
-                        <div class="concept-description">Capital gains tax rates differ for short-term (< 1 year) vs long-term (> 1 year) holdings.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-hourglass-end"></i> Retirement Planning</div>
-                        <div class="concept-description">4% withdrawal rule: you can withdraw 4% of your retirement portfolio annually without running out of money.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-chart-pie"></i> Asset Allocation by Age</div>
-                        <div class="concept-description">Rule of thumb: (100 - your age)% in stocks, rest in bonds. Adjust based on risk tolerance.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Items Card -->
-            <div class="concept-card" onclick="toggleCard(this)">
-                <div class="card-header">
-                    <i class="fas fa-tasks card-icon"></i>
-                    <h3 class="card-title">Getting Started</h3>
-                    <p class="card-subtitle">Your roadmap to building wealth through investing</p>
-                    <i class="fas fa-chevron-down expand-indicator"></i>
-                </div>
-                <div class="card-content">
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-check-circle"></i> Build Emergency Fund</div>
-                        <div class="concept-description">Save 3-6 months of expenses in a high-yield savings account before investing.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-percentage"></i> Maximize Employer Match</div>
-                        <div class="concept-description">Contribute enough to your 401(k) to get the full employer match - it's free money!</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-credit-card"></i> Pay Off High-Interest Debt</div>
-                        <div class="concept-description">Pay off credit cards and loans with interest rates above 6-7% before investing.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-bullseye"></i> Set Investment Goals</div>
-                        <div class="concept-description">Define your timeline and risk tolerance before choosing investments.</div>
-                    </div>
-                    <div class="concept-item">
-                        <div class="concept-term"><i class="fas fa-robot"></i> Start Simple</div>
-                        <div class="concept-description">Begin with low-cost index funds or target-date funds for instant diversification.</div>
-                    </div>
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <i class="fas fa-brain"></i> Financial Literacy Center
+                </h1>
+                <p class="hero-subtitle">Master the art of intelligent investing with AI-powered education</p>
+                <div class="market-indicator" id="marketIndicator">
+                    <i class="fas fa-map-marker-alt"></i> <span id="currentMarket">Loading...</span>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Calculators Section -->
+        <!-- Educational Videos Section -->
+        <div class="video-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-play-circle"></i> Educational Videos
+                </h2>
+                <p class="section-subtitle">Learn from expert-curated financial education content</p>
+            </div>
+            <div class="video-grid" id="videoGrid">
+                <!-- Videos will be populated by JavaScript based on selected market -->
+            </div>
+        </div>
+
+        <!-- Financial Concepts -->
+        <div class="concepts-grid" id="conceptsGrid">
+            <!-- Concepts will be populated by JavaScript based on selected market -->
+        </div>
+
+        <!-- Interactive Calculators -->
         <div class="calculator-section">
-            <h2 class="calculator-title"><i class="fas fa-calculator"></i> Interactive Financial Calculators</h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-calculator"></i> Smart Financial Calculators
+                </h2>
+                <p class="section-subtitle">Interactive tools to plan your financial future</p>
+            </div>
             <div class="calculator-grid">
                 <!-- Compound Interest Calculator -->
                 <div class="calculator-card">
-                    <h4 class="calculator-name"><i class="fas fa-chart-line"></i> Compound Interest Calculator</h4>
+                    <h4 class="calculator-name">
+                        <i class="fas fa-chart-line"></i> Compound Interest Calculator
+                    </h4>
                     <div class="mb-3">
-                        <label class="form-label">Initial Investment ($)</label>
-                        <input type="number" class="form-control" id="principal" value="10000">
+                        <label class="form-label">Initial Investment</label>
+                        <input type="number" class="form-control" id="principal" value="10000" placeholder="Enter amount">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Monthly Contribution ($)</label>
-                        <input type="number" class="form-control" id="monthly" value="500">
+                        <label class="form-label">Monthly Contribution</label>
+                        <input type="number" class="form-control" id="monthly" value="500" placeholder="Monthly addition">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Annual Interest Rate (%)</label>
-                        <input type="number" class="form-control" id="rate" value="7" step="0.1">
+                        <input type="number" class="form-control" id="rate" value="7" step="0.1" placeholder="Expected return">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Years</label>
-                        <input type="number" class="form-control" id="years" value="30">
+                        <label class="form-label">Investment Period (Years)</label>
+                        <input type="number" class="form-control" id="years" value="30" placeholder="Time horizon">
                     </div>
-                    <button class="btn-calculate" onclick="calculateCompound()">Calculate Growth</button>
+                    <button class="btn-calculate" onclick="calculateCompound()">
+                        <i class="fas fa-rocket"></i> Calculate Growth
+                    </button>
                     <div id="compoundResult" class="result-box">
                         <div class="result-value"></div>
                         <div class="result-details"></div>
@@ -550,16 +762,20 @@
 
                 <!-- P/E Ratio Calculator -->
                 <div class="calculator-card">
-                    <h4 class="calculator-name"><i class="fas fa-balance-scale"></i> P/E Ratio Calculator</h4>
+                    <h4 class="calculator-name">
+                        <i class="fas fa-balance-scale"></i> P/E Ratio Analyzer
+                    </h4>
                     <div class="mb-3">
-                        <label class="form-label">Stock Price ($)</label>
-                        <input type="number" class="form-control" id="stockPrice" value="150" step="0.01">
+                        <label class="form-label">Stock Price</label>
+                        <input type="number" class="form-control" id="stockPrice" value="100" placeholder="Current price">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Earnings Per Share ($)</label>
-                        <input type="number" class="form-control" id="eps" value="10" step="0.01">
+                        <label class="form-label">Earnings Per Share</label>
+                        <input type="number" class="form-control" id="eps" value="5" step="0.01" placeholder="Annual EPS">
                     </div>
-                    <button class="btn-calculate" onclick="calculatePE()">Calculate P/E Ratio</button>
+                    <button class="btn-calculate" onclick="calculatePE()">
+                        <i class="fas fa-chart-bar"></i> Analyze Valuation
+                    </button>
                     <div id="peResult" class="result-box">
                         <div class="result-value"></div>
                         <div class="result-details"></div>
@@ -568,10 +784,12 @@
 
                 <!-- Emergency Fund Calculator -->
                 <div class="calculator-card">
-                    <h4 class="calculator-name"><i class="fas fa-life-ring"></i> Emergency Fund Calculator</h4>
+                    <h4 class="calculator-name">
+                        <i class="fas fa-shield-alt"></i> Emergency Fund Planner
+                    </h4>
                     <div class="mb-3">
-                        <label class="form-label">Monthly Expenses ($)</label>
-                        <input type="number" class="form-control" id="monthlyExpenses" value="4000">
+                        <label class="form-label">Monthly Expenses</label>
+                        <input type="number" class="form-control" id="monthlyExpenses" value="4000" placeholder="Total monthly costs">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Job Stability</label>
@@ -581,7 +799,9 @@
                             <option value="9">Unstable job (9 months)</option>
                         </select>
                     </div>
-                    <button class="btn-calculate" onclick="calculateEmergencyFund()">Calculate Fund</button>
+                    <button class="btn-calculate" onclick="calculateEmergencyFund()">
+                        <i class="fas fa-life-ring"></i> Calculate Fund
+                    </button>
                     <div id="emergencyResult" class="result-box">
                         <div class="result-value"></div>
                         <div class="result-details"></div>
@@ -589,28 +809,413 @@
                 </div>
             </div>
         </div>
-
-        <!-- Disclaimer -->
-        <div class="alert alert-warning mt-4">
-            <h5><i class="fas fa-exclamation-triangle"></i> Important Disclaimer</h5>
-            <p class="mb-0">This information is for educational purposes only and should not be considered as financial advice. Always consult with a qualified financial advisor before making investment decisions. Past performance does not guarantee future results.</p>
-        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Toggle card expansion
-        function toggleCard(card) {
-            const content = card.querySelector('.card-content');
-            const isExpanded = card.classList.contains('expanded');
-            
-            if (isExpanded) {
-                card.classList.remove('expanded');
-                content.classList.remove('expanded');
-            } else {
-                card.classList.add('expanded');
-                content.classList.add('expanded');
+        // Global variables
+        let currentMarket = 'saudi'; // Default to Saudi Arabia
+        let currentCurrency = 'SAR';
+
+        // Market data
+        const marketData = {
+            saudi: {
+                name: 'Saudi Arabia Market',
+                flag: '🇸🇦',
+                currency: 'SAR',
+                concepts: [
+                    {
+                        icon: 'fas fa-book-open',
+                        title: 'Basic Financial Concepts',
+                        subtitle: 'Understanding Tadawul, Islamic finance, and Sharia-compliant investments',
+                        items: [
+                            {
+                                term: 'Tadawul Stocks',
+                                icon: 'fas fa-chart-line',
+                                description: 'Shares of Saudi companies listed on the Saudi Stock Exchange (Tadawul). All stocks are Sharia-compliant.'
+                            },
+                            {
+                                term: 'Sukuk (Islamic Bonds)',
+                                icon: 'fas fa-university',
+                                description: 'Sharia-compliant investment certificates that represent ownership in underlying assets rather than debt.'
+                            },
+                            {
+                                term: 'REITs (صناديق الاستثمار العقاري)',
+                                icon: 'fas fa-building',
+                                description: 'Real Estate Investment Trusts that allow you to invest in income-generating real estate portfolios.'
+                            },
+                            {
+                                term: 'Commodity Trading',
+                                icon: 'fas fa-oil-can',
+                                description: 'Investment in commodities like oil, gold, and precious metals, fundamental to Saudi economy.'
+                            },
+                            {
+                                term: 'Islamic Finance Principles',
+                                icon: 'fas fa-mosque',
+                                description: 'All investments follow Islamic principles: no interest (riba), gambling (maysir), or excessive uncertainty (gharar).'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-piggy-bank',
+                        title: 'Investment Fundamentals',
+                        subtitle: 'Saudi investment accounts, GOSI benefits, and local investment strategies',
+                        items: [
+                            {
+                                term: 'GOSI (التأمينات الاجتماعية)',
+                                icon: 'fas fa-shield-alt',
+                                description: 'General Organization for Social Insurance - mandatory retirement savings for Saudi employees with employer matching.'
+                            },
+                            {
+                                term: 'Bank Investment Accounts',
+                                icon: 'fas fa-university',
+                                description: 'Sharia-compliant investment accounts offered by Saudi banks like Al Rajhi, SNB, and SABB.'
+                            },
+                            {
+                                term: 'Dollar-Cost Averaging (متوسط التكلفة)',
+                                icon: 'fas fa-calendar-alt',
+                                description: 'Investing fixed amounts regularly in SAR to reduce impact of market volatility over time.'
+                            },
+                            {
+                                term: 'Asset Allocation',
+                                icon: 'fas fa-pie-chart',
+                                description: 'Diversifying between Saudi stocks, international Sharia funds, real estate, and commodities.'
+                            },
+                            {
+                                term: 'Zakat Considerations',
+                                icon: 'fas fa-hand-holding-heart',
+                                description: 'Remember to calculate and pay 2.5% Zakat on your investment gains and savings annually.'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-chart-area',
+                        title: 'Saudi Market Education',
+                        subtitle: 'Tadawul operations, Saudi economic sectors, and market analysis',
+                        items: [
+                            {
+                                term: 'Tadawul Exchange',
+                                icon: 'fas fa-building',
+                                description: 'Saudi Stock Exchange operating Sunday-Thursday, 10:00 AM - 3:00 PM. Market cap over 10 trillion SAR.'
+                            },
+                            {
+                                term: 'MSCI EM Inclusion',
+                                icon: 'fas fa-globe',
+                                description: 'Saudi Arabia included in MSCI Emerging Markets index, attracting international investment.'
+                            },
+                            {
+                                term: 'Vision 2030 Sectors',
+                                icon: 'fas fa-eye',
+                                description: 'Key growth sectors: renewable energy, tourism, entertainment, technology, and healthcare.'
+                            },
+                            {
+                                term: 'Oil Impact Analysis',
+                                icon: 'fas fa-oil-can',
+                                description: 'Understanding how oil prices affect Saudi stocks, especially petrochemical and banking sectors.'
+                            },
+                            {
+                                term: 'Saudi GAAP vs IFRS',
+                                icon: 'fas fa-file-invoice-dollar',
+                                description: 'Saudi companies report using International Financial Reporting Standards (IFRS) for transparency.'
+                            }
+                        ]
+                    }
+                ],
+                videos: [
+                    {
+                        title: 'Tadawul Trading Basics',
+                        description: 'Complete guide to trading on Saudi Stock Exchange',
+                        thumbnail: 'saudi-trading',
+                        duration: '15:30'
+                    },
+                    {
+                        title: 'Islamic Investment Principles',
+                        description: 'Understanding Sharia-compliant investing in Saudi Arabia',
+                        thumbnail: 'islamic-finance',
+                        duration: '12:45'  
+                    },
+                    {
+                        title: 'Vision 2030 Investment Opportunities',
+                        description: 'Sectors to watch under Saudi Vision 2030',
+                        thumbnail: 'vision-2030',
+                        duration: '18:20'
+                    },
+                    {
+                        title: 'GOSI and Retirement Planning',
+                        description: 'Maximizing your Saudi social insurance benefits',
+                        thumbnail: 'gosi-guide',
+                        duration: '10:15'
+                    }
+                ]
+            },
+            us: {
+                name: 'United States Market',
+                flag: '🇺🇸',
+                currency: 'USD',
+                concepts: [
+                    {
+                        icon: 'fas fa-book-open',
+                        title: 'Basic Financial Concepts',
+                        subtitle: 'Understanding securities, risk vs return, and diversification',
+                        items: [
+                            {
+                                term: 'Stocks',
+                                icon: 'fas fa-chart-line',
+                                description: 'Shares of ownership in a company. When you buy stock, you become a partial owner and have a claim on the company\'s assets and earnings.'
+                            },
+                            {
+                                term: 'Bonds',
+                                icon: 'fas fa-university',
+                                description: 'Debt securities where you lend money to a government or corporation for a fixed period at a fixed interest rate.'
+                            },
+                            {
+                                term: 'ETFs',
+                                icon: 'fas fa-layer-group',
+                                description: 'Exchange-Traded Funds that track an index, commodity, bonds, or basket of assets like an index fund.'
+                            },
+                            {
+                                term: 'Risk vs Return',
+                                icon: 'fas fa-balance-scale',
+                                description: 'Higher potential returns typically come with higher risk. There\'s no such thing as a guaranteed high-return, low-risk investment.'
+                            },
+                            {
+                                term: 'Diversification',
+                                icon: 'fas fa-random',
+                                description: 'Spreading investments across different asset classes, sectors, and geographic regions to reduce risk.'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-piggy-bank',
+                        title: 'Investment Fundamentals',
+                        subtitle: 'Account types, dollar-cost averaging, and asset allocation',
+                        items: [
+                            {
+                                term: '401(k) Accounts',
+                                icon: 'fas fa-briefcase',
+                                description: 'Employer-sponsored retirement accounts with tax advantages. Many employers offer matching contributions.'
+                            },
+                            {
+                                term: 'IRA Accounts',
+                                icon: 'fas fa-coins',
+                                description: 'Individual Retirement Accounts - Traditional (tax-deferred) or Roth (tax-free growth) options available.'
+                            },
+                            {
+                                term: 'Dollar-Cost Averaging',
+                                icon: 'fas fa-calendar-alt',
+                                description: 'Investing a fixed amount regularly regardless of market conditions to reduce the impact of volatility.'
+                            },
+                            {
+                                term: 'Asset Allocation',
+                                icon: 'fas fa-pie-chart',
+                                description: 'The mix of stocks, bonds, and other investments in your portfolio based on your goals and risk tolerance.'
+                            },
+                            {
+                                term: 'Time Horizon',
+                                icon: 'fas fa-clock',
+                                description: 'How long you plan to hold investments before needing the money affects your investment strategy.'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'fas fa-chart-area',
+                        title: 'Stock Market Education',
+                        subtitle: 'How exchanges work, financial statements, and key ratios',
+                        items: [
+                            {
+                                term: 'Stock Exchanges',
+                                icon: 'fas fa-building',
+                                description: 'NYSE (traditional + electronic) and NASDAQ (fully electronic) are the major U.S. exchanges where stocks are traded.'
+                            },
+                            {
+                                term: 'Financial Statements',
+                                icon: 'fas fa-file-invoice-dollar',
+                                description: 'Income Statement (revenue/expenses), Balance Sheet (assets/liabilities), and Cash Flow Statement show company health.'
+                            },
+                            {
+                                term: 'P/E Ratio',
+                                icon: 'fas fa-calculator',
+                                description: 'Price-to-Earnings ratio compares stock price to earnings per share to evaluate if a stock is over/undervalued.'
+                            },
+                            {
+                                term: 'Market Volatility',
+                                icon: 'fas fa-wave-square',
+                                description: 'Stock prices fluctuate due to economic conditions, company performance, and investor sentiment.'
+                            },
+                            {
+                                term: 'Market Cycles',
+                                icon: 'fas fa-sync-alt',
+                                description: 'Markets go through bull (rising) and bear (falling) cycles - understanding this helps with long-term investing.'
+                            }
+                        ]
+                    }
+                ],
+                videos: [
+                    {
+                        title: 'Stock Market Fundamentals',
+                        description: 'Complete beginner\'s guide to US stock market investing',
+                        thumbnail: 'us-stocks',
+                        duration: '20:15'
+                    },
+                    {
+                        title: '401k vs IRA Explained',
+                        description: 'Understanding retirement account options in the US',
+                        thumbnail: 'retirement-accounts',
+                        duration: '16:30'
+                    },
+                    {
+                        title: 'ETF Investing Strategy',
+                        description: 'Building a diverse portfolio with exchange-traded funds',
+                        thumbnail: 'etf-guide',
+                        duration: '14:45'
+                    },
+                    {
+                        title: 'Tax-Efficient Investing',
+                        description: 'Minimizing taxes on your investment gains',
+                        thumbnail: 'tax-strategies',
+                        duration: '12:20'
+                    }
+                ]
             }
+        };
+
+        // Initialize particles
+        function createParticles() {
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Market selection function
+        function selectMarket(market) {
+            currentMarket = market;
+            currentCurrency = marketData[market].currency;
+            
+            // Hide market selector
+            document.getElementById('marketSelector').style.display = 'none';
+            
+            // Update currency buttons
+            updateCurrencyButtons();
+            
+            // Update content
+            updateMarketContent();
+            
+            // Store preference
+            localStorage.setItem('selectedMarket', market);
+        }
+
+        // Currency switching
+        function switchCurrency(currency) {
+            currentCurrency = currency;
+            updateCurrencyButtons();
+            // Update calculator labels and results if needed
+        }
+
+        function updateCurrencyButtons() {
+            document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(currentCurrency.toLowerCase() + 'Btn').classList.add('active');
+        }
+
+        // Update page content based on selected market
+        function updateMarketContent() {
+            const data = marketData[currentMarket];
+            
+            // Update market indicator
+            document.getElementById('currentMarket').textContent = data.name;
+            
+            // Update concepts
+            updateConcepts(data.concepts);
+            
+            // Update videos
+            updateVideos(data.videos);
+        }
+
+        function updateConcepts(concepts) {
+            const grid = document.getElementById('conceptsGrid');
+            grid.innerHTML = '';
+            
+            concepts.forEach(concept => {
+                const card = createConceptCard(concept);
+                grid.appendChild(card);
+            });
+        }
+
+        function createConceptCard(concept) {
+            const card = document.createElement('div');
+            card.className = 'concept-card';
+            card.onclick = () => toggleCard(card);
+            
+            const items = concept.items.map(item => `
+                <div class="concept-item">
+                    <div class="concept-term">
+                        <i class="${item.icon}"></i> ${item.term}
+                    </div>
+                    <div class="concept-description">${item.description}</div>
+                </div>
+            `).join('');
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="${concept.icon}"></i>
+                    </div>
+                    <h3 class="card-title">${concept.title}</h3>
+                    <p class="card-subtitle">${concept.subtitle}</p>
+                    <i class="fas fa-chevron-down expand-indicator"></i>
+                </div>
+                <div class="card-content">
+                    ${items}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function updateVideos(videos) {
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const card = createVideoCard(video);
+                grid.appendChild(card);
+            });
+        }
+
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            
+            card.innerHTML = `
+                <div class="video-thumbnail" onclick="playVideo('${video.thumbnail}')">
+                    <div class="play-button">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="video-info">
+                    <h4 class="video-title">${video.title}</h4>
+                    <p class="video-description">${video.description}</p>
+                    <small style="color: var(--text-secondary);">
+                        <i class="fas fa-clock"></i> ${video.duration}
+                    </small>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function playVideo(videoId) {
+            // In a real implementation, this would open a video player
+            alert(`Playing video: ${videoId}\n\nThis would open the educational video in a modal or redirect to the video platform.`);
+        }
+
+        // Card toggle functionality
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
         }
 
         // Calculator functions
@@ -620,26 +1225,34 @@
             const rate = parseFloat(document.getElementById('rate').value) / 100 || 0;
             const years = parseFloat(document.getElementById('years').value) || 0;
             
-            const monthlyRate = rate / 12;
             const months = years * 12;
+            const monthlyRate = rate / 12;
             
             // Future value of initial investment
             const futureValuePrincipal = principal * Math.pow(1 + monthlyRate, months);
             
             // Future value of monthly contributions
-            const futureValueContributions = monthly * (Math.pow(1 + monthlyRate, months) - 1) / monthlyRate;
+            let futureValueMonthly = 0;
+            if (monthlyRate > 0) {
+                futureValueMonthly = monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+            } else {
+                futureValueMonthly = monthly * months;
+            }
             
-            const totalValue = futureValuePrincipal + futureValueContributions;
+            const totalFutureValue = futureValuePrincipal + futureValueMonthly;
             const totalContributions = principal + (monthly * months);
-            const totalEarnings = totalValue - totalContributions;
+            const totalEarnings = totalFutureValue - totalContributions;
+            
+            const currencySymbol = currentCurrency === 'SAR' ? 'ر.س' : '$';
             
             const resultBox = document.getElementById('compoundResult');
             resultBox.style.display = 'block';
-            resultBox.querySelector('.result-value').textContent = `Final Amount: $${totalValue.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+            resultBox.querySelector('.result-value').textContent = 
+                `Final Value: ${currencySymbol}${totalFutureValue.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
             resultBox.querySelector('.result-details').innerHTML = `
-                <div>Total Contributions: $${totalContributions.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
-                <div>Total Earnings: $${totalEarnings.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
-                <div>Growth Multiple: ${(totalValue / totalContributions).toFixed(2)}x</div>
+                <div>Total Contributions: ${currencySymbol}${totalContributions.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+                <div>Total Earnings: ${currencySymbol}${totalEarnings.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+                <div>Growth Multiple: ${(totalFutureValue / totalContributions).toFixed(2)}x</div>
             `;
         }
 
@@ -674,18 +1287,21 @@
             const months = parseInt(document.getElementById('jobStability').value) || 3;
             
             const recommendedAmount = expenses * months;
-            const monthlySavingsGoal = recommendedAmount / 12; // Save over 1 year
+            const monthlySavingsGoal = recommendedAmount / 12;
+            
+            const currencySymbol = currentCurrency === 'SAR' ? 'ر.س' : '$';
             
             const resultBox = document.getElementById('emergencyResult');
             resultBox.style.display = 'block';
-            resultBox.querySelector('.result-value').textContent = `Recommended Amount: $${recommendedAmount.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+            resultBox.querySelector('.result-value').textContent = 
+                `Recommended Amount: ${currencySymbol}${recommendedAmount.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
             resultBox.querySelector('.result-details').innerHTML = `
                 <div>Coverage: ${months} months of expenses</div>
-                <div>Monthly Savings Goal: $${monthlySavingsGoal.toFixed(0)} (if saving over 1 year)</div>
+                <div>Monthly Savings Goal: ${currencySymbol}${monthlySavingsGoal.toFixed(0)} (if saving over 1 year)</div>
             `;
         }
 
-        // Theme switching functionality
+        // Theme switching
         document.addEventListener('DOMContentLoaded', function() {
             const themeSwitch = document.querySelector('.theme-switch');
             const html = document.documentElement;
@@ -701,6 +1317,15 @@
                 html.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
             });
+
+            // Initialize particles
+            createParticles();
+            
+            // Check for saved market preference
+            const savedMarket = localStorage.getItem('selectedMarket');
+            if (savedMarket && marketData[savedMarket]) {
+                selectMarket(savedMarket);
+            }
         });
     </script>
 </body>
