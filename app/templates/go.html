@@ -63,6 +63,11 @@
                         <p>Day Range: ${{ market_context.day_low }} - ${{ market_context.day_high }}</p>
                         <p>Volume: {{ '{:,}'.format(market_context.volume) }}</p>
                         <p>P/E Ratio: {{ '%.2f'|format(market_context.pe_ratio) if market_context.pe_ratio != 'N/A' else 'N/A' }}</p>
+                        <p>P/B Ratio: {{ '%.2f'|format(market_context.pb_ratio) if market_context.pb_ratio != 'N/A' else 'N/A' }}</p>
+                        <p>EV/EBITDA: {{ '%.2f'|format(market_context.ev_ebitda) if market_context.ev_ebitda != 'N/A' else 'N/A' }}</p>
+                        <p>ROE: {{ '%.2f'|format(market_context.roe) if market_context.roe != 'N/A' else 'N/A' }}</p>
+                        <p>14-Day RSI: {{ '%.2f'|format(market_context.rsi_14) if market_context.rsi_14 != 'N/A' else 'N/A' }}</p>
+                        <p>Dividend Yield: {{ '%.2f'|format(market_context.dividend_yield) if market_context.dividend_yield != 'N/A' else 'N/A' }}</p>
                         <p>Market Cap: ${{ '{:,.0f}'.format(market_context.market_cap/1000000) }}M</p>
                         <p>52W High: ${{ market_context.year_high }}</p>
                         <p>52W Low: ${{ market_context.year_low }}</p>

@@ -1,6 +1,7 @@
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import os
+from app.utils.stock_scoring import StockScoring
 import pandas as pd
 import numpy as np
 from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
@@ -110,16 +111,61 @@ def is_valid_ticker(ticker):
     except:
         return False
 
+# def get_market_context(ticker):
+#     try:
+#         stock = yf.Ticker(ticker)
+#         info = stock.info
+#         return {]
+#             'current_price': info.get('regularMarketPrice', 'N/A'),
+#             'day_high': info.get('dayHigh', 'N/A'),
+#             'day_low': info.get('dayLow', 'N/A'),
+#             'volume': info.get('volume', 0),
+#             'pe_ratio': info.get('forwardPE', 'N/A'),
+#             'pb_ratio': info.get('priceToBook', 'N/A'),
+#             'ev_ebitda': info.get('enterpriseToEbitda', 'N/A'),
+#             'roe': info.get('returnOnEquity', 'N/A'),
+#             #calculate the rsi of the 14 day period
+           
+
+
+#             'dividend_yield': info.get('dividendYield', 'N/A'),
+#             'market_cap': info.get('marketCap', 'N/A'),
+#             'year_high': info.get('fiftyTwoWeekHigh', 'N/A'),
+#             'year_low': info.get('fiftyTwoWeekLow', 'N/A')
+#         }
+#     except:
+#         return None
+    
+
+
 def get_market_context(ticker):
     try:
         stock = yf.Ticker(ticker)
         info = stock.info
+
+        # Calculate 14-day RSI
+        data = stock.history(period="1mo")
+        delta = data['Close'].diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+        avg_gain = gain.rolling(window=14).mean()
+        avg_loss = loss.rolling(window=14).mean()
+        rs = avg_gain / avg_loss
+        rsi_14 = 100 - (100 / (1 + rs))
+        latest_rsi_14 = rsi_14.dropna().iloc[-1] if not rsi_14.dropna().empty else 'N/A'
+
         return {
             'current_price': info.get('regularMarketPrice', 'N/A'),
             'day_high': info.get('dayHigh', 'N/A'),
             'day_low': info.get('dayLow', 'N/A'),
             'volume': info.get('volume', 0),
             'pe_ratio': info.get('forwardPE', 'N/A'),
+            'pb_ratio': info.get('priceToBook', 'N/A'),
+            'ev_ebitda': info.get('enterpriseToEbitda', 'N/A'),
+            'roe': info.get('returnOnEquity', 'N/A'),
+            #calculate the rsi of the 14 day period
+            'rsi_14': latest_rsi_14,
+            'dividend_yield': info.get('dividendYield', 'N/A'),
             'market_cap': info.get('marketCap', 'N/A'),
             'year_high': info.get('fiftyTwoWeekHigh', 'N/A'),
             'year_low': info.get('fiftyTwoWeekLow', 'N/A')
@@ -127,9 +173,66 @@ def get_market_context(ticker):
     except:
         return None
 
+
+
+
+
+
+
 @app.route('/')
 def index():
     return render_template('main.html')
+
+
+
+
+
+
+
+@app.route('/stock_scoring', methods=['POST'])
+def stock_scoring():
+    """Handle stock scoring requests"""
+    try:
+        symbols_input = request.form.get('symbols', '').strip()
+        
+        if not symbols_input:
+            return jsonify({'error': 'Please provide at least one stock symbol'})
+        
+        # Parse symbols (comma-separated)
+        symbols = [s.strip().upper() for s in symbols_input.split(',') if s.strip()]
+        
+        if not symbols:
+            return jsonify({'error': 'Please provide valid stock symbols'})
+        
+        # Limit to reasonable number of stocks
+        if len(symbols) > 10:
+            return jsonify({'error': 'Please limit analysis to 10 stocks or fewer'})
+        
+        # Initialize scoring engine
+        scorer = StockScoring()
+        
+        # Analyze stocks
+        results = scorer.analyze_stocks(symbols)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'})
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 @app.route('/predict', methods=['POST'])

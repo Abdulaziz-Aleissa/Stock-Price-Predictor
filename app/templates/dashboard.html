@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -39,6 +38,9 @@
             <h1>Dashboard</h1>
             <div>
                 <a href="{{ url_for('index') }}" class="btn btn-custom me-2">New Prediction</a>
+                <button class="btn btn-custom me-2" data-bs-toggle="modal" data-bs-target="#stockScoringModal">
+                    Stock Scoring
+                </button>
                 <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
             </div>
         </div>
@@ -344,6 +346,57 @@
         </div>
     </div>
 
+    <!-- Stock Scoring Modal -->
+    <div class="modal fade" id="stockScoringModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Stock Scoring & Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="stockScoringForm">
+                        <div class="mb-3">
+                            <label class="form-label">Stock Symbols (comma-separated for multiple)</label>
+                            <input type="text" class="form-control" name="symbols" placeholder="e.g., AAPL, MSFT, GOOGL" required>
+                            <div class="form-text">Enter one or more stock symbols separated by commas</div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="scoringSpinner"></span>
+                            Analyze Stocks
+                        </button>
+                    </form>
+                    
+                    <div id="scoringResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <h6>Analysis Results</h6>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>P/E</th>
+                                        <th>P/B</th>
+                                        <th>ROE</th>
+                                        <th>EV/EBITDA</th>
+                                        <th>RSI</th>
+                                        <th>Volatility</th>
+                                        <th>Total Score</th>
+                                        <th>Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scoringTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="scoringError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script>
@@ -363,6 +416,81 @@
             modal.hide();
         })
         .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Stock Scoring Form Handler
+    document.getElementById('stockScoringForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('scoringSpinner');
+        const resultsDiv = document.getElementById('scoringResults');
+        const errorDiv = document.getElementById('scoringError');
+        const tableBody = document.getElementById('scoringTableBody');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/stock_scoring', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Clear previous results
+            tableBody.innerHTML = '';
+            
+            // Populate results table
+            data.results.forEach(stock => {
+                const row = tableBody.insertRow();
+                
+                // Recommendation badge class
+                let badgeClass = 'bg-secondary';
+                if (stock.recommendation === 'BUY') badgeClass = 'bg-success';
+                else if (stock.recommendation === 'SELL') badgeClass = 'bg-danger';
+                else if (stock.recommendation === 'HOLD') badgeClass = 'bg-warning';
+                
+                row.innerHTML = `
+                    <td><strong>${stock.symbol}</strong></td>
+                    <td>${stock.metrics.pe_ratio !== null ? stock.metrics.pe_ratio.toFixed(2) : 'N/A'}</td>
+                    <td>${stock.metrics.pb_ratio !== null ? stock.metrics.pb_ratio.toFixed(2) : 'N/A'}</td>
+                    <td>${stock.metrics.roe !== null ? stock.metrics.roe.toFixed(2) + '%' : 'N/A'}</td>
+                    <td>${stock.metrics.ev_ebitda !== null ? stock.metrics.ev_ebitda.toFixed(2) : 'N/A'}</td>
+                    <td>${stock.metrics.rsi !== null ? stock.metrics.rsi.toFixed(2) : 'N/A'}</td>
+                    <td>${stock.metrics.volatility !== null ? (stock.metrics.volatility * 100).toFixed(2) + '%' : 'N/A'}</td>
+                    <td><strong>${stock.total_score}</strong></td>
+                    <td>
+                        <span class="badge ${badgeClass}" data-bs-toggle="tooltip" title="${stock.reasoning}">
+                            ${stock.recommendation}
+                        </span>
+                    </td>
+                `;
+            });
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred while analyzing stocks. Please try again.';
+            errorDiv.style.display = 'block';
             console.error('Error:', error);
         });
     });
