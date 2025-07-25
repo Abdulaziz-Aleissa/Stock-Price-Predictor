@@ -77,6 +77,107 @@
             {% endif %}
         </div>
 
+        <!-- News Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="metrics-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>Latest News</h4>
+                        <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#newsSection" aria-expanded="true" aria-controls="newsSection">
+                            <span class="toggle-text">Hide</span>
+                        </button>
+                    </div>
+                    
+                    {% if news_summary and news_summary.total_articles > 0 %}
+                    <div class="news-sentiment-overview mb-4">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="sentiment-stat">
+                                    <div class="stat-number">{{ news_summary.total_articles }}</div>
+                                    <div class="stat-label">Articles</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="sentiment-stat">
+                                    <div class="stat-number sentiment-{{ news_summary.sentiment_label.lower() }}">
+                                        {{ news_summary.sentiment_label }}
+                                    </div>
+                                    <div class="stat-label">Overall Sentiment</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="sentiment-stat">
+                                    <div class="stat-number positive-change">{{ news_summary.bullish_count }}</div>
+                                    <div class="stat-label">Bullish</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="sentiment-stat">
+                                    <div class="stat-number">{{ news_summary.neutral_count }}</div>
+                                    <div class="stat-label">Neutral</div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="sentiment-stat">
+                                    <div class="stat-number negative-change">{{ news_summary.bearish_count }}</div>
+                                    <div class="stat-label">Bearish</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="collapse show" id="newsSection">
+                        {% if news_articles %}
+                        <div class="news-grid">
+                            {% for article in news_articles %}
+                            <div class="news-card">
+                                <div class="news-card-header">
+                                    <h6 class="news-title">
+                                        <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+                                            {{ article.title }}
+                                        </a>
+                                    </h6>
+                                    <div class="news-meta">
+                                        <span class="news-source">{{ article.source }}</span>
+                                        <span class="news-date">{{ article.published_date }}</span>
+                                        {% if article.sentiment %}
+                                        <span class="sentiment-badge sentiment-{{ article.sentiment.label.lower().replace('-', '') }}">
+                                            {{ article.sentiment.label }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="news-summary">
+                                    {{ article.summary[:200] }}{% if article.summary|length > 200 %}...{% endif %}
+                                </div>
+                                <div class="news-card-footer">
+                                    <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="read-more-link">
+                                        Read Full Article →
+                                    </a>
+                                    {% if article.sentiment %}
+                                    <div class="sentiment-score">
+                                        Sentiment: {{ "%.2f"|format(article.sentiment.score) }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="no-news-message">
+                            <p class="text-center text-muted">
+                                <i class="fas fa-newspaper"></i><br>
+                                No recent news articles found for {{ ticker }}.<br>
+                                This could be due to API limitations or limited news coverage.
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="time-selector">
             <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
             <button class="time-btn" onclick="updateTimeframe('3M')">3M</button>
@@ -170,6 +271,21 @@
         document.querySelector('.theme-switch').addEventListener('click', () => {
             setTimeout(createChart, 100);
         });
+
+        // News section toggle functionality
+        const newsToggleBtn = document.querySelector('[data-bs-target="#newsSection"]');
+        const toggleText = document.querySelector('.toggle-text');
+        
+        if (newsToggleBtn && toggleText) {
+            newsToggleBtn.addEventListener('click', function() {
+                const newsSection = document.getElementById('newsSection');
+                const isCollapsed = !newsSection.classList.contains('show');
+                
+                setTimeout(() => {
+                    toggleText.textContent = isCollapsed ? 'Show' : 'Hide';
+                }, 150);
+            });
+        }
     </script>
 </body>
 </html>

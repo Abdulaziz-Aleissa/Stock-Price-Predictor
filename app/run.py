@@ -2,6 +2,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import os
 from app.utils.stock_scoring import StockScoring
+from app.utils.news_api import news_api
 import pandas as pd
 import numpy as np
 from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
@@ -27,6 +28,10 @@ from models.train_classifier import (
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.impute import SimpleImputer
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 
@@ -40,7 +45,7 @@ app = Flask(__name__,
            template_folder='templates',
            static_folder='static')
 
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this in production
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')  # Use env var or fallback
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -345,6 +350,23 @@ def predict():
 
         # Calculate change percentage
         price_change_pct = ((tomorrow_prediction - current_price) / current_price) * 100
+        
+        # Fetch news articles for the stock
+        try:
+            news_articles = news_api.get_stock_news(stock_ticker, limit=8)
+            news_summary = news_api.get_news_summary(stock_ticker)
+            logger.info(f"Fetched {len(news_articles)} news articles for {stock_ticker}")
+        except Exception as e:
+            logger.error(f"Error fetching news for {stock_ticker}: {str(e)}")
+            news_articles = []
+            news_summary = {
+                'total_articles': 0,
+                'avg_sentiment_score': 0,
+                'sentiment_label': 'Neutral',
+                'bullish_count': 0,
+                'bearish_count': 0,
+                'neutral_count': 0
+            }
 
         logger.info(f"Prediction complete for {stock_ticker}")
         logger.info(f"Current Price: ${current_price:.2f}")
@@ -366,7 +388,9 @@ def predict():
                 'r2_score': f"{metrics.get('r2', 0):.3f}",
                 'mae': f"${metrics.get('mae', 0):.2f}",
                 'rmse': f"${metrics.get('rmse', 0):.2f}"
-            }
+            },
+            news_articles=news_articles,
+            news_summary=news_summary
         )
 
     except Exception as e:
