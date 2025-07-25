@@ -1460,9 +1460,10 @@ p {
 
 .stat-label {
     font-size: 0.875rem;
-    color: var(--text-muted);
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
 }
 
 .stat-change {
