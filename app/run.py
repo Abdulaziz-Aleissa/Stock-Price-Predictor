@@ -380,9 +380,16 @@ def predict():
         price_change_pct = ((tomorrow_prediction - current_price) / current_price) * 100
         
         # Fetch news articles for the stock
+        news_api_key_configured = bool(os.getenv('ALPHA_VANTAGE_API_KEY'))
+        news_error_message = None
+        
         try:
             news_articles = news_api.get_stock_news(stock_ticker, limit=8)
             news_summary = news_api.get_news_summary(stock_ticker)
+            
+            if not news_articles and not news_api_key_configured:
+                news_error_message = "To get real news articles, please configure your Alpha Vantage API key in the .env file. See NEWS_SETUP.md for instructions."
+            
             logger.info(f"Fetched {len(news_articles)} news articles for {stock_ticker}")
         except Exception as e:
             logger.error(f"Error fetching news for {stock_ticker}: {str(e)}")
@@ -395,6 +402,8 @@ def predict():
                 'bearish_count': 0,
                 'neutral_count': 0
             }
+            if not news_api_key_configured:
+                news_error_message = "To get real news articles, please configure your Alpha Vantage API key in the .env file. See NEWS_SETUP.md for instructions."
 
         logger.info(f"Prediction complete for {stock_ticker}")
         logger.info(f"Current Price: ${current_price:.2f}")
@@ -418,7 +427,8 @@ def predict():
                 'rmse': f"${metrics.get('rmse', 0):.2f}"
             },
             news_articles=news_articles,
-            news_summary=news_summary
+            news_summary=news_summary,
+            news_error_message=news_error_message
         )
 
     except Exception as e:

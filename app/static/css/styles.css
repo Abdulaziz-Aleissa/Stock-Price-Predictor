@@ -547,6 +547,27 @@ body {
     color: var(--text-secondary);
 }
 
+.no-news-message .alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: var(--text-primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 0;
+}
+
+[data-theme="light"] .no-news-message .alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    color: var(--text-primary);
+}
+
+.no-news-message .alert-warning i {
+    font-size: 1.5rem;
+    margin-right: 8px;
+    color: #ffc107;
+}
+
 .no-news-message i {
     font-size: 2rem;
     margin-bottom: 16px;

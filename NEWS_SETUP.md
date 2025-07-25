@@ -43,7 +43,9 @@ You can test the news API functionality:
 python3 test_news_api.py
 ```
 
-If no API key is configured, the system will automatically use mock data for demonstration purposes.
+If no API key is configured, the system will show a clear message indicating that an API key is required for real news articles.
+
+**Important**: To get real, live news articles instead of demo data, you must configure a valid Alpha Vantage API key.
 
 ## Features
 

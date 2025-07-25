@@ -69,8 +69,8 @@ class NewsAPI:
     def _make_request(self, params: Dict[str, str]) -> Optional[Dict]:
         """Make API request with error handling and rate limiting"""
         if not self.api_key:
-            logger.warning("Alpha Vantage API key not found. Using mock data.")
-            return self._get_mock_news_data(params.get('tickers', ''))
+            logger.error("Alpha Vantage API key not found. Real news requires an API key.")
+            return None
         
         self._rate_limit()
         
@@ -97,167 +97,7 @@ class NewsAPI:
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing API response: {str(e)}")
             return None
-    
-    def _get_mock_news_data(self, ticker: str) -> Dict:
-        """Return mock news data when API key is not available"""
-        # Generate current dates dynamically
-        now = datetime.now()
-        dates = []
-        times = ["120000", "143000", "094500", "160000", "113000"]
-        
-        for i in range(5):
-            # Generate dates from today going backwards
-            date = now - timedelta(days=i)
-            # Format as YYYYMMDDTHHMMSS
-            formatted_date = date.strftime("%Y%m%d") + "T" + times[i]
-            dates.append(formatted_date)
-            
-        # Format URLs with current year and month
-        current_year = now.year
-        current_month = now.month
-        
-        return {
-            "items": str(5),
-            "sentiment_score_definition": "x <= -0.35: Bearish; -0.35 < x <= -0.15: Somewhat-Bearish; -0.15 < x < 0.15: Neutral; 0.15 <= x < 0.35: Somewhat_Bullish; x >= 0.35: Bullish",
-            "relevance_score_definition": "0 < x <= 1, with a higher score indicating higher relevance.",
-            "feed": [
-                {
-                    "title": f"{ticker} Reports Strong Q4 Earnings with Record Revenue Growth",
-                    "url": f"https://www.marketwatch.com/story/{ticker.lower()}-reports-earnings-{current_year}-{current_month:02d}-{now.day:02d}",
-                    "time_published": dates[0],
-                    "authors": ["Financial News"],
-                    "summary": f"Company {ticker} announced impressive quarterly results, beating analyst expectations on both revenue and earnings per share. The strong performance was driven by increased demand and operational efficiency improvements.",
-                    "banner_image": "https://example.com/image1.jpg",
-                    "source": "MarketWatch",
-                    "category_within_source": "Finance",
-                    "source_domain": "marketwatch.com",
-                    "topics": [
-                        {
-                            "topic": "Earnings",
-                            "relevance_score": "0.9"
-                        }
-                    ],
-                    "overall_sentiment_score": 0.4,
-                    "overall_sentiment_label": "Bullish",
-                    "ticker_sentiment": [
-                        {
-                            "ticker": ticker,
-                            "relevance_score": "0.95",
-                            "ticker_sentiment_score": "0.42",
-                            "ticker_sentiment_label": "Bullish"
-                        }
-                    ]
-                },
-                {
-                    "title": f"Analysts Upgrade {ticker} Stock Rating Following Strategic Partnership",
-                    "url": f"https://finance.yahoo.com/news/{ticker.lower()}-analysts-upgrade-{current_year}-{current_month:02d}-{(now - timedelta(days=1)).day:02d}",
-                    "time_published": dates[1],
-                    "authors": ["Investment Analysis"],
-                    "summary": f"Multiple analysts have raised their price targets for {ticker} following announcement of a strategic partnership that could expand market reach and boost future revenue streams.",
-                    "banner_image": "https://example.com/image2.jpg",
-                    "source": "Yahoo Finance",
-                    "category_within_source": "Markets",
-                    "source_domain": "finance.yahoo.com",
-                    "topics": [
-                        {
-                            "topic": "Financial Markets",
-                            "relevance_score": "0.8"
-                        }
-                    ],
-                    "overall_sentiment_score": 0.3,
-                    "overall_sentiment_label": "Somewhat-Bullish",
-                    "ticker_sentiment": [
-                        {
-                            "ticker": ticker,
-                            "relevance_score": "0.88",
-                            "ticker_sentiment_score": "0.31",
-                            "ticker_sentiment_label": "Somewhat-Bullish"
-                        }
-                    ]
-                },
-                {
-                    "title": f"Market Volatility Affects {ticker} Despite Strong Fundamentals",
-                    "url": f"https://www.reuters.com/business/{ticker.lower()}-market-volatility-{current_year}-{current_month:02d}-{(now - timedelta(days=2)).day:02d}",
-                    "time_published": dates[2],
-                    "authors": ["Market Reporter"],
-                    "summary": f"While {ticker} maintains solid business fundamentals, broader market uncertainty and sector-wide concerns have created some volatility in the stock price recently.",
-                    "banner_image": "https://example.com/image3.jpg",
-                    "source": "Reuters",
-                    "category_within_source": "Business",
-                    "source_domain": "reuters.com",
-                    "topics": [
-                        {
-                            "topic": "Technology",
-                            "relevance_score": "0.7"
-                        }
-                    ],
-                    "overall_sentiment_score": -0.1,
-                    "overall_sentiment_label": "Neutral",
-                    "ticker_sentiment": [
-                        {
-                            "ticker": ticker,
-                            "relevance_score": "0.82",
-                            "ticker_sentiment_score": "-0.08",
-                            "ticker_sentiment_label": "Neutral"
-                        }
-                    ]
-                },
-                {
-                    "title": f"{ticker} Announces New Product Line Expected to Drive Growth",
-                    "url": f"https://www.bloomberg.com/news/articles/{current_year}-{current_month:02d}-{(now - timedelta(days=3)).day:02d}/{ticker.lower()}-product-line-growth",
-                    "time_published": dates[3],
-                    "authors": ["Business News"],
-                    "summary": f"The company unveiled its latest product innovation, which management expects to capture significant market share and contribute meaningfully to revenue growth in the coming quarters.",
-                    "banner_image": "https://example.com/image4.jpg",
-                    "source": "Bloomberg",
-                    "category_within_source": "Technology",
-                    "source_domain": "bloomberg.com",
-                    "topics": [
-                        {
-                            "topic": "Technology",
-                            "relevance_score": "0.9"
-                        }
-                    ],
-                    "overall_sentiment_score": 0.35,
-                    "overall_sentiment_label": "Bullish",
-                    "ticker_sentiment": [
-                        {
-                            "ticker": ticker,
-                            "relevance_score": "0.92",
-                            "ticker_sentiment_score": "0.38",
-                            "ticker_sentiment_label": "Bullish"
-                        }
-                    ]
-                },
-                {
-                    "title": f"Industry Trends Support Long-term Outlook for {ticker}",
-                    "url": f"https://www.cnbc.com/{current_year}/{current_month:02d}/{(now - timedelta(days=4)).day:02d}/{ticker.lower()}-industry-outlook.html",
-                    "time_published": dates[4],
-                    "authors": ["Industry Analysis"],
-                    "summary": f"Sector analysis indicates favorable long-term trends that position {ticker} well for sustained growth, despite short-term market challenges facing the broader industry.",
-                    "banner_image": "https://example.com/image5.jpg",
-                    "source": "CNBC",
-                    "category_within_source": "Investing",
-                    "source_domain": "cnbc.com",
-                    "topics": [
-                        {
-                            "topic": "Financial Markets",
-                            "relevance_score": "0.75"
-                        }
-                    ],
-                    "overall_sentiment_score": 0.2,
-                    "overall_sentiment_label": "Somewhat-Bullish",
-                    "ticker_sentiment": [
-                        {
-                            "ticker": ticker,
-                            "relevance_score": "0.78",
-                            "ticker_sentiment_score": "0.22",
-                            "ticker_sentiment_label": "Somewhat-Bullish"
-                        }
-                    ]
-                }
-            ]
-        }
+
     
     def _parse_news_article(self, article_data: Dict, ticker: str) -> Optional[NewsArticle]:
         """Parse API response data into NewsArticle objects"""
@@ -329,13 +169,25 @@ class NewsAPI:
             logger.info(f"Returning cached news for {ticker}")
             return cached_articles
         
+        # Check if API key is configured
+        if not self.api_key:
+            logger.error(f"Cannot fetch real news for {ticker}: Alpha Vantage API key not configured")
+            logger.info("To get real news articles, please:")
+            logger.info("1. Get a free API key from https://www.alphavantage.co/support/#api-key")
+            logger.info("2. Copy .env.example to .env")
+            logger.info("3. Add your API key to the .env file")
+            logger.info("4. See NEWS_SETUP.md for detailed instructions")
+            return []
+        
         # Prepare API parameters
         params = {
             'function': 'NEWS_SENTIMENT',
             'tickers': ticker,
             'limit': str(limit),
-            'apikey': self.api_key or 'demo'
+            'apikey': self.api_key
         }
+        
+        logger.info(f"Making real API call to Alpha Vantage for {ticker} news...")
         
         # Make API request
         data = self._make_request(params)

@@ -167,11 +167,19 @@
                         </div>
                         {% else %}
                         <div class="no-news-message">
+                            {% if news_error_message %}
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-key"></i>
+                                <strong>API Key Required for Real News</strong><br>
+                                {{ news_error_message }}
+                            </div>
+                            {% else %}
                             <p class="text-center text-muted">
                                 <i class="fas fa-newspaper"></i><br>
                                 No recent news articles found for {{ ticker }}.<br>
                                 This could be due to API limitations or limited news coverage.
                             </p>
+                            {% endif %}
                         </div>
                         {% endif %}
                     </div>
