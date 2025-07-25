@@ -8109,6 +8109,227 @@
                                     { title: 'M&A Analysis Framework', link: '#', icon: 'handshake' },
                                     { title: 'Due Diligence Checklist', link: '#', icon: 'tasks' }
                                 ]
+                            },
+                            {
+                                title: 'Quantitative Risk Analytics',
+                                icon: 'calculator',
+                                concepts: [
+                                    'Value at Risk (VaR) methodologies and applications',
+                                    'Time Series Forecasting with ARIMA and GARCH models',
+                                    'Monte Carlo simulations for portfolio risk assessment',
+                                    'Backtesting frameworks for strategy validation',
+                                    'Options pricing and Greeks sensitivity analysis'
+                                ],
+                                conceptExplanations: [
+                                    {
+                                        title: 'Value at Risk (VaR) methodologies and applications',
+                                        content: `
+                                            <h5>Value at Risk (VaR) Analysis</h5>
+                                            <p><strong>Understanding VaR:</strong></p>
+                                            <p>Value at Risk quantifies the maximum potential loss in a portfolio over a specific time period at a given confidence level, making it essential for Islamic investment risk management.</p>
+                                            
+                                            <p><strong>VaR Calculation Methods:</strong></p>
+                                            <ul>
+                                                <li><strong>Historical VaR:</strong> Uses actual historical price movements to estimate future risk without distributional assumptions</li>
+                                                <li><strong>Parametric VaR:</strong> Assumes normal distribution of returns for mathematical simplicity and quick calculation</li>
+                                                <li><strong>Monte Carlo VaR:</strong> Simulates thousands of potential price paths for comprehensive risk assessment</li>
+                                            </ul>
+                                            
+                                            <p><strong>VaR Applications in Islamic Finance:</strong></p>
+                                            <ul>
+                                                <li><strong>Portfolio Risk Limits:</strong> Setting maximum acceptable loss thresholds for Sharia-compliant investments</li>
+                                                <li><strong>Capital Allocation:</strong> Determining optimal position sizes based on risk tolerance</li>
+                                                <li><strong>Regulatory Compliance:</strong> Meeting SAMA risk management requirements</li>
+                                                <li><strong>Investor Communication:</strong> Clearly explaining potential losses to stakeholders</li>
+                                            </ul>
+                                            
+                                            <p><strong>Expected Shortfall (CVaR):</strong></p>
+                                            <ul>
+                                                <li><strong>Tail Risk Measurement:</strong> Average loss beyond VaR threshold for extreme scenarios</li>
+                                                <li><strong>Coherent Risk Measure:</strong> Mathematically superior to VaR for optimization</li>
+                                                <li><strong>Stress Testing:</strong> Understanding worst-case scenario impacts</li>
+                                                <li><strong>Islamic Compliance:</strong> Ensuring risk measures align with Sharia principles</li>
+                                            </ul>
+                                            
+                                            <p><strong>Practical Implementation:</strong></p>
+                                            <ul>
+                                                <li><strong>Holding Periods:</strong> 1-day for trading, 10-day for risk management, 1-month for strategic planning</li>
+                                                <li><strong>Confidence Levels:</strong> 95% for routine monitoring, 99% for stress testing</li>
+                                                <li><strong>Backtesting:</strong> Regular validation of VaR model accuracy</li>
+                                                <li><strong>Risk Reporting:</strong> Daily, weekly, and monthly risk dashboards</li>
+                                            </ul>
+                                        `
+                                    },
+                                    {
+                                        title: 'Time Series Forecasting with ARIMA and GARCH models',
+                                        content: `
+                                            <h5>Advanced Time Series Forecasting</h5>
+                                            <p><strong>ARIMA Models for Price Prediction:</strong></p>
+                                            <p>AutoRegressive Integrated Moving Average (ARIMA) models capture price trends and patterns for Islamic investment forecasting while respecting market efficiency principles.</p>
+                                            
+                                            <p><strong>ARIMA Components:</strong></p>
+                                            <ul>
+                                                <li><strong>AutoRegressive (AR):</strong> Price depends on its own past values</li>
+                                                <li><strong>Integrated (I):</strong> Differencing to achieve stationarity</li>
+                                                <li><strong>Moving Average (MA):</strong> Price depends on past forecast errors</li>
+                                                <li><strong>Model Selection:</strong> AIC/BIC criteria for optimal parameter selection</li>
+                                            </ul>
+                                            
+                                            <p><strong>GARCH Models for Volatility Forecasting:</strong></p>
+                                            <ul>
+                                                <li><strong>Volatility Clustering:</strong> High volatility periods followed by high volatility</li>
+                                                <li><strong>Conditional Heteroskedasticity:</strong> Time-varying volatility modeling</li>
+                                                <li><strong>Risk Management:</strong> Dynamic hedging and position sizing</li>
+                                                <li><strong>Options Pricing:</strong> Improving Black-Scholes with realistic volatility</li>
+                                            </ul>
+                                            
+                                            <p><strong>Islamic Finance Applications:</strong></p>
+                                            <ul>
+                                                <li><strong>Sukuk Yield Forecasting:</strong> Predicting Islamic bond returns</li>
+                                                <li><strong>Commodity Price Trends:</strong> Gold, silver, and halal commodity forecasting</li>
+                                                <li><strong>Currency Risk:</strong> SAR and major currency pair volatility</li>
+                                                <li><strong>Market Timing:</strong> Optimal entry/exit points for Sharia-compliant investments</li>
+                                            </ul>
+                                            
+                                            <p><strong>Model Validation and Limitations:</strong></p>
+                                            <ul>
+                                                <li><strong>Out-of-Sample Testing:</strong> Validating forecasts on unseen data</li>
+                                                <li><strong>Structural Breaks:</strong> Handling regime changes and market shifts</li>
+                                                <li><strong>Forecast Intervals:</strong> Quantifying prediction uncertainty</li>
+                                                <li><strong>Model Diagnostics:</strong> Residual analysis and goodness-of-fit testing</li>
+                                            </ul>
+                                        `
+                                    },
+                                    {
+                                        title: 'Monte Carlo simulations for portfolio risk assessment',
+                                        content: `
+                                            <h5>Monte Carlo Simulation in Islamic Finance</h5>
+                                            <p><strong>Simulation-Based Risk Analysis:</strong></p>
+                                            <p>Monte Carlo methods generate thousands of potential market scenarios to assess portfolio risk and return distributions for Sharia-compliant investments.</p>
+                                            
+                                            <p><strong>Simulation Framework:</strong></p>
+                                            <ul>
+                                                <li><strong>Random Number Generation:</strong> Creating statistically valid random scenarios</li>
+                                                <li><strong>Correlation Modeling:</strong> Maintaining realistic asset relationships</li>
+                                                <li><strong>Path Generation:</strong> Simulating price paths over different time horizons</li>
+                                                <li><strong>Statistical Analysis:</strong> Extracting meaningful risk metrics from simulation results</li>
+                                            </ul>
+                                            
+                                            <p><strong>Islamic Portfolio Applications:</strong></p>
+                                            <ul>
+                                                <li><strong>Asset Allocation:</strong> Optimizing Sharia-compliant portfolio weights</li>
+                                                <li><strong>Scenario Planning:</strong> Stress testing under various market conditions</li>
+                                                <li><strong>Capital Planning:</strong> Determining adequate capital reserves</li>
+                                                <li><strong>Performance Attribution:</strong> Understanding sources of portfolio risk and return</li>
+                                            </ul>
+                                            
+                                            <p><strong>Risk Metrics from Simulation:</strong></p>
+                                            <ul>
+                                                <li><strong>Probability Distributions:</strong> Full range of potential outcomes</li>
+                                                <li><strong>Percentile Analysis:</strong> Best case, worst case, and median scenarios</li>
+                                                <li><strong>Tail Risk Measures:</strong> Extreme loss probabilities and magnitudes</li>
+                                                <li><strong>Time Horizon Analysis:</strong> Risk evolution over different periods</li>
+                                            </ul>
+                                            
+                                            <p><strong>Advanced Techniques:</strong></p>
+                                            <ul>
+                                                <li><strong>Quasi-Monte Carlo:</strong> More efficient sampling for better convergence</li>
+                                                <li><strong>Importance Sampling:</strong> Focusing on rare but important events</li>
+                                                <li><strong>Antithetic Variables:</strong> Variance reduction techniques</li>
+                                                <li><strong>Control Variates:</strong> Using known analytical results to improve accuracy</li>
+                                            </ul>
+                                        `
+                                    },
+                                    {
+                                        title: 'Backtesting frameworks for strategy validation',
+                                        content: `
+                                            <h5>Strategy Backtesting and Validation</h5>
+                                            <p><strong>Historical Performance Testing:</strong></p>
+                                            <p>Backtesting evaluates trading strategies against historical data to assess their viability for Islamic investment approaches while avoiding hindsight bias.</p>
+                                            
+                                            <p><strong>Backtesting Framework Components:</strong></p>
+                                            <ul>
+                                                <li><strong>Data Quality:</strong> Clean, adjusted historical price and volume data</li>
+                                                <li><strong>Transaction Costs:</strong> Realistic trading costs including spreads and commissions</li>
+                                                <li><strong>Market Impact:</strong> Price impact of large orders and liquidity constraints</li>
+                                                <li><strong>Survivorship Bias:</strong> Including delisted stocks to avoid overly optimistic results</li>
+                                            </ul>
+                                            
+                                            <p><strong>Common Trading Strategies for Islamic Markets:</strong></p>
+                                            <ul>
+                                                <li><strong>Moving Average Crossover:</strong> Simple trend-following strategy</li>
+                                                <li><strong>RSI Mean Reversion:</strong> Contrarian approach using overbought/oversold levels</li>
+                                                <li><strong>MACD Momentum:</strong> Momentum-based signal generation</li>
+                                                <li><strong>Bollinger Bands:</strong> Volatility-based trading signals</li>
+                                            </ul>
+                                            
+                                            <p><strong>Performance Metrics:</strong></p>
+                                            <ul>
+                                                <li><strong>Sharpe Ratio:</strong> Risk-adjusted return measurement</li>
+                                                <li><strong>Maximum Drawdown:</strong> Largest peak-to-trough decline</li>
+                                                <li><strong>Win Rate:</strong> Percentage of profitable trades</li>
+                                                <li><strong>Profit Factor:</strong> Ratio of gross profits to gross losses</li>
+                                            </ul>
+                                            
+                                            <p><strong>Validation Techniques:</strong></p>
+                                            <ul>
+                                                <li><strong>Out-of-Sample Testing:</strong> Testing on data not used for strategy development</li>
+                                                <li><strong>Walk-Forward Analysis:</strong> Rolling optimization and testing windows</li>
+                                                <li><strong>Monte Carlo Testing:</strong> Randomizing trade sequences to test robustness</li>
+                                                <li><strong>Cross-Validation:</strong> Multiple testing periods for statistical significance</li>
+                                            </ul>
+                                        `
+                                    },
+                                    {
+                                        title: 'Options pricing and Greeks sensitivity analysis',
+                                        content: `
+                                            <h5>Options Pricing and Risk Management</h5>
+                                            <p><strong>Black-Scholes Model for Islamic Finance:</strong></p>
+                                            <p>While traditional options may have Sharia concerns due to gharar (uncertainty), understanding pricing principles helps with Sharia-compliant structured products and risk management.</p>
+                                            
+                                            <p><strong>Black-Scholes Components:</strong></p>
+                                            <ul>
+                                                <li><strong>Current Stock Price:</strong> Market value of the underlying asset</li>
+                                                <li><strong>Strike Price:</strong> Predetermined exercise price</li>
+                                                <li><strong>Time to Expiration:</strong> Remaining life of the contract</li>
+                                                <li><strong>Risk-Free Rate:</strong> SAMA repo rate or government sukuk yield</li>
+                                                <li><strong>Volatility:</strong> Expected price fluctuation of the underlying asset</li>
+                                            </ul>
+                                            
+                                            <p><strong>The Greeks - Risk Sensitivities:</strong></p>
+                                            <ul>
+                                                <li><strong>Delta (Δ):</strong> Price sensitivity to underlying asset movement</li>
+                                                <li><strong>Gamma (Γ):</strong> Rate of change of delta (delta's delta)</li>
+                                                <li><strong>Theta (Θ):</strong> Time decay - value lost as expiration approaches</li>
+                                                <li><strong>Vega (ν):</strong> Sensitivity to volatility changes</li>
+                                                <li><strong>Rho (ρ):</strong> Sensitivity to interest rate changes</li>
+                                            </ul>
+                                            
+                                            <p><strong>Islamic Finance Applications:</strong></p>
+                                            <ul>
+                                                <li><strong>Structured Products:</strong> Pricing Sharia-compliant capital-protected notes</li>
+                                                <li><strong>Corporate Finance:</strong> Valuing employee stock options and warrants</li>
+                                                <li><strong>Real Options:</strong> Valuing investment projects with flexibility</li>
+                                                <li><strong>Risk Management:</strong> Understanding embedded options in Islamic bonds</li>
+                                            </ul>
+                                            
+                                            <p><strong>Practical Risk Management:</strong></p>
+                                            <ul>
+                                                <li><strong>Delta Hedging:</strong> Maintaining market-neutral positions</li>
+                                                <li><strong>Gamma Scalping:</strong> Profiting from volatility while staying delta-neutral</li>
+                                                <li><strong>Theta Management:</strong> Understanding time decay in structured products</li>
+                                                <li><strong>Vega Exposure:</strong> Managing volatility risk in complex instruments</li>
+                                            </ul>
+                                        `
+                                    }
+                                ],
+                                resources: [
+                                    { title: 'VaR Calculation Tools', link: '#', icon: 'exclamation-triangle' },
+                                    { title: 'Time Series Model Library', link: '#', icon: 'chart-line' },
+                                    { title: 'Monte Carlo Simulator', link: '#', icon: 'random' },
+                                    { title: 'Backtesting Framework', link: '#', icon: 'history' },
+                                    { title: 'Options Pricing Calculator', link: '#', icon: 'calculator' }
+                                ]
                             }
                         ]
                     }

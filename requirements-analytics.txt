@@ -1,0 +1,19 @@
+# Advanced Analytics Dependencies
+# Time Series Forecasting
+statsmodels>=0.14.0
+arch>=6.2.0
+
+# Enhanced Scientific Computing
+scipy>=1.10.0
+numpy>=1.21.0
+pandas>=1.5.0
+
+# Visualization (already in main requirements)
+# plotly>=5.0.0
+# matplotlib>=3.5.0
+
+# Risk Analysis
+scikit-learn>=1.0.0
+
+# Data fetching (already in main requirements)  
+# yfinance>=0.2.0
