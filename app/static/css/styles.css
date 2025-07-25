@@ -718,6 +718,7 @@ p {
 /* Tables */
 .table {
     color: var(--text-primary) !important;
+    background: transparent;
 }
 
 .table-dark {
@@ -728,6 +729,39 @@ p {
 .table th {
     border-color: var(--border-color) !important;
     vertical-align: middle;
+    background: transparent;
+}
+
+/* Enhanced table styling for dark mode */
+[data-theme="dark"] .table {
+    --bs-table-bg: rgba(30, 41, 59, 0.3);
+    --bs-table-hover-bg: rgba(59, 130, 246, 0.1);
+    --bs-table-striped-bg: rgba(30, 41, 59, 0.2);
+}
+
+[data-theme="dark"] .table > :not(caption) > * > * {
+    background-color: var(--bs-table-bg);
+    border-bottom-color: rgba(203, 213, 224, 0.2);
+}
+
+[data-theme="dark"] .table-hover > tbody > tr:hover > * {
+    background-color: var(--bs-table-hover-bg);
+}
+
+/* Light theme tables */
+[data-theme="light"] .table {
+    --bs-table-bg: rgba(255, 255, 255, 0.9);
+    --bs-table-hover-bg: rgba(59, 130, 246, 0.05);
+    --bs-table-striped-bg: rgba(248, 250, 252, 0.8);
+}
+
+[data-theme="light"] .table > :not(caption) > * > * {
+    background-color: var(--bs-table-bg);
+    border-bottom-color: var(--neutral-200);
+}
+
+[data-theme="light"] .table-hover > tbody > tr:hover > * {
+    background-color: var(--bs-table-hover-bg);
 }
 
 /* Modals */
