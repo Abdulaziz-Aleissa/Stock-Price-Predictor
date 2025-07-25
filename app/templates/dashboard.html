@@ -253,7 +253,7 @@
                             <h2 class="mb-1">🚀 Advanced Analytics</h2>
                             <p class="text-muted mb-0">Professional quantitative analysis tools for informed investment decisions</p>
                         </div>
-                        <div class="btn-group flex-wrap" role="group">
+                        <div class="d-flex flex-wrap gap-3" role="group">
                             <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
                                 📊 Monte Carlo
                             </button>
@@ -265,9 +265,6 @@
                             </button>
                             <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
                                 📈 Time Series
-                            </button>
-                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#optionsPricingModal">
-                                🎯 Options Pricing
                             </button>
                         </div>
                     </div>
@@ -295,16 +292,10 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-12 mb-3">
                             <div class="analytics-feature">
                                 <h5>📈 Time Series Forecasting</h5>
                                 <p><strong>Predictive Analytics:</strong> Advanced ARIMA and GARCH models for price and volatility forecasting with statistical validation</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="analytics-feature">
-                                <h5>🎯 Options Pricing</h5>
-                                <p><strong>Derivatives Valuation:</strong> Black-Scholes option pricing with comprehensive Greeks analysis for risk management</p>
                             </div>
                         </div>
                     </div>
@@ -814,86 +805,6 @@
         </div>
     </div>
 
-    <!-- Options Pricing Modal -->
-    <div class="modal fade" id="optionsPricingModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">🎯 Black-Scholes Options Pricing</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info">
-                        <strong>📊 Professional Options Pricing:</strong> Calculate theoretical option values using the Black-Scholes model with comprehensive Greeks analysis for risk assessment.
-                    </div>
-                    <form id="optionsPricingForm">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">Stock Symbol</label>
-                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">Strike Price ($)</label>
-                                    <input type="number" class="form-control" name="strike_price" step="0.01" min="0.01" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">Days to Expiration</label>
-                                    <input type="number" class="form-control" name="expiration_days" value="30" min="1" max="1825" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Option Type</label>
-                                    <select class="form-control" name="option_type">
-                                        <option value="call">Call Option</option>
-                                        <option value="put">Put Option</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Custom Volatility (%) - Optional</label>
-                                    <input type="number" class="form-control" name="custom_volatility" step="0.1" min="0.1" max="500" placeholder="Leave blank for historical">
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-custom w-100">
-                            <span class="spinner-border spinner-border-sm d-none" id="optionsPricingSpinner"></span>
-                            Calculate Option Price & Greeks
-                        </button>
-                    </form>
-                    
-                    <div id="optionsPricingResults" class="mt-4" style="display: none;">
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Option Valuation</h6>
-                                <div id="optionPricing"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>The Greeks (Risk Sensitivities)</h6>
-                                <div id="optionGreeks"></div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <h6>Risk Analysis & Market Context</h6>
-                            <div id="optionRiskAnalysis"></div>
-                        </div>
-                    </div>
-                    
-                    <div id="optionsPricingError" class="alert alert-danger mt-3" style="display: none;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
     <script>
@@ -1212,45 +1123,6 @@
         });
     });
 
-    // Options Pricing Form Handler
-    document.getElementById('optionsPricingForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const spinner = document.getElementById('optionsPricingSpinner');
-        const resultsDiv = document.getElementById('optionsPricingResults');
-        const errorDiv = document.getElementById('optionsPricingError');
-        
-        // Show loading state
-        spinner.classList.remove('d-none');
-        resultsDiv.style.display = 'none';
-        errorDiv.style.display = 'none';
-        
-        fetch('/options_pricing', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            spinner.classList.add('d-none');
-            
-            if (data.error) {
-                errorDiv.textContent = data.error;
-                errorDiv.style.display = 'block';
-                return;
-            }
-            
-            displayOptionsPricingResults(data.results);
-            resultsDiv.style.display = 'block';
-        })
-        .catch(error => {
-            spinner.classList.add('d-none');
-            errorDiv.textContent = 'An error occurred during options pricing. Please try again.';
-            errorDiv.style.display = 'block';
-            console.error('Error:', error);
-        });
-    });
-
     function displayVarAnalysisResults(results) {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         
@@ -1522,86 +1394,6 @@
             
             Plotly.newPlot('volatilityForecastChart', [volTrace], volLayout);
         }
-    }
-
-    // Remove all options strategy related code
-    // Update the options pricing display function
-    function displayOptionsPricingResults(results) {
-        // Option Pricing
-        document.getElementById('optionPricing').innerHTML = `
-            <div class="metrics-grid">
-                <div class="metric-item">
-                    <div class="metric-label">Option Price</div>
-                    <div class="metric-value">$${results.option_price.toFixed(3)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Intrinsic Value</div>
-                    <div class="metric-value">$${results.intrinsic_value.toFixed(3)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Time Value</div>
-                    <div class="metric-value">$${results.time_value.toFixed(3)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Breakeven Price</div>
-                    <div class="metric-value">$${results.breakeven.toFixed(2)}</div>
-                </div>
-            </div>
-        `;
-        
-        // Greeks
-        document.getElementById('optionGreeks').innerHTML = `
-            <div class="metrics-grid">
-                <div class="metric-item">
-                    <div class="metric-label">Delta (Δ)</div>
-                    <div class="metric-value">${results.greeks.delta.toFixed(4)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Gamma (Γ)</div>
-                    <div class="metric-value">${results.greeks.gamma.toFixed(4)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Theta (Θ)</div>
-                    <div class="metric-value negative-change">${results.greeks.theta.toFixed(4)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Vega (ν)</div>
-                    <div class="metric-value">${results.greeks.vega.toFixed(4)}</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Rho (ρ)</div>
-                    <div class="metric-value">${results.greeks.rho.toFixed(4)}</div>
-                </div>
-            </div>
-        `;
-        
-        // Risk Analysis
-        document.getElementById('optionRiskAnalysis').innerHTML = `
-            <div class="alert alert-info">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="metric-item">
-                            <div class="metric-label">ITM Probability</div>
-                            <div class="metric-value">${results.itm_probability.toFixed(1)}%</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="metric-item">
-                            <div class="metric-label">Moneyness</div>
-                            <div class="metric-value">${results.moneyness.toFixed(3)}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-2">
-                    <small class="text-muted">
-                        <strong>Current Price:</strong> $${results.current_price.toFixed(2)} | 
-                        <strong>Strike:</strong> $${results.strike_price.toFixed(2)} | 
-                        <strong>Volatility:</strong> ${results.volatility.toFixed(1)}% | 
-                        <strong>Time to Expiry:</strong> ${results.expiration_days} days
-                    </small>
-                </div>
-            </div>
-        `;
     }
     </script>
 </body>
