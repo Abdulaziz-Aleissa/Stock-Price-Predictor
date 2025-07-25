@@ -399,6 +399,15 @@ p {
     color: #fdfdfd !important;
 }
 
+/* Auth links text visibility fix for dark mode */
+.auth-links p.text-muted {
+    color: #fdfdfd !important;
+}
+
+[data-theme="light"] .auth-links p.text-muted {
+    color: var(--neutral-600) !important;
+}
+
 [data-theme="light"] .financial-literacy-description {
     color: var(--neutral-700) !important;
 }
