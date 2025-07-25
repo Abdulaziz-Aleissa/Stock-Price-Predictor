@@ -107,8 +107,8 @@ class NewsAPI:
             "feed": [
                 {
                     "title": f"{ticker} Reports Strong Q4 Earnings with Record Revenue Growth",
-                    "url": "https://example.com/news1",
-                    "time_published": "20241201T120000",
+                    "url": f"https://www.marketwatch.com/story/{ticker.lower()}-reports-earnings-2025-01-10",
+                    "time_published": "20250110T120000",
                     "authors": ["Financial News"],
                     "summary": f"Company {ticker} announced impressive quarterly results, beating analyst expectations on both revenue and earnings per share. The strong performance was driven by increased demand and operational efficiency improvements.",
                     "banner_image": "https://example.com/image1.jpg",
@@ -134,8 +134,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Analysts Upgrade {ticker} Stock Rating Following Strategic Partnership",
-                    "url": "https://example.com/news2",
-                    "time_published": "20241130T143000",
+                    "url": f"https://finance.yahoo.com/news/{ticker.lower()}-analysts-upgrade-2025-01-09",
+                    "time_published": "20250109T143000",
                     "authors": ["Investment Analysis"],
                     "summary": f"Multiple analysts have raised their price targets for {ticker} following announcement of a strategic partnership that could expand market reach and boost future revenue streams.",
                     "banner_image": "https://example.com/image2.jpg",
@@ -161,8 +161,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Market Volatility Affects {ticker} Despite Strong Fundamentals",
-                    "url": "https://example.com/news3",
-                    "time_published": "20241129T094500",
+                    "url": f"https://www.reuters.com/business/{ticker.lower()}-market-volatility-2025-01-08",
+                    "time_published": "20250108T094500",
                     "authors": ["Market Reporter"],
                     "summary": f"While {ticker} maintains solid business fundamentals, broader market uncertainty and sector-wide concerns have created some volatility in the stock price recently.",
                     "banner_image": "https://example.com/image3.jpg",
@@ -188,8 +188,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"{ticker} Announces New Product Line Expected to Drive Growth",
-                    "url": "https://example.com/news4",
-                    "time_published": "20241128T160000",
+                    "url": f"https://www.bloomberg.com/news/articles/2025-01-07/{ticker.lower()}-product-line-growth",
+                    "time_published": "20250107T160000",
                     "authors": ["Business News"],
                     "summary": f"The company unveiled its latest product innovation, which management expects to capture significant market share and contribute meaningfully to revenue growth in the coming quarters.",
                     "banner_image": "https://example.com/image4.jpg",
@@ -215,8 +215,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Industry Trends Support Long-term Outlook for {ticker}",
-                    "url": "https://example.com/news5",
-                    "time_published": "20241127T113000",
+                    "url": f"https://www.cnbc.com/2025/01/06/{ticker.lower()}-industry-outlook.html",
+                    "time_published": "20250106T113000",
                     "authors": ["Industry Analysis"],
                     "summary": f"Sector analysis indicates favorable long-term trends that position {ticker} well for sustained growth, despite short-term market challenges facing the broader industry.",
                     "banner_image": "https://example.com/image5.jpg",

@@ -328,15 +328,43 @@ def predict():
         if 'Date' in X.columns:
             X = X.drop(columns=['Date'])
             
-        # Final check for NaN values
+        # Comprehensive data validation and cleaning
+        # Replace infinite values
+        numeric_columns = X.select_dtypes(include=[np.number]).columns
+        X[numeric_columns] = X[numeric_columns].replace([np.inf, -np.inf], 0)
+        
+        # Fill NaN values
         if X.isna().any().any():
             X = X.fillna(0)
             logger.info("Filled remaining NaN values with 0")
         
+        # Check for extremely large values and cap them
+        for col in numeric_columns:
+            max_val = X[col].abs().max()
+            if max_val > 1e10:
+                logger.warning(f"Capping extremely large values in {col}")
+                X[col] = X[col].clip(-1e6, 1e6)
+        
+        # Final validation before scaling
+        if np.isinf(X.values).any() or np.isnan(X.values).any():
+            logger.error("Data still contains infinite or NaN values after cleaning")
+            return render_template('error.html', error="Data processing error: Invalid values detected")
+        
         # Scale features and make predictions
-        X_scaled = scaler.transform(X)
-        predicted_prices = model.predict(X_scaled).tolist()
-        tomorrow_prediction = predicted_prices[-1]
+        try:
+            X_scaled = scaler.transform(X)
+            
+            # Additional check after scaling
+            if np.isinf(X_scaled).any() or np.isnan(X_scaled).any():
+                logger.error("Scaled data contains infinite or NaN values")
+                return render_template('error.html', error="Data scaling error: Invalid values after scaling")
+            
+            predicted_prices = model.predict(X_scaled).tolist()
+            tomorrow_prediction = predicted_prices[-1]
+            
+        except Exception as e:
+            logger.error(f"Error in prediction: {str(e)}")
+            return render_template('error.html', error=f"Prediction error: {str(e)}")
         
         # Get actual prices
         actual_prices = df['Close'].tolist()
