@@ -31,6 +31,7 @@
             <div class="nav-container">
                 <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
                 <div class="nav-links">
+                    <span class="user-welcome">👤 {{ current_user.username }}</span>
                     <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 Education</a>
                     <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🔍 New Analysis</a>
                     <button class="btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#stockScoringModal">
@@ -102,23 +103,23 @@
                             </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Shares</th>
-                                    <th>Buy Price</th>
-                                    <th>Current</th>
-                                    <th>Value</th>
-                                    <th>P/L</th>
-                                    <th>Change</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Shares</th>
+                                    <th style="color: var(--text-primary);">Buy Price</th>
+                                    <th style="color: var(--text-primary);">Current</th>
+                                    <th style="color: var(--text-primary);">Value</th>
+                                    <th style="color: var(--text-primary);">P/L</th>
+                                    <th style="color: var(--text-primary);">Change</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for item in portfolio %}
-                                <tr>
-                                    <td>{{ item.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ item.symbol }}</td>
                                     <td>{{ "%.2f"|format(item.shares) }}</td>
                                     <td>${{ "%.2f"|format(item.purchase_price) }}</td>
                                     <td>${{ "%.2f"|format(item.current_price) }}</td>
@@ -152,20 +153,20 @@
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Target</th>
-                                    <th>Current</th>
-                                    <th>Distance</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Target</th>
+                                    <th style="color: var(--text-primary);">Current</th>
+                                    <th style="color: var(--text-primary);">Distance</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for item in watchlist %}
-                                <tr>
-                                    <td>{{ item.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ item.symbol }}</td>
                                     <td>${{ "%.2f"|format(item.target_price) }}</td>
                                     <td>${{ "%.2f"|format(item.current_price) }}</td>
                                     <td class="{{ 'positive-change' if item.current_price >= item.target_price else 'negative-change' }}">
@@ -194,21 +195,21 @@
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Condition</th>
-                                    <th>Target Price</th>
-                                    <th>Current Price</th>
-                                    <th>Status</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Condition</th>
+                                    <th style="color: var(--text-primary);">Target Price</th>
+                                    <th style="color: var(--text-primary);">Current Price</th>
+                                    <th style="color: var(--text-primary);">Status</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for alert in alerts %}
-                                <tr>
-                                    <td>{{ alert.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ alert.symbol }}</td>
                                     <td>Goes {{ alert.condition }}</td>
                                     <td>${{ "%.2f"|format(alert.target_price) }}</td>
                                     <td>${{ "%.2f"|format(alert.current_price) }}</td>
@@ -247,22 +248,25 @@
             <!-- Advanced Analytics Section -->
             <div class="col-md-12 mt-4">
                 <div class="metrics-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>🚀 Advanced Analytics</h2>
-                        <div class="btn-group" role="group">
-                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                        <div class="mb-3 mb-md-0">
+                            <h2 class="mb-1">🚀 Advanced Analytics</h2>
+                            <p class="text-muted mb-0">Professional quantitative analysis tools for informed investment decisions</p>
+                        </div>
+                        <div class="btn-group flex-wrap" role="group">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
                                 📊 Monte Carlo
                             </button>
-                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#backtestingModal">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#backtestingModal">
                                 📈 Backtesting
                             </button>
-                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#varAnalysisModal">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#varAnalysisModal">
                                 ⚠️ Value at Risk
                             </button>
-                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
                                 📈 Time Series
                             </button>
-                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#optionsPricingModal">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#optionsPricingModal">
                                 🎯 Options Pricing
                             </button>
                         </div>
@@ -443,21 +447,21 @@
                         <hr>
                         <h6>Analysis Results</h6>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover">
-                                <thead>
+                            <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                                <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                     <tr>
-                                        <th>Symbol</th>
-                                        <th>P/E</th>
-                                        <th>P/B</th>
-                                        <th>ROE</th>
-                                        <th>EV/EBITDA</th>
-                                        <th>RSI</th>
-                                        <th>Volatility</th>
-                                        <th>Total Score</th>
-                                        <th>Recommendation</th>
+                                        <th style="color: var(--text-primary);">Symbol</th>
+                                        <th style="color: var(--text-primary);">P/E</th>
+                                        <th style="color: var(--text-primary);">P/B</th>
+                                        <th style="color: var(--text-primary);">ROE</th>
+                                        <th style="color: var(--text-primary);">EV/EBITDA</th>
+                                        <th style="color: var(--text-primary);">RSI</th>
+                                        <th style="color: var(--text-primary);">Volatility</th>
+                                        <th style="color: var(--text-primary);">Total Score</th>
+                                        <th style="color: var(--text-primary);">Recommendation</th>
                                     </tr>
                                 </thead>
-                                <tbody id="scoringTableBody">
+                                <tbody id="scoringTableBody" style="color: var(--text-secondary);">
                                 </tbody>
                             </table>
                         </div>
@@ -1276,7 +1280,7 @@
         
         // VaR Comparison
         const var95Methods = ['Historical', 'Parametric', 'MC'];
-        let varComparisonHTML = '<div class="table-responsive"><table class="table table-sm table-dark"><thead><tr><th>Method</th><th>95% VaR</th><th>99% VaR</th></tr></thead><tbody>';
+        let varComparisonHTML = '<div class="table-responsive"><table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);"><thead style="background: var(--bg-tertiary);"><tr><th style="color: var(--text-primary);">Method</th><th style="color: var(--text-primary);">95% VaR</th><th style="color: var(--text-primary);">99% VaR</th></tr></thead><tbody style="color: var(--text-secondary);">';
         
         var95Methods.forEach(method => {
             const var95 = method === 'Historical' ? results.historical_var.VaR_95 :
@@ -1288,8 +1292,8 @@
             
             if (var95 !== undefined && var99 !== undefined) {
                 varComparisonHTML += `
-                    <tr>
-                        <td><strong>${method}</strong></td>
+                    <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                        <td style="color: var(--text-primary);"><strong>${method}</strong></td>
                         <td class="negative-change">${var95.toFixed(2)}%</td>
                         <td class="negative-change">${var99.toFixed(2)}%</td>
                     </tr>

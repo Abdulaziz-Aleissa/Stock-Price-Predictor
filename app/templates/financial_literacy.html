@@ -31,9 +31,16 @@
             <div class="nav-container">
                 <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
                 <div class="nav-links">
-                    <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
-                    <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 Login</a>
-                    <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ Sign Up</a>
+                    {% if current_user.is_authenticated %}
+                        <span class="user-welcome">👤 {{ current_user.username }}</span>
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn-secondary btn-sm">📊 Dashboard</a>
+                        <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
+                        <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 Login</a>
+                        <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ Sign Up</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -56,7 +63,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: var(--bg-primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -699,23 +706,6 @@
     </style>
 </head>
 <body>
-    <!-- Theme Switch -->
-    <div class="theme-switch">
-        <div class="switch-track">
-            <div class="switch-icons">
-                <div class="sun">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                </div>
-                <div class="moon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </div>
-            </div>
-            <div class="switch-circle"></div>
-        </div>
-    </div>
-
-
-
     <!-- Market Selection Modal -->
     <div class="market-selector" id="marketSelector">
         <div class="selector-card">
@@ -743,18 +733,6 @@
     <div class="content-box">
         <!-- Main Content (Hidden until market selected) -->
         <div class="financial-content" id="financialContent">
-            <!-- Navigation -->
-            <div class="nav-links">
-                <a href="{{ url_for('index') }}" class="btn btn-custom">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard') }}" class="btn btn-custom">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </a>
-                {% endif %}
-            </div>
-
             <!-- Hero Section -->
             <div class="hero-section">
                 <h1 class="hero-title">

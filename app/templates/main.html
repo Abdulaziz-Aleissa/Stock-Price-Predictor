@@ -26,12 +26,19 @@
             </div>
         </div>
 
+        {% if current_user.is_authenticated %}
+        <!-- User Info Display -->
+        <div class="user-info-display">
+            <span class="user-welcome">👤 Welcome, {{ current_user.username }}!</span>
+        </div>
+        {% endif %}
+
         <!-- Main Content Wrapper -->
         <div class="content-wrapper">
             <div class="content-box animate-fade-in">
                 <div class="search-container">
                     <h1 class="main-title">Stock Price Predictor</h1>
-                    <p class="text-center text-muted mb-4" style="font-size: 1.125rem; max-width: 600px; margin: 0 auto 2rem;">
+                    <p class="text-center mb-4" style="font-size: 1.125rem; max-width: 600px; margin: 0 auto 2rem; color: var(--text-secondary); font-weight: 500;">
                         Professional-grade stock analysis with AI-powered predictions, real-time news sentiment, and advanced analytics
                     </p>
                     
