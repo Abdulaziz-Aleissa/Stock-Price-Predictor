@@ -3,6 +3,9 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 import os
 from app.utils.stock_scoring import StockScoring
 from app.utils.news_api import news_api
+from app.utils.monte_carlo import monte_carlo_simulator
+from app.utils.backtesting import backtesting_framework
+from app.utils.options_pricing import options_pricing
 import pandas as pd
 import numpy as np
 from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
@@ -693,6 +696,194 @@ def compare_stocks():
     }
     
     return jsonify(data)
+
+@app.route('/monte_carlo_simulation', methods=['POST'])
+@login_required
+def monte_carlo_simulation():
+    """Handle Monte Carlo simulation requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        days = int(request.form.get('days', 30))
+        simulations = int(request.form.get('simulations', 1000))
+        investment_amount = float(request.form.get('investment_amount', 10000))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Limit parameters for performance
+        days = min(max(days, 1), 365)  # 1 to 365 days
+        simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
+        investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
+        
+        # Run risk analysis
+        results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Simulation failed: {str(e)}'})
+
+@app.route('/backtesting', methods=['POST'])
+@login_required
+def backtesting():
+    """Handle backtesting requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        strategy = request.form.get('strategy', 'moving_average_crossover')
+        initial_capital = float(request.form.get('initial_capital', 10000))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Limit initial capital
+        initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
+        
+        # Valid strategies
+        valid_strategies = [
+            'buy_and_hold',
+            'moving_average_crossover',
+            'rsi_strategy',
+            'macd_strategy',
+            'bollinger_bands'
+        ]
+        
+        if strategy not in valid_strategies:
+            return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
+        
+        # Run backtest
+        results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Backtesting failed: {str(e)}'})
+
+@app.route('/options_pricing', methods=['POST'])
+@login_required
+def options_pricing_route():
+    """Handle options pricing requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        strike_price = float(request.form.get('strike_price'))
+        expiration_days = int(request.form.get('expiration_days'))
+        option_type = request.form.get('option_type', 'call').lower()
+        custom_volatility = request.form.get('custom_volatility')
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if strike_price <= 0:
+            return jsonify({'error': 'Strike price must be positive'})
+        
+        if expiration_days <= 0 or expiration_days > 1825:  # Max 5 years
+            return jsonify({'error': 'Expiration days must be between 1 and 1825'})
+        
+        if option_type not in ['call', 'put']:
+            return jsonify({'error': 'Option type must be "call" or "put"'})
+        
+        # Process custom volatility
+        volatility = None
+        if custom_volatility:
+            try:
+                volatility = float(custom_volatility) / 100  # Convert percentage to decimal
+                if volatility <= 0 or volatility > 5:  # Max 500% volatility
+                    return jsonify({'error': 'Volatility must be between 0% and 500%'})
+            except:
+                return jsonify({'error': 'Invalid volatility value'})
+        
+        # Price option
+        results = options_pricing.price_option(
+            symbol, strike_price, expiration_days, option_type, volatility
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Options pricing failed: {str(e)}'})
+
+@app.route('/option_strategy', methods=['POST'])
+@login_required
+def option_strategy():
+    """Handle option strategy analysis requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        strategy_type = request.form.get('strategy_type', 'straddle').lower()
+        expiration_days = int(request.form.get('expiration_days'))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        if expiration_days <= 0 or expiration_days > 1825:
+            return jsonify({'error': 'Expiration days must be between 1 and 1825'})
+        
+        # Get strikes for complex strategies
+        strikes = []
+        if strategy_type == 'strangle':
+            call_strike = request.form.get('call_strike')
+            put_strike = request.form.get('put_strike')
+            if call_strike:
+                strikes.append(float(call_strike))
+            if put_strike:
+                strikes.append(float(put_strike))
+        elif strategy_type == 'straddle':
+            strike = request.form.get('strike')
+            if strike:
+                strikes.append(float(strike))
+        
+        # Analyze strategy
+        results = options_pricing.option_strategy_analyzer(
+            symbol, strategy_type, expiration_days, strikes if strikes else None
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Option strategy analysis failed: {str(e)}'})
 
 @app.errorhandler(404)
 def not_found_error(error):

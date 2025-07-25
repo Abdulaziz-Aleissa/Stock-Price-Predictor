@@ -610,3 +610,239 @@ body {
         align-items: flex-start;
     }
 }
+
+/* Advanced Analytics Styles */
+.analytics-feature {
+    text-align: center;
+    padding: 20px;
+    background: var(--input-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.analytics-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+}
+
+.analytics-feature h5 {
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.analytics-feature p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.metric-item {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.metric-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Tab Styling */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-secondary);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: transparent;
+}
+
+/* Button Group Styling */
+.btn-group .btn-custom {
+    border-radius: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-group .btn-custom:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn-custom:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-right: none;
+}
+
+/* Chart Container Styling */
+#monteCarloChart,
+#backtestingChart {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid var(--border-color);
+}
+
+/* Loading States */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 8px;
+}
+
+/* Form Enhancements for Analytics */
+.form-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.alert-info {
+    background: rgba(66, 153, 225, 0.1);
+    border: 1px solid rgba(66, 153, 225, 0.3);
+    color: var(--text-primary);
+}
+
+.alert-danger {
+    background: rgba(245, 101, 101, 0.1);
+    border: 1px solid rgba(245, 101, 101, 0.3);
+    color: var(--negative);
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.bg-success {
+    background-color: var(--positive) !important;
+}
+
+.bg-danger {
+    background-color: var(--negative) !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Responsive adjustments for analytics */
+@media (max-width: 768px) {
+    .analytics-feature {
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .analytics-feature h5 {
+        font-size: 1rem;
+    }
+    
+    .analytics-feature p {
+        font-size: 0.85rem;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    
+    .metric-item {
+        padding: 12px;
+    }
+    
+    .metric-value {
+        font-size: 1rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn-custom {
+        border-radius: 8px !important;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 5px;
+    }
+    
+    .btn-group .btn-custom:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-feature {
+        padding: 12px;
+    }
+    
+    .metric-item {
+        padding: 10px;
+    }
+}

@@ -235,6 +235,46 @@
                     <div id="comparisonChart"></div>
                 </div>
             </div>
+
+            <!-- Advanced Analytics Section -->
+            <div class="col-md-12 mt-4">
+                <div class="metrics-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>Advanced Analytics</h2>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
+                                📊 Monte Carlo
+                            </button>
+                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#backtestingModal">
+                                📈 Backtesting
+                            </button>
+                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#optionsPricingModal">
+                                🎯 Options Pricing
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="analytics-feature">
+                                <h5>Monte Carlo Simulations</h5>
+                                <p>Risk analysis through probabilistic modeling of future price movements</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="analytics-feature">
+                                <h5>Backtesting Framework</h5>
+                                <p>Test trading strategies against historical data to evaluate performance</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="analytics-feature">
+                                <h5>Options Pricing Models</h5>
+                                <p>Black-Scholes pricing with Greeks calculation for options strategies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -393,6 +433,292 @@
                     </div>
                     
                     <div id="scoringError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monte Carlo Simulation Modal -->
+    <div class="modal fade" id="monteCarloModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📊 Monte Carlo Risk Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="monteCarloForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Investment Amount ($)</label>
+                                    <input type="number" class="form-control" name="investment_amount" value="10000" min="100" max="1000000" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Simulation Days</label>
+                                    <input type="number" class="form-control" name="days" value="30" min="1" max="365" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Number of Simulations</label>
+                                    <select class="form-control" name="simulations">
+                                        <option value="1000">1,000 (Fast)</option>
+                                        <option value="5000" selected>5,000 (Recommended)</option>
+                                        <option value="10000">10,000 (Detailed)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="monteCarloSpinner"></span>
+                            Run Monte Carlo Simulation
+                        </button>
+                    </form>
+                    
+                    <div id="monteCarloResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Risk Metrics</h6>
+                                <div id="riskMetrics"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Price Scenarios</h6>
+                                <div id="priceScenarios"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Simulation Visualization</h6>
+                            <div id="monteCarloChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Risk Assessment</h6>
+                            <div id="riskRecommendations"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="monteCarloError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backtesting Modal -->
+    <div class="modal fade" id="backtestingModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📈 Strategy Backtesting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="backtestingForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Strategy</label>
+                                    <select class="form-control" name="strategy">
+                                        <option value="buy_and_hold">Buy & Hold</option>
+                                        <option value="moving_average_crossover" selected>Moving Average Crossover</option>
+                                        <option value="rsi_strategy">RSI Strategy</option>
+                                        <option value="macd_strategy">MACD Strategy</option>
+                                        <option value="bollinger_bands">Bollinger Bands</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Initial Capital ($)</label>
+                                    <input type="number" class="form-control" name="initial_capital" value="10000" min="1000" max="1000000" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="backtestingSpinner"></span>
+                            Run Backtest
+                        </button>
+                    </form>
+                    
+                    <div id="backtestingResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Performance Summary</h6>
+                                <div id="performanceMetrics"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Key Statistics</h6>
+                                <div id="backtestingStats"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Equity Curve</h6>
+                            <div id="backtestingChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Recent Trades</h6>
+                            <div id="recentTrades"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="backtestingError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Options Pricing Modal -->
+    <div class="modal fade" id="optionsPricingModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🎯 Black-Scholes Options Pricing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="optionsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="single-option-tab" data-bs-toggle="tab" data-bs-target="#single-option" type="button" role="tab">
+                                Single Option
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="option-strategy-tab" data-bs-toggle="tab" data-bs-target="#option-strategy" type="button" role="tab">
+                                Option Strategies
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="optionsTabContent">
+                        <!-- Single Option Tab -->
+                        <div class="tab-pane fade show active" id="single-option" role="tabpanel">
+                            <div class="mt-3">
+                                <form id="optionsPricingForm">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Stock Symbol</label>
+                                                <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Strike Price ($)</label>
+                                                <input type="number" class="form-control" name="strike_price" step="0.01" min="0.01" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Days to Expiration</label>
+                                                <input type="number" class="form-control" name="expiration_days" value="30" min="1" max="1825" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Option Type</label>
+                                                <select class="form-control" name="option_type">
+                                                    <option value="call">Call Option</option>
+                                                    <option value="put">Put Option</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Custom Volatility (%) - Optional</label>
+                                                <input type="number" class="form-control" name="custom_volatility" step="0.1" min="0.1" max="500" placeholder="Leave blank for historical">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-custom w-100">
+                                        <span class="spinner-border spinner-border-sm d-none" id="optionsPricingSpinner"></span>
+                                        Calculate Option Price
+                                    </button>
+                                </form>
+                                
+                                <div id="optionsPricingResults" class="mt-4" style="display: none;">
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Option Pricing</h6>
+                                            <div id="optionPricing"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>The Greeks</h6>
+                                            <div id="optionGreeks"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <h6>Risk Analysis</h6>
+                                        <div id="optionRiskAnalysis"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Option Strategy Tab -->
+                        <div class="tab-pane fade" id="option-strategy" role="tabpanel">
+                            <div class="mt-3">
+                                <form id="optionStrategyForm">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Stock Symbol</label>
+                                                <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Strategy Type</label>
+                                                <select class="form-control" name="strategy_type" id="strategyTypeSelect">
+                                                    <option value="straddle">Long Straddle</option>
+                                                    <option value="strangle">Long Strangle</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Days to Expiration</label>
+                                                <input type="number" class="form-control" name="expiration_days" value="30" min="1" max="1825" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="strategyStrikes">
+                                        <!-- Strike inputs will be dynamically added here -->
+                                    </div>
+                                    <button type="submit" class="btn btn-custom w-100">
+                                        <span class="spinner-border spinner-border-sm d-none" id="optionStrategySpinner"></span>
+                                        Analyze Strategy
+                                    </button>
+                                </form>
+                                
+                                <div id="optionStrategyResults" class="mt-4" style="display: none;">
+                                    <hr>
+                                    <h6>Strategy Analysis</h6>
+                                    <div id="strategyAnalysis"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="optionsPricingError" class="alert alert-danger mt-3" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -559,6 +885,534 @@
             });
         }
     });
+
+    // Monte Carlo Simulation Form Handler
+    document.getElementById('monteCarloForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('monteCarloSpinner');
+        const resultsDiv = document.getElementById('monteCarloResults');
+        const errorDiv = document.getElementById('monteCarloError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/monte_carlo_simulation', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayMonteCarloResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during simulation. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Backtesting Form Handler
+    document.getElementById('backtestingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('backtestingSpinner');
+        const resultsDiv = document.getElementById('backtestingResults');
+        const errorDiv = document.getElementById('backtestingError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/backtesting', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayBacktestingResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during backtesting. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Options Pricing Form Handler
+    document.getElementById('optionsPricingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('optionsPricingSpinner');
+        const resultsDiv = document.getElementById('optionsPricingResults');
+        const errorDiv = document.getElementById('optionsPricingError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/options_pricing', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayOptionsPricingResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during options pricing. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Option Strategy Form Handler
+    document.getElementById('optionStrategyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('optionStrategySpinner');
+        const resultsDiv = document.getElementById('optionStrategyResults');
+        const errorDiv = document.getElementById('optionsPricingError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/option_strategy', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayOptionStrategyResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during strategy analysis. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Strategy Type Change Handler
+    document.getElementById('strategyTypeSelect').addEventListener('change', function() {
+        updateStrategyStrikes(this.value);
+    });
+
+    // Initialize strategy strikes on page load
+    updateStrategyStrikes('straddle');
+
+    function updateStrategyStrikes(strategyType) {
+        const strikesDiv = document.getElementById('strategyStrikes');
+        
+        if (strategyType === 'straddle') {
+            strikesDiv.innerHTML = `
+                <div class="mb-3">
+                    <label class="form-label">Strike Price ($ - leave blank for ATM)</label>
+                    <input type="number" class="form-control" name="strike" step="0.01" min="0.01" placeholder="At-the-money if blank">
+                </div>
+            `;
+        } else if (strategyType === 'strangle') {
+            strikesDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Call Strike ($ - leave blank for 5% OTM)</label>
+                            <input type="number" class="form-control" name="call_strike" step="0.01" min="0.01" placeholder="5% out-of-the-money if blank">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Put Strike ($ - leave blank for 5% OTM)</label>
+                            <input type="number" class="form-control" name="put_strike" step="0.01" min="0.01" placeholder="5% out-of-the-money if blank">
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function displayMonteCarloResults(results) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        // Risk Metrics
+        document.getElementById('riskMetrics').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Value at Risk (5%)</div>
+                    <div class="metric-value negative-change">${results.var_5.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Expected Shortfall</div>
+                    <div class="metric-value negative-change">${results.expected_shortfall.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Annual Volatility</div>
+                    <div class="metric-value">${results.annual_volatility.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Risk Level</div>
+                    <div class="metric-value">${results.risk_level}</div>
+                </div>
+            </div>
+        `;
+        
+        // Price Scenarios
+        document.getElementById('priceScenarios').innerHTML = `
+            <div class="table-responsive">
+                <table class="table table-sm table-dark">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Price</th>
+                            <th>P&L</th>
+                            <th>Return</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(results.scenarios).map(([percentile, scenario]) => `
+                            <tr>
+                                <td>${percentile} Percentile</td>
+                                <td>$${scenario.price.toFixed(2)}</td>
+                                <td class="${scenario.profit_loss > 0 ? 'positive-change' : 'negative-change'}">
+                                    $${scenario.profit_loss.toFixed(0)}
+                                </td>
+                                <td class="${scenario.return_percentage > 0 ? 'positive-change' : 'negative-change'}">
+                                    ${scenario.return_percentage.toFixed(1)}%
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        // Recommendations
+        document.getElementById('riskRecommendations').innerHTML = `
+            <div class="alert alert-info">
+                ${results.recommendation.map(rec => `<div>• ${rec}</div>`).join('')}
+            </div>
+        `;
+        
+        // Chart
+        const traces = [];
+        for (let i = 0; i < Math.min(results.sample_paths.length, 20); i++) {
+            traces.push({
+                x: results.dates,
+                y: results.sample_paths[i],
+                type: 'scatter',
+                mode: 'lines',
+                line: { width: 1, color: 'rgba(100, 150, 200, 0.3)' },
+                showlegend: false
+            });
+        }
+        
+        // Add current price line
+        traces.push({
+            x: [results.dates[0], results.dates[results.dates.length - 1]],
+            y: [results.current_price, results.current_price],
+            type: 'scatter',
+            mode: 'lines',
+            line: { width: 2, color: 'red', dash: 'dash' },
+            name: 'Current Price'
+        });
+        
+        const layout = {
+            title: `Monte Carlo Simulation - ${results.symbol}`,
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            font: { color: isDark ? '#e0e0e0' : '#1a202c' },
+            xaxis: { 
+                title: 'Date',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            yaxis: { 
+                title: 'Price ($)',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            showlegend: true,
+            legend: { x: 0, y: 1 }
+        };
+        
+        Plotly.newPlot('monteCarloChart', traces, layout);
+    }
+
+    function displayBacktestingResults(results) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        // Performance Metrics
+        document.getElementById('performanceMetrics').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Total Return</div>
+                    <div class="metric-value ${results.performance.total_return > 0 ? 'positive-change' : 'negative-change'}">
+                        ${results.performance.total_return.toFixed(2)}%
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Sharpe Ratio</div>
+                    <div class="metric-value">${results.performance.sharpe_ratio.toFixed(3)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Max Drawdown</div>
+                    <div class="metric-value negative-change">${results.performance.max_drawdown.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Win Rate</div>
+                    <div class="metric-value">${results.performance.win_rate.toFixed(1)}%</div>
+                </div>
+            </div>
+        `;
+        
+        // Statistics
+        document.getElementById('backtestingStats').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Final Value</div>
+                    <div class="metric-value">$${results.final_portfolio_value.toFixed(0)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Total Trades</div>
+                    <div class="metric-value">${results.total_trades}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">vs Benchmark</div>
+                    <div class="metric-value ${results.outperformance > 0 ? 'positive-change' : 'negative-change'}">
+                        ${results.outperformance > 0 ? '+' : ''}${results.outperformance.toFixed(2)}%
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Volatility</div>
+                    <div class="metric-value">${results.performance.volatility.toFixed(2)}%</div>
+                </div>
+            </div>
+        `;
+        
+        // Recent Trades
+        if (results.trades && results.trades.length > 0) {
+            document.getElementById('recentTrades').innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-sm table-dark">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>Shares</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results.trades.slice(-5).map(trade => `
+                                <tr>
+                                    <td>${new Date(trade.date).toLocaleDateString()}</td>
+                                    <td><span class="badge bg-${trade.action === 'BUY' ? 'success' : 'danger'}">${trade.action}</span></td>
+                                    <td>${trade.shares}</td>
+                                    <td>$${trade.price.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Equity Curve Chart
+        const strategyTrace = {
+            x: results.dates,
+            y: results.strategy_equity_curve,
+            name: `${results.strategy.replace('_', ' ').toUpperCase()}`,
+            type: 'scatter',
+            line: { width: 2, color: '#00ff88' }
+        };
+        
+        const benchmarkTrace = {
+            x: results.dates,
+            y: results.benchmark_equity_curve,
+            name: 'Buy & Hold',
+            type: 'scatter',
+            line: { width: 2, color: '#ff6b6b' }
+        };
+        
+        const layout = {
+            title: `Strategy Performance - ${results.symbol}`,
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            font: { color: isDark ? '#e0e0e0' : '#1a202c' },
+            xaxis: { 
+                title: 'Date',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            yaxis: { 
+                title: 'Portfolio Value ($)',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            showlegend: true,
+            legend: { x: 0, y: 1 }
+        };
+        
+        Plotly.newPlot('backtestingChart', [strategyTrace, benchmarkTrace], layout);
+    }
+
+    function displayOptionsPricingResults(results) {
+        // Option Pricing
+        document.getElementById('optionPricing').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Option Price</div>
+                    <div class="metric-value">$${results.option_price.toFixed(3)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Intrinsic Value</div>
+                    <div class="metric-value">$${results.intrinsic_value.toFixed(3)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Time Value</div>
+                    <div class="metric-value">$${results.time_value.toFixed(3)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Breakeven</div>
+                    <div class="metric-value">$${results.breakeven.toFixed(2)}</div>
+                </div>
+            </div>
+        `;
+        
+        // Greeks
+        document.getElementById('optionGreeks').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Delta</div>
+                    <div class="metric-value">${results.greeks.delta.toFixed(4)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Gamma</div>
+                    <div class="metric-value">${results.greeks.gamma.toFixed(4)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Theta</div>
+                    <div class="metric-value negative-change">${results.greeks.theta.toFixed(4)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Vega</div>
+                    <div class="metric-value">${results.greeks.vega.toFixed(4)}</div>
+                </div>
+            </div>
+        `;
+        
+        // Risk Analysis
+        document.getElementById('optionRiskAnalysis').innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="metric-item">
+                        <div class="metric-label">ITM Probability</div>
+                        <div class="metric-value">${results.itm_probability.toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="metric-item">
+                        <div class="metric-label">Moneyness</div>
+                        <div class="metric-value">${results.moneyness.toFixed(3)}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <strong>Current Price:</strong> $${results.current_price.toFixed(2)} | 
+                    <strong>Volatility:</strong> ${results.volatility.toFixed(1)}% | 
+                    <strong>Time to Expiry:</strong> ${results.expiration_days} days
+                </small>
+            </div>
+        `;
+    }
+
+    function displayOptionStrategyResults(results) {
+        document.getElementById('strategyAnalysis').innerHTML = `
+            <div class="alert alert-info">
+                <h6>${results.strategy} Analysis</h6>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">Total Cost</div>
+                                <div class="metric-value negative-change">$${results.total_cost.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Max Loss</div>
+                                <div class="metric-value negative-change">$${results.max_loss.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Max Profit</div>
+                                <div class="metric-value">${results.max_profit}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-label">Upper Breakeven</div>
+                                <div class="metric-value">$${results.breakeven_upper.toFixed(2)}</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">Lower Breakeven</div>
+                                <div class="metric-value">$${results.breakeven_lower.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div><strong>Best Scenario:</strong> ${results.best_scenario}</div>
+                    <div><strong>Worst Scenario:</strong> ${results.worst_scenario}</div>
+                </div>
+            </div>
+        `;
+    }
     </script>
 </body>
 </html>
