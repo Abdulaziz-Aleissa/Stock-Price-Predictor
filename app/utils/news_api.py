@@ -100,6 +100,22 @@ class NewsAPI:
     
     def _get_mock_news_data(self, ticker: str) -> Dict:
         """Return mock news data when API key is not available"""
+        # Generate current dates dynamically
+        now = datetime.now()
+        dates = []
+        times = ["120000", "143000", "094500", "160000", "113000"]
+        
+        for i in range(5):
+            # Generate dates from today going backwards
+            date = now - timedelta(days=i)
+            # Format as YYYYMMDDTHHMMSS
+            formatted_date = date.strftime("%Y%m%d") + "T" + times[i]
+            dates.append(formatted_date)
+            
+        # Format URLs with current year and month
+        current_year = now.year
+        current_month = now.month
+        
         return {
             "items": str(5),
             "sentiment_score_definition": "x <= -0.35: Bearish; -0.35 < x <= -0.15: Somewhat-Bearish; -0.15 < x < 0.15: Neutral; 0.15 <= x < 0.35: Somewhat_Bullish; x >= 0.35: Bullish",
@@ -107,8 +123,8 @@ class NewsAPI:
             "feed": [
                 {
                     "title": f"{ticker} Reports Strong Q4 Earnings with Record Revenue Growth",
-                    "url": f"https://www.marketwatch.com/story/{ticker.lower()}-reports-earnings-2025-01-10",
-                    "time_published": "20250110T120000",
+                    "url": f"https://www.marketwatch.com/story/{ticker.lower()}-reports-earnings-{current_year}-{current_month:02d}-{now.day:02d}",
+                    "time_published": dates[0],
                     "authors": ["Financial News"],
                     "summary": f"Company {ticker} announced impressive quarterly results, beating analyst expectations on both revenue and earnings per share. The strong performance was driven by increased demand and operational efficiency improvements.",
                     "banner_image": "https://example.com/image1.jpg",
@@ -134,8 +150,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Analysts Upgrade {ticker} Stock Rating Following Strategic Partnership",
-                    "url": f"https://finance.yahoo.com/news/{ticker.lower()}-analysts-upgrade-2025-01-09",
-                    "time_published": "20250109T143000",
+                    "url": f"https://finance.yahoo.com/news/{ticker.lower()}-analysts-upgrade-{current_year}-{current_month:02d}-{(now - timedelta(days=1)).day:02d}",
+                    "time_published": dates[1],
                     "authors": ["Investment Analysis"],
                     "summary": f"Multiple analysts have raised their price targets for {ticker} following announcement of a strategic partnership that could expand market reach and boost future revenue streams.",
                     "banner_image": "https://example.com/image2.jpg",
@@ -161,8 +177,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Market Volatility Affects {ticker} Despite Strong Fundamentals",
-                    "url": f"https://www.reuters.com/business/{ticker.lower()}-market-volatility-2025-01-08",
-                    "time_published": "20250108T094500",
+                    "url": f"https://www.reuters.com/business/{ticker.lower()}-market-volatility-{current_year}-{current_month:02d}-{(now - timedelta(days=2)).day:02d}",
+                    "time_published": dates[2],
                     "authors": ["Market Reporter"],
                     "summary": f"While {ticker} maintains solid business fundamentals, broader market uncertainty and sector-wide concerns have created some volatility in the stock price recently.",
                     "banner_image": "https://example.com/image3.jpg",
@@ -188,8 +204,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"{ticker} Announces New Product Line Expected to Drive Growth",
-                    "url": f"https://www.bloomberg.com/news/articles/2025-01-07/{ticker.lower()}-product-line-growth",
-                    "time_published": "20250107T160000",
+                    "url": f"https://www.bloomberg.com/news/articles/{current_year}-{current_month:02d}-{(now - timedelta(days=3)).day:02d}/{ticker.lower()}-product-line-growth",
+                    "time_published": dates[3],
                     "authors": ["Business News"],
                     "summary": f"The company unveiled its latest product innovation, which management expects to capture significant market share and contribute meaningfully to revenue growth in the coming quarters.",
                     "banner_image": "https://example.com/image4.jpg",
@@ -215,8 +231,8 @@ class NewsAPI:
                 },
                 {
                     "title": f"Industry Trends Support Long-term Outlook for {ticker}",
-                    "url": f"https://www.cnbc.com/2025/01/06/{ticker.lower()}-industry-outlook.html",
-                    "time_published": "20250106T113000",
+                    "url": f"https://www.cnbc.com/{current_year}/{current_month:02d}/{(now - timedelta(days=4)).day:02d}/{ticker.lower()}-industry-outlook.html",
+                    "time_published": dates[4],
                     "authors": ["Industry Analysis"],
                     "summary": f"Sector analysis indicates favorable long-term trends that position {ticker} well for sustained growth, despite short-term market challenges facing the broader industry.",
                     "banner_image": "https://example.com/image5.jpg",
