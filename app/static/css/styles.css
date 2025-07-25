@@ -408,6 +408,23 @@ p {
     color: var(--neutral-600) !important;
 }
 
+/* Login page professional features text visibility fix */
+.text-xs.text-muted {
+    color: #fdfdfd !important;
+}
+
+[data-theme="light"] .text-xs.text-muted {
+    color: var(--neutral-600) !important;
+}
+
+.d-flex.text-xs.text-muted span {
+    color: #fdfdfd !important;
+}
+
+[data-theme="light"] .d-flex.text-xs.text-muted span {
+    color: var(--neutral-600) !important;
+}
+
 [data-theme="light"] .financial-literacy-description {
     color: var(--neutral-700) !important;
 }
