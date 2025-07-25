@@ -6,6 +6,8 @@ from app.utils.news_api import news_api
 from app.utils.monte_carlo import monte_carlo_simulator
 from app.utils.backtesting import backtesting_framework
 from app.utils.options_pricing import options_pricing
+from app.utils.value_at_risk import var_analyzer
+from app.utils.time_series_forecasting import ts_forecaster
 import pandas as pd
 import numpy as np
 from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
@@ -780,6 +782,97 @@ def backtesting():
     except Exception as e:
         return jsonify({'error': f'Backtesting failed: {str(e)}'})
 
+@app.route('/value_at_risk', methods=['POST'])
+@login_required
+def value_at_risk():
+    """Handle Value at Risk analysis requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        portfolio_value = float(request.form.get('portfolio_value', 10000))
+        holding_period = int(request.form.get('holding_period', 1))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if portfolio_value <= 0:
+            return jsonify({'error': 'Portfolio value must be positive'})
+        
+        if holding_period <= 0 or holding_period > 252:  # Max 1 year
+            return jsonify({'error': 'Holding period must be between 1 and 252 days'})
+        
+        # Get confidence levels from checkboxes
+        confidence_levels = []
+        if request.form.get('confidence_95'):
+            confidence_levels.append(0.95)
+        if request.form.get('confidence_99'):
+            confidence_levels.append(0.99)
+        
+        if not confidence_levels:
+            confidence_levels = [0.95, 0.99]  # Default
+        
+        # Run VaR analysis
+        results = var_analyzer.comprehensive_var_analysis(
+            symbol, portfolio_value, confidence_levels, holding_period
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'VaR analysis failed: {str(e)}'})
+
+@app.route('/time_series_forecasting', methods=['POST'])
+@login_required
+def time_series_forecasting():
+    """Handle time series forecasting requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        forecast_days = int(request.form.get('forecast_days', 30))
+        include_price_forecast = request.form.get('include_price_forecast') is not None
+        include_volatility_forecast = request.form.get('include_volatility_forecast') is not None
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if forecast_days <= 0 or forecast_days > 365:  # Max 1 year
+            return jsonify({'error': 'Forecast days must be between 1 and 365'})
+        
+        if not include_price_forecast and not include_volatility_forecast:
+            return jsonify({'error': 'Please select at least one analysis type'})
+        
+        # Run forecasting analysis
+        results = ts_forecaster.comprehensive_forecast(
+            symbol, forecast_days, include_volatility_forecast
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Time series forecasting failed: {str(e)}'})
+
 @app.route('/options_pricing', methods=['POST'])
 @login_required
 def options_pricing_route():
@@ -834,56 +927,6 @@ def options_pricing_route():
         return jsonify({'error': 'Invalid input parameters'})
     except Exception as e:
         return jsonify({'error': f'Options pricing failed: {str(e)}'})
-
-@app.route('/option_strategy', methods=['POST'])
-@login_required
-def option_strategy():
-    """Handle option strategy analysis requests"""
-    try:
-        symbol = request.form.get('symbol', '').strip().upper()
-        strategy_type = request.form.get('strategy_type', 'straddle').lower()
-        expiration_days = int(request.form.get('expiration_days'))
-        
-        if not symbol:
-            return jsonify({'error': 'Please provide a stock symbol'})
-        
-        if not is_valid_ticker(symbol):
-            return jsonify({'error': 'Invalid ticker symbol'})
-        
-        if expiration_days <= 0 or expiration_days > 1825:
-            return jsonify({'error': 'Expiration days must be between 1 and 1825'})
-        
-        # Get strikes for complex strategies
-        strikes = []
-        if strategy_type == 'strangle':
-            call_strike = request.form.get('call_strike')
-            put_strike = request.form.get('put_strike')
-            if call_strike:
-                strikes.append(float(call_strike))
-            if put_strike:
-                strikes.append(float(put_strike))
-        elif strategy_type == 'straddle':
-            strike = request.form.get('strike')
-            if strike:
-                strikes.append(float(strike))
-        
-        # Analyze strategy
-        results = options_pricing.option_strategy_analyzer(
-            symbol, strategy_type, expiration_days, strikes if strikes else None
-        )
-        
-        if "error" in results:
-            return jsonify(results)
-        
-        return jsonify({
-            'success': True,
-            'results': results
-        })
-        
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
-    except Exception as e:
-        return jsonify({'error': f'Option strategy analysis failed: {str(e)}'})
 
 @app.errorhandler(404)
 def not_found_error(error):
