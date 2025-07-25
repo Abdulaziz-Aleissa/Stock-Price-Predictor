@@ -757,7 +757,7 @@ p {
 }
 
 /* Dark mode table cell text color */
-[data-theme="dark"] .table td {
+[data-theme="dark"] .table td:not(.positive-change):not(.negative-change) {
     color: #fdfdfd !important;
 }
 
@@ -853,6 +853,14 @@ p {
 }
 .negative-change { 
     color: var(--negative) !important; 
+}
+
+/* Ensure financial colors work properly in dark mode tables */
+[data-theme="dark"] .table .positive-change {
+    color: var(--positive) !important;
+}
+[data-theme="dark"] .table .negative-change {
+    color: var(--negative) !important;
 }
 
 /* Responsive Design */
