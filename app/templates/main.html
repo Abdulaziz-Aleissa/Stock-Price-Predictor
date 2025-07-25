@@ -4,56 +4,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Price Predictor</title>
+    <title>Stock Price Predictor - Professional Analytics Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <meta name="description" content="Advanced stock price prediction with professional analytics, news sentiment analysis, and comprehensive financial insights.">
 </head>
 <body>
-    <div class="theme-switch">
-        <div class="switch-track">
-            <div class="switch-icons">
-                <div class="sun">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    <div class="app-container">
+        <!-- Professional Theme Switch -->
+        <div class="theme-switch">
+            <div class="switch-track">
+                <div class="switch-icons">
+                    <div class="sun">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    </div>
+                    <div class="moon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </div>
                 </div>
-                <div class="moon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </div>
+                <div class="switch-circle"></div>
             </div>
-            <div class="switch-circle"></div>
         </div>
-    </div>
 
-    <div class="content-box">
-        <div class="search-container">
-            <h1 class="main-title">Stock Price Predictor</h1>
-            
-            <form action="{{ url_for('predict') }}" method="post" onsubmit="showLoadingMessage()" class="search-form">
-                <div class="search-group">
-                    <input type="text" id="ticker" name="ticker" class="form-control" placeholder="Enter stock ticker symbol..." required>
-                    <button type="submit" class="predict-btn">
-                        <span class="btn-text">PREDICT</span>
-                        <div class="btn-loader d-none">
-                            <div class="spinner-border spinner-border-sm"></div>
+        <!-- Main Content Wrapper -->
+        <div class="content-wrapper">
+            <div class="content-box animate-fade-in">
+                <div class="search-container">
+                    <h1 class="main-title">Stock Price Predictor</h1>
+                    <p class="text-center text-muted mb-4" style="font-size: 1.125rem; max-width: 600px; margin: 0 auto 2rem;">
+                        Professional-grade stock analysis with AI-powered predictions, real-time news sentiment, and advanced analytics
+                    </p>
+                    
+                    <form action="{{ url_for('predict') }}" method="post" onsubmit="showLoadingMessage()" class="search-form">
+                        <div class="search-group">
+                            <input type="text" id="ticker" name="ticker" class="form-control" placeholder="Enter stock ticker (e.g., AAPL, GOOGL, TSLA)..." required>
+                            <button type="submit" class="predict-btn">
+                                <span class="btn-text">ANALYZE STOCK</span>
+                                <div class="btn-loader d-none">
+                                    <div class="loading-spinner"></div>
+                                </div>
+                            </button>
                         </div>
-                    </button>
-                </div>
-            </form>
+                    </form>
 
-            <div class="mt-4">
-                <p>
-                    <a href="{{ url_for('financial_literacy') }}" class="btn btn-custom me-2">📚 Financial Literacy</a>
-                </p>
-                {% if not current_user.is_authenticated %}
-                <p>
-                    <a href="{{ url_for('login') }}" class="btn btn-custom me-2">Login</a>
-                    <a href="{{ url_for('signup') }}" class="btn btn-outline-custom">Sign Up</a>
-                </p>
-                {% else %}
-                <p>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-custom me-2">Dashboard</a>
-                    <a href="{{ url_for('logout') }}" class="btn btn-outline-custom">Logout</a>
-                </p>
-                {% endif %}
+                    <!-- Professional Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card animate-slide-in">
+                            <div class="stat-value">📊</div>
+                            <div class="stat-label">Advanced Analytics</div>
+                            <p class="text-xs text-muted mt-2">Monte Carlo • VaR • Time Series</p>
+                        </div>
+                        <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
+                            <div class="stat-value">📰</div>
+                            <div class="stat-label">Real-Time News</div>
+                            <p class="text-xs text-muted mt-2">Sentiment Analysis • Market Insights</p>
+                        </div>
+                        <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
+                            <div class="stat-value">🎯</div>
+                            <div class="stat-label">AI Predictions</div>
+                            <p class="text-xs text-muted mt-2">Machine Learning • High Accuracy</p>
+                        </div>
+                    </div>
+
+                    <!-- Professional Navigation -->
+                    <div class="text-center">
+                        <div class="nav-pills d-inline-flex">
+                            <a href="{{ url_for('financial_literacy') }}" class="nav-link">
+                                📚 Financial Education
+                            </a>
+                            {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('dashboard') }}" class="nav-link">
+                                    📊 Dashboard
+                                </a>
+                                <a href="{{ url_for('logout') }}" class="nav-link">
+                                    🚪 Logout
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('login') }}" class="nav-link">
+                                    🔐 Login
+                                </a>
+                                <a href="{{ url_for('signup') }}" class="nav-link">
+                                    ✨ Sign Up
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                    <div class="alert alert-info mt-4">
+                        <strong>Welcome back, {{ current_user.username }}!</strong> 
+                        Access your <a href="{{ url_for('dashboard') }}" class="fw-bold">personalized dashboard</a> for portfolio tracking and advanced analytics.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning mt-4">
+                        <strong>Unlock Premium Features!</strong> 
+                        <a href="{{ url_for('signup') }}" class="fw-bold">Create an account</a> to access portfolio tracking, advanced analytics, and personalized insights.
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

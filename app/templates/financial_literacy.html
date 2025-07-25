@@ -3,10 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Literacy - Stock Price Predictor</title>
+    <title>Financial Education Hub - Stock Analytics Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="description" content="Comprehensive financial education hub with professional insights on stock analysis, investment strategies, and market fundamentals.">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Professional Theme Switch -->
+        <div class="theme-switch">
+            <div class="switch-track">
+                <div class="switch-icons">
+                    <div class="sun">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    </div>
+                    <div class="moon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </div>
+                </div>
+                <div class="switch-circle"></div>
+            </div>
+        </div>
+
+        <!-- Professional Navigation Header -->
+        <div class="nav-header">
+            <div class="nav-container">
+                <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
+                <div class="nav-links">
+                    <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
+                    <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 Login</a>
+                    <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="content-box animate-fade-in">
+                <!-- Header Section -->
+                <div class="text-center mb-5">
+                    <h1 class="main-title mb-3">📚 Financial Education Hub</h1>
+                    <p class="text-muted fs-5 mb-4" style="max-width: 800px; margin: 0 auto;">
+                        Master the fundamentals of stock analysis, investment strategies, and advanced financial concepts with our comprehensive educational resources.
+                    </p>
+                </div>
     <style>
         /* Market Selection Modal */
         .market-selector {
