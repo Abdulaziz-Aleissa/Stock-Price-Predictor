@@ -62,6 +62,9 @@
     /* Financial Colors */
     --positive: var(--success-500);
     --negative: var(--danger-500);
+    
+    /* Modal Colors */
+    --modal-bg: rgba(15, 23, 42, 0.95);
 }
 
 [data-theme="light"] {
@@ -86,6 +89,9 @@
     /* Financial Colors */
     --positive: var(--success-600);
     --negative: var(--danger-600);
+    
+    /* Modal Colors */
+    --modal-bg: rgba(255, 255, 255, 0.95);
 }
 
 /* Professional Typography */
@@ -842,6 +848,15 @@ p {
 
 .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Dark mode text overrides for specific elements */
+[data-theme="dark"] .auth-text-description {
+    color: #fdfdfd !important;
+}
+
+[data-theme="dark"] .dashboard-description {
+    color: #fdfdfd !important;
 }
 
 /* Notifications */
