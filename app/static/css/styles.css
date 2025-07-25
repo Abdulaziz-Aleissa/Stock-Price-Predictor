@@ -394,6 +394,15 @@ p {
     color: var(--neutral-600) !important;
 }
 
+/* Financial literacy page description text visibility fix */
+.financial-literacy-description {
+    color: #fdfdfd !important;
+}
+
+[data-theme="light"] .financial-literacy-description {
+    color: var(--neutral-700) !important;
+}
+
 /* Professional Button System */
 .btn-primary {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
