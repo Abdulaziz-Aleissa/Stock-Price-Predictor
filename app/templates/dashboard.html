@@ -40,12 +40,9 @@
         }
 
         .gradient-text {
-            background: linear-gradient(135deg, var(--accent-color), var(--success-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
+            color: var(--text-primary);
             font-size: 28px;
+            font-weight: 600;
         }
 
         .practice-badge {
@@ -308,12 +305,21 @@
 
         .symbol-badge {
             background: var(--accent-color);
-            color: white;
+            color: var(--text-primary);
             padding: 4px 8px;
             border-radius: 6px;
             font-weight: 600;
             font-size: 12px;
             display: inline-block;
+        }
+        
+        /* Ensure symbol badges work well in both themes */
+        [data-theme="dark"] .symbol-badge {
+            color: white;
+        }
+        
+        [data-theme="light"] .symbol-badge {
+            color: white;
         }
 
         .purchase-price-cell {
@@ -2167,17 +2173,26 @@
                     <form action="{{ url_for('paper_buy') }}" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Stock Symbol</label>
-                            <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                            <input type="text" class="form-control" name="symbol" id="buyStockSymbol" placeholder="e.g., AAPL" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Number of Shares</label>
                             <input type="number" class="form-control" name="shares" placeholder="Enter shares" step="0.01" min="0.01" required>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Purchase Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="price" id="buyPurchasePrice" placeholder="Price per share" step="0.01" min="0.01" required>
+                                <button type="button" class="btn btn-outline-secondary" id="getCurrentPriceBuy">Get Current</button>
+                            </div>
+                            <small class="form-text text-muted">Default is current market price. You can modify for practice scenarios.</small>
+                        </div>
                         <div class="alert alert-info">
                             <strong>💰 Virtual Cash Available:</strong> ${{ "%.2f"|format(paper_summary.cash_balance) }}
                         </div>
                         <div class="alert alert-warning">
-                            <strong>📋 Note:</strong> This is paper trading with virtual money. Orders will execute at current market price.
+                            <strong>📋 Note:</strong> This is paper trading with virtual money. You can use current market price or set custom price for practice.
                         </div>
                         <button type="submit" class="btn btn-success w-100">Execute Buy Order</button>
                     </form>
@@ -2198,7 +2213,7 @@
                     <form action="{{ url_for('paper_sell') }}" method="POST">
                         <div class="mb-3">
                             <label class="form-label">Stock Symbol</label>
-                            <select class="form-control" name="symbol" required>
+                            <select class="form-control" name="symbol" id="sellStockSymbol" required>
                                 <option value="">Select a stock to sell</option>
                                 {% for item in paper_portfolio %}
                                 <option value="{{ item.symbol }}">{{ item.symbol }} ({{ "%.2f"|format(item.shares) }} shares @ ${{ "%.2f"|format(item.average_price) }})</option>
@@ -2208,6 +2223,15 @@
                         <div class="mb-3">
                             <label class="form-label">Number of Shares</label>
                             <input type="number" class="form-control" name="shares" placeholder="Enter shares to sell" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sell Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="price" id="sellPrice" placeholder="Price per share" step="0.01" min="0.01" required>
+                                <button type="button" class="btn btn-outline-secondary" id="getCurrentPriceSell">Get Current</button>
+                            </div>
+                            <small class="form-text text-muted">Default is current market price. You can modify for practice scenarios.</small>
                         </div>
                         <div class="alert alert-info">
                             <strong>📊 Current Holdings:</strong>
@@ -2221,7 +2245,7 @@
                             </ul>
                         </div>
                         <div class="alert alert-warning">
-                            <strong>📋 Note:</strong> This is paper trading with virtual money. Orders will execute at current market price.
+                            <strong>📋 Note:</strong> This is paper trading with virtual money. You can use current market price or set custom price for practice.
                         </div>
                         <button type="submit" class="btn btn-danger w-100">Execute Sell Order</button>
                     </form>
@@ -2269,6 +2293,105 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Get current price functionality for paper trading modals
+        async function getCurrentPrice(symbol) {
+            if (!symbol) {
+                alert('Please enter a stock symbol first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/get_stock_price/${symbol.toUpperCase()}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    return data.price;
+                } else {
+                    alert('Unable to fetch current price. Please enter manually.');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching price:', error);
+                alert('Error fetching price. Please enter manually.');
+                return null;
+            }
+        }
+        
+        // Handle Get Current Price button for Buy modal
+        document.getElementById('getCurrentPriceBuy').addEventListener('click', async function() {
+            const symbolInput = document.getElementById('buyStockSymbol');
+            const priceInput = document.getElementById('buyPurchasePrice');
+            const symbol = symbolInput.value.trim();
+            
+            if (!symbol) {
+                alert('Please enter a stock symbol first');
+                symbolInput.focus();
+                return;
+            }
+            
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            this.disabled = true;
+            
+            const price = await getCurrentPrice(symbol);
+            if (price) {
+                priceInput.value = price.toFixed(2);
+            }
+            
+            // Reset button state
+            this.innerHTML = 'Get Current';
+            this.disabled = false;
+        });
+        
+        // Handle Get Current Price button for Sell modal
+        document.getElementById('getCurrentPriceSell').addEventListener('click', async function() {
+            const symbolSelect = document.getElementById('sellStockSymbol');
+            const priceInput = document.getElementById('sellPrice');
+            const symbol = symbolSelect.value;
+            
+            if (!symbol) {
+                alert('Please select a stock to sell first');
+                symbolSelect.focus();
+                return;
+            }
+            
+            // Show loading state
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            this.disabled = true;
+            
+            const price = await getCurrentPrice(symbol);
+            if (price) {
+                priceInput.value = price.toFixed(2);
+            }
+            
+            // Reset button state
+            this.innerHTML = 'Get Current';
+            this.disabled = false;
+        });
+        
+        // Auto-populate price when modal opens if symbol is already entered
+        document.getElementById('paperBuyModal').addEventListener('shown.bs.modal', function() {
+            const symbolInput = document.getElementById('buyStockSymbol');
+            const priceInput = document.getElementById('buyPurchasePrice');
+            
+            // If symbol is entered but price is not, try to get current price
+            if (symbolInput.value.trim() && !priceInput.value) {
+                document.getElementById('getCurrentPriceBuy').click();
+            }
+        });
+        
+        document.getElementById('paperSellModal').addEventListener('shown.bs.modal', function() {
+            const symbolSelect = document.getElementById('sellStockSymbol');
+            const priceInput = document.getElementById('sellPrice');
+            
+            // If symbol is selected but price is not, try to get current price
+            if (symbolSelect.value && !priceInput.value) {
+                document.getElementById('getCurrentPriceSell').click();
+            }
+        });
+    </script>
 
 </body>
 </html>

@@ -789,6 +789,7 @@ def paper_buy():
     try:
         symbol = request.form['symbol'].upper()
         shares = float(request.form['shares'])
+        price = float(request.form['price'])
         
         if not is_valid_ticker(symbol):
             flash('Invalid ticker symbol')
@@ -797,14 +798,12 @@ def paper_buy():
         if shares <= 0:
             flash('Shares must be positive')
             return redirect(url_for('dashboard'))
-        
-        # Get current price
-        current_price = get_current_price(symbol)
-        if not current_price:
-            flash('Unable to get current price')
+            
+        if price <= 0:
+            flash('Price must be positive')
             return redirect(url_for('dashboard'))
         
-        total_cost = shares * current_price
+        total_cost = shares * price
         
         # Check cash balance
         cash_balance = get_or_create_paper_cash_balance(current_user.id)
@@ -822,16 +821,16 @@ def paper_buy():
             stock_symbol=symbol,
             transaction_type='BUY',
             shares=shares,
-            price=current_price,
+            price=price,
             total_amount=total_cost
         )
         db.add(transaction)
         
         # Update portfolio
-        update_paper_portfolio(current_user.id, symbol, shares, current_price, 'BUY')
+        update_paper_portfolio(current_user.id, symbol, shares, price, 'BUY')
         
         db.commit()
-        flash(f'Successfully bought {shares} shares of {symbol} at ${current_price:.2f}')
+        flash(f'Successfully bought {shares} shares of {symbol} at ${price:.2f}')
         
     except ValueError:
         flash('Invalid input values')
@@ -846,9 +845,14 @@ def paper_sell():
     try:
         symbol = request.form['symbol'].upper()
         shares = float(request.form['shares'])
+        price = float(request.form['price'])
         
         if shares <= 0:
             flash('Shares must be positive')
+            return redirect(url_for('dashboard'))
+            
+        if price <= 0:
+            flash('Price must be positive')
             return redirect(url_for('dashboard'))
         
         # Check if user has enough shares
@@ -861,13 +865,7 @@ def paper_sell():
             flash('Insufficient shares to sell')
             return redirect(url_for('dashboard'))
         
-        # Get current price
-        current_price = get_current_price(symbol)
-        if not current_price:
-            flash('Unable to get current price')
-            return redirect(url_for('dashboard'))
-        
-        total_proceeds = shares * current_price
+        total_proceeds = shares * price
         
         # Execute transaction
         cash_balance = get_or_create_paper_cash_balance(current_user.id)
@@ -880,18 +878,18 @@ def paper_sell():
             stock_symbol=symbol,
             transaction_type='SELL',
             shares=shares,
-            price=current_price,
+            price=price,
             total_amount=total_proceeds
         )
         db.add(transaction)
         
         # Update portfolio
-        if not update_paper_portfolio(current_user.id, symbol, shares, current_price, 'SELL'):
+        if not update_paper_portfolio(current_user.id, symbol, shares, price, 'SELL'):
             flash('Error updating portfolio')
             return redirect(url_for('dashboard'))
         
         db.commit()
-        flash(f'Successfully sold {shares} shares of {symbol} at ${current_price:.2f}')
+        flash(f'Successfully sold {shares} shares of {symbol} at ${price:.2f}')
         
     except ValueError:
         flash('Invalid input values')
@@ -921,6 +919,23 @@ def paper_transactions():
         })
     
     return jsonify(transaction_data)
+
+@app.route('/get_stock_price/<symbol>')
+@login_required
+def get_stock_price_api(symbol):
+    """API endpoint to get current stock price"""
+    try:
+        symbol = symbol.upper()
+        if not is_valid_ticker(symbol):
+            return jsonify({'success': False, 'error': 'Invalid ticker symbol'})
+        
+        price = get_current_price(symbol)
+        if price:
+            return jsonify({'success': True, 'price': price, 'symbol': symbol})
+        else:
+            return jsonify({'success': False, 'error': 'Unable to fetch current price'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/reset_paper_portfolio')
 @login_required
