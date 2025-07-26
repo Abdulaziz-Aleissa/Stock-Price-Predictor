@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 1040;
         }
 
         [data-theme="light"] .market-selector {
@@ -706,6 +706,634 @@
 
         .nav-links .btn {
             margin: 0 10px 10px 0;
+        }
+
+        /* Bootstrap Modal Z-Index Fix */
+        .modal-backdrop {
+            z-index: 10050 !important;
+        }
+        
+        .modal {
+            z-index: 10055 !important;
+        }
+        
+        .modal-dialog {
+            z-index: 10060 !important;
+        }
+
+        /* Paper Trading Enhanced Styles */
+        .paper-trading-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paper-trading-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .paper-trading-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+
+        .paper-trading-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .trading-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .practice-badge {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .paper-trading-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+        }
+
+        .paper-trading-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-glass {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: rgba(59, 130, 246, 0.25);
+            color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-warning-glass {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning-glass:hover {
+            background: rgba(245, 158, 11, 0.25);
+            color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-success-glass {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-glass:hover {
+            background: rgba(16, 185, 129, 0.25);
+            color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-danger-glass {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger-glass:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-outline-glass {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-glass:hover {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .practice-alert {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .alert-content strong {
+            color: #3b82f6;
+        }
+
+        /* Enhanced Trading Stats Grid */
+        .trading-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card-modern {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card-modern:hover::before {
+            opacity: 1;
+        }
+
+        .cash-card { border-left: 4px solid #10b981; }
+        .portfolio-card { border-left: 4px solid #3b82f6; }
+        .total-card { border-left: 4px solid #8b5cf6; }
+        .profit-card { border-left: 4px solid #10b981; }
+        .loss-card { border-left: 4px solid #ef4444; }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            flex-shrink: 0;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .profit-text { color: #10b981; }
+        .loss-text { color: #ef4444; }
+
+        /* Enhanced Holdings Section */
+        .holdings-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .holdings-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .holdings-count {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .trading-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .holdings-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .holdings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+        }
+
+        .holdings-table th {
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(59, 130, 246, 0.1));
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .holdings-table th i {
+            margin-right: 5px;
+            color: var(--accent);
+        }
+
+        .holding-row {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .holding-row:hover {
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+        }
+
+        .holdings-table td {
+            padding: 15px 12px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .symbol-cell {
+            font-weight: 600;
+        }
+
+        .symbol-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .purchase-price-cell {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pl-cell, .return-cell {
+            font-weight: 600;
+        }
+
+        .profit-cell { color: #10b981; }
+        .loss-cell { color: #ef4444; }
+
+        .pl-value {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .return-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .profit-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .loss-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Empty State Styling */
+        .empty-portfolio-row {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+        }
+
+        .empty-portfolio-cell {
+            padding: 40px 20px !important;
+            text-align: center;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+
+        .empty-title {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .empty-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        /* Enhanced Transaction History */
+        .transactions-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .transactions-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-history-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .transaction-symbol {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .transaction-details {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .buy-transaction { border-left: 4px solid #10b981; }
+        .sell-transaction { border-left: 4px solid #ef4444; }
+
+        /* No Transactions State */
+        .no-transactions-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-primary) !important; /* Force white color in dark mode */
+        }
+
+        [data-theme="dark"] .no-transactions-state {
+            color: var(--text-primary) !important;
+        }
+
+        .no-transactions-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .no-transactions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary) !important;
+        }
+
+        .no-transactions-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .paper-trading-container {
+                padding: 20px;
+            }
+            
+            .paper-trading-title {
+                font-size: 1.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .trading-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .paper-trading-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-glass, .btn-warning-glass {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .holdings-table-container {
+                font-size: 0.8rem;
+            }
+            
+            .holdings-table th,
+            .holdings-table td {
+                padding: 10px 8px;
+            }
+            
+            .trading-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-success-glass,
+            .btn-danger-glass {
+                width: 100%;
+            }
         }
 
         /* Responsive */
@@ -8372,34 +9000,70 @@
             }
         };
 
-        // Initialize
+        // Initialize with improved error handling and performance
         document.addEventListener('DOMContentLoaded', function() {
-            // Show market selector on page load
-            document.getElementById('marketSelector').style.display = 'flex';
+            try {
+                // Show market selector on page load with a small delay to prevent freezing
+                setTimeout(() => {
+                    const marketSelector = document.getElementById('marketSelector');
+                    if (marketSelector) {
+                        marketSelector.style.display = 'flex';
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error initializing market selector:', error);
+                // Fallback: show content directly if market selector fails
+                document.getElementById('financialContent').classList.add('active');
+                document.getElementById('currentMarket').textContent = 'Saudi Arabia 🇸🇦';
+                selectMarket('saudi');
+            }
         });
 
-        // Market selection
+        // Market selection with improved performance
         function selectMarket(market) {
-            currentMarket = market;
-            currentCurrency = marketData[market].currency;
-            
-            // Hide market selector
-            document.getElementById('marketSelector').style.display = 'none';
-            
-            // Show main content
-            document.getElementById('financialContent').classList.add('active');
-            
-            // Update market indicator
-            document.getElementById('currentMarket').textContent = marketData[market].name;
-            
-            // Update currency buttons
-            updateCurrencyButtons();
-            
-            // Populate videos for the selected market
-            populateVideos();
-            
-            // Don't populate concepts on initial load - wait for level selection
-            showLevel('beginner'); // Show beginner by default
+            try {
+                currentMarket = market;
+                currentCurrency = marketData[market].currency;
+                
+                // Hide market selector with smooth transition
+                const marketSelector = document.getElementById('marketSelector');
+                if (marketSelector) {
+                    marketSelector.style.opacity = '0';
+                    setTimeout(() => {
+                        marketSelector.style.display = 'none';
+                    }, 300);
+                }
+                
+                // Show main content with delay to prevent UI blocking
+                setTimeout(() => {
+                    const financialContent = document.getElementById('financialContent');
+                    if (financialContent) {
+                        financialContent.classList.add('active');
+                    }
+                    
+                    // Update market indicator
+                    const currentMarketElement = document.getElementById('currentMarket');
+                    if (currentMarketElement) {
+                        currentMarketElement.textContent = marketData[market].name;
+                    }
+                    
+                    // Update currency buttons (if they exist)
+                    updateCurrencyButtons();
+                    
+                    // Populate content asynchronously to prevent blocking
+                    requestAnimationFrame(() => {
+                        populateVideos();
+                        showLevel('beginner'); // Show beginner by default
+                    });
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error selecting market:', error);
+                // Fallback to prevent complete failure
+                currentMarket = 'saudi';
+                currentCurrency = 'SAR';
+                document.getElementById('financialContent').classList.add('active');
+            }
         }
 
         // Update currency display
@@ -8411,32 +9075,55 @@
 
 
 
-        // Content population
+        // Content population with error handling
         function populateVideos() {
-            const videoGrid = document.getElementById('videoGrid');
-            const videos = marketData[currentMarket].videos;
-            
-            if (!videoGrid) {
-                console.error('Video grid element not found!');
-                return;
-            }
-            
-            if (!videos || videos.length === 0) {
-                console.error('No videos found for market:', currentMarket);
-                return;
-            }
-            
-            videoGrid.innerHTML = videos.map(video => `
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="video-card" onclick="playVideo('${video.title}')">
-                        <div class="video-thumbnail">
-                            <i class="fas fa-${video.icon}"></i>
+            try {
+                const videoGrid = document.getElementById('videoGrid');
+                const videos = marketData[currentMarket]?.videos;
+                
+                if (!videoGrid) {
+                    console.error('Video grid element not found!');
+                    return;
+                }
+                
+                if (!videos || videos.length === 0) {
+                    console.error('No videos found for market:', currentMarket);
+                    videoGrid.innerHTML = '<div class="col-12"><p class="text-center text-muted">Videos coming soon for this market!</p></div>';
+                    return;
+                }
+                
+                // Use document fragment for better performance
+                const fragment = document.createDocumentFragment();
+                const tempDiv = document.createElement('div');
+                
+                tempDiv.innerHTML = videos.map(video => `
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="video-card" onclick="playVideo('${video.title.replace(/'/g, "\\'")}')">
+                            <div class="video-thumbnail">
+                                <i class="fas fa-${video.icon}"></i>
+                            </div>
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-duration">${video.duration}</div>
                         </div>
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-duration">${video.duration}</div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+                
+                // Move all children to fragment
+                while (tempDiv.firstChild) {
+                    fragment.appendChild(tempDiv.firstChild);
+                }
+                
+                // Clear and append in one operation
+                videoGrid.innerHTML = '';
+                videoGrid.appendChild(fragment);
+                
+            } catch (error) {
+                console.error('Error populating videos:', error);
+                const videoGrid = document.getElementById('videoGrid');
+                if (videoGrid) {
+                    videoGrid.innerHTML = '<div class="col-12"><p class="text-center text-muted">Error loading videos. Please refresh the page.</p></div>';
+                }
+            }
         }
 
         // Level-based education content
@@ -8521,7 +9208,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
@@ -8921,7 +9608,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
@@ -9018,7 +9705,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
