@@ -53,5 +53,34 @@ class Notification(Base):
     read = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
 
+class PaperPortfolio(Base):
+    __tablename__ = 'paper_portfolios'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_symbol = Column(String(10))
+    shares = Column(Float)
+    average_price = Column(Float)  # Average cost basis
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+class PaperTransaction(Base):
+    __tablename__ = 'paper_transactions'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_symbol = Column(String(10))
+    transaction_type = Column(String(4))  # 'BUY' or 'SELL'
+    shares = Column(Float)
+    price = Column(Float)
+    total_amount = Column(Float)  # shares * price
+    created_at = Column(DateTime, default=datetime.now)
+
+class PaperCashBalance(Base):
+    __tablename__ = 'paper_cash_balances'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), unique=True)
+    cash_balance = Column(Float, default=100000.0)  # $100,000 starting balance
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
 engine = create_engine('sqlite:///stock_predictor.db')
 Base.metadata.create_all(engine)

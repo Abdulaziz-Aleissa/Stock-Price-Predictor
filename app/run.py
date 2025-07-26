@@ -19,7 +19,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, engine
+from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperTransaction, PaperCashBalance, engine
 from sqlalchemy.orm import sessionmaker
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -120,6 +120,50 @@ def is_valid_ticker(ticker):
         return not hist.empty
     except:
         return False
+
+def get_or_create_paper_cash_balance(user_id):
+    """Get or create paper cash balance for user with default $100,000"""
+    cash_balance = db.query(PaperCashBalance).filter_by(user_id=user_id).first()
+    if not cash_balance:
+        cash_balance = PaperCashBalance(user_id=user_id, cash_balance=100000.0)
+        db.add(cash_balance)
+        db.commit()
+    return cash_balance
+
+def update_paper_portfolio(user_id, symbol, shares, price, transaction_type):
+    """Update paper portfolio position after a transaction"""
+    position = db.query(PaperPortfolio).filter_by(user_id=user_id, stock_symbol=symbol).first()
+    
+    if transaction_type == 'BUY':
+        if position:
+            # Update average price using weighted average
+            total_shares = position.shares + shares
+            total_cost = (position.shares * position.average_price) + (shares * price)
+            position.average_price = total_cost / total_shares
+            position.shares = total_shares
+            position.updated_at = datetime.now()
+        else:
+            # Create new position
+            position = PaperPortfolio(
+                user_id=user_id,
+                stock_symbol=symbol,
+                shares=shares,
+                average_price=price
+            )
+            db.add(position)
+    
+    elif transaction_type == 'SELL':
+        if position and position.shares >= shares:
+            position.shares -= shares
+            position.updated_at = datetime.now()
+            # Remove position if no shares left
+            if position.shares == 0:
+                db.delete(position)
+        else:
+            return False  # Insufficient shares
+    
+    db.commit()
+    return True
 
 # def get_market_context(ticker):
 #     try:
@@ -554,13 +598,52 @@ def dashboard():
         'total_profit_loss': total_value - total_cost,
         'total_return_percent': ((total_value - total_cost) / total_cost * 100) if total_cost > 0 else 0
     }
+
+    # Paper Trading Data
+    paper_portfolio = db.query(PaperPortfolio).filter_by(user_id=current_user.id).all()
+    paper_cash_balance = get_or_create_paper_cash_balance(current_user.id)
+    
+    paper_portfolio_data = []
+    paper_total_value = 0
+    paper_total_cost = 0
+    
+    for item in paper_portfolio:
+        current_price = get_current_price(item.stock_symbol)
+        if current_price:
+            position_cost = item.average_price * item.shares
+            position_value = current_price * item.shares
+            profit_loss = position_value - position_cost
+            paper_total_value += position_value
+            paper_total_cost += position_cost
+            
+            paper_portfolio_data.append({
+                'id': item.id,
+                'symbol': item.stock_symbol,
+                'shares': item.shares,
+                'average_price': item.average_price,
+                'current_price': current_price,
+                'profit_loss': profit_loss,
+                'position_value': position_value,
+                'change_percent': ((current_price - item.average_price) / item.average_price * 100)
+            })
+
+    paper_summary = {
+        'total_value': paper_total_value,
+        'total_cost': paper_total_cost,
+        'cash_balance': paper_cash_balance.cash_balance,
+        'total_account_value': paper_total_value + paper_cash_balance.cash_balance,
+        'total_profit_loss': paper_total_value - paper_total_cost,
+        'total_return_percent': ((paper_total_value - paper_total_cost) / paper_total_cost * 100) if paper_total_cost > 0 else 0
+    }
     
     return render_template('dashboard.html',
                          portfolio=portfolio_data,
                          watchlist=watchlist_data,
                          alerts=alerts_data,
                          notifications=notifications,
-                         summary=portfolio_summary)
+                         summary=portfolio_summary,
+                         paper_portfolio=paper_portfolio_data,
+                         paper_summary=paper_summary)
 
 @app.route('/add_to_portfolio', methods=['POST'])
 @login_required
@@ -661,6 +744,169 @@ def mark_notification_read(notification_id):
     if notification and notification.user_id == current_user.id:
         notification.read = True
         db.commit()
+    return redirect(url_for('dashboard'))
+
+# Paper Trading Routes
+@app.route('/paper_buy', methods=['POST'])
+@login_required
+def paper_buy():
+    try:
+        symbol = request.form['symbol'].upper()
+        shares = float(request.form['shares'])
+        
+        if not is_valid_ticker(symbol):
+            flash('Invalid ticker symbol')
+            return redirect(url_for('dashboard'))
+        
+        if shares <= 0:
+            flash('Shares must be positive')
+            return redirect(url_for('dashboard'))
+        
+        # Get current price
+        current_price = get_current_price(symbol)
+        if not current_price:
+            flash('Unable to get current price')
+            return redirect(url_for('dashboard'))
+        
+        total_cost = shares * current_price
+        
+        # Check cash balance
+        cash_balance = get_or_create_paper_cash_balance(current_user.id)
+        if cash_balance.cash_balance < total_cost:
+            flash('Insufficient virtual cash')
+            return redirect(url_for('dashboard'))
+        
+        # Execute transaction
+        cash_balance.cash_balance -= total_cost
+        cash_balance.updated_at = datetime.now()
+        
+        # Create transaction record
+        transaction = PaperTransaction(
+            user_id=current_user.id,
+            stock_symbol=symbol,
+            transaction_type='BUY',
+            shares=shares,
+            price=current_price,
+            total_amount=total_cost
+        )
+        db.add(transaction)
+        
+        # Update portfolio
+        update_paper_portfolio(current_user.id, symbol, shares, current_price, 'BUY')
+        
+        db.commit()
+        flash(f'Successfully bought {shares} shares of {symbol} at ${current_price:.2f}')
+        
+    except ValueError:
+        flash('Invalid input values')
+    except Exception as e:
+        flash(f'Error executing buy order: {str(e)}')
+    
+    return redirect(url_for('dashboard'))
+
+@app.route('/paper_sell', methods=['POST'])
+@login_required
+def paper_sell():
+    try:
+        symbol = request.form['symbol'].upper()
+        shares = float(request.form['shares'])
+        
+        if shares <= 0:
+            flash('Shares must be positive')
+            return redirect(url_for('dashboard'))
+        
+        # Check if user has enough shares
+        position = db.query(PaperPortfolio).filter_by(
+            user_id=current_user.id, 
+            stock_symbol=symbol
+        ).first()
+        
+        if not position or position.shares < shares:
+            flash('Insufficient shares to sell')
+            return redirect(url_for('dashboard'))
+        
+        # Get current price
+        current_price = get_current_price(symbol)
+        if not current_price:
+            flash('Unable to get current price')
+            return redirect(url_for('dashboard'))
+        
+        total_proceeds = shares * current_price
+        
+        # Execute transaction
+        cash_balance = get_or_create_paper_cash_balance(current_user.id)
+        cash_balance.cash_balance += total_proceeds
+        cash_balance.updated_at = datetime.now()
+        
+        # Create transaction record
+        transaction = PaperTransaction(
+            user_id=current_user.id,
+            stock_symbol=symbol,
+            transaction_type='SELL',
+            shares=shares,
+            price=current_price,
+            total_amount=total_proceeds
+        )
+        db.add(transaction)
+        
+        # Update portfolio
+        if not update_paper_portfolio(current_user.id, symbol, shares, current_price, 'SELL'):
+            flash('Error updating portfolio')
+            return redirect(url_for('dashboard'))
+        
+        db.commit()
+        flash(f'Successfully sold {shares} shares of {symbol} at ${current_price:.2f}')
+        
+    except ValueError:
+        flash('Invalid input values')
+    except Exception as e:
+        flash(f'Error executing sell order: {str(e)}')
+    
+    return redirect(url_for('dashboard'))
+
+@app.route('/paper_transactions')
+@login_required
+def paper_transactions():
+    transactions = db.query(PaperTransaction)\
+        .filter_by(user_id=current_user.id)\
+        .order_by(PaperTransaction.created_at.desc())\
+        .limit(50)\
+        .all()
+    
+    transaction_data = []
+    for t in transactions:
+        transaction_data.append({
+            'symbol': t.stock_symbol,
+            'type': t.transaction_type,
+            'shares': t.shares,
+            'price': t.price,
+            'total': t.total_amount,
+            'date': t.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    return jsonify(transaction_data)
+
+@app.route('/reset_paper_portfolio')
+@login_required
+def reset_paper_portfolio():
+    try:
+        # Delete all paper portfolio positions
+        db.query(PaperPortfolio).filter_by(user_id=current_user.id).delete()
+        
+        # Delete all paper transactions
+        db.query(PaperTransaction).filter_by(user_id=current_user.id).delete()
+        
+        # Reset cash balance to $100,000
+        cash_balance = get_or_create_paper_cash_balance(current_user.id)
+        cash_balance.cash_balance = 100000.0
+        cash_balance.updated_at = datetime.now()
+        
+        db.commit()
+        flash('Paper portfolio reset to $100,000 cash')
+        
+    except Exception as e:
+        flash(f'Error resetting portfolio: {str(e)}')
+    
     return redirect(url_for('dashboard'))
 
 @app.route('/compare_stocks', methods=['POST'])

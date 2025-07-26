@@ -232,6 +232,117 @@
                 </div>
             </div>
 
+            <!-- Paper Trading Section -->
+            <div class="col-md-12 mt-4">
+                <div class="metrics-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>💰 Paper Trading</h2>
+                        <div>
+                            <button class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperTradingInfoModal">
+                                ℹ️ Info
+                            </button>
+                            <button class="btn btn-warning btn-sm me-2" onclick="confirmResetPaperPortfolio()">
+                                🔄 Reset
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Paper Trading Summary Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.cash_balance) }}</div>
+                                <div class="stat-label">Virtual Cash</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_value) }}</div>
+                                <div class="stat-label">Stock Value</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_account_value) }}</div>
+                                <div class="stat-label">Total Account</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-value {{ 'positive' if paper_summary.total_profit_loss > 0 else 'negative' }}">${{ "%.2f"|format(paper_summary.total_profit_loss) }}</div>
+                                <div class="stat-label">Profit/Loss</div>
+                                <div class="stat-change {{ 'positive' if paper_summary.total_return_percent > 0 else 'negative' }}">
+                                    {{ "%.2f"|format(paper_summary.total_return_percent) }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Paper Portfolio Holdings -->
+                        <div class="col-lg-8">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4>📈 Virtual Holdings</h4>
+                                <div>
+                                    <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperBuyModal">
+                                        🟢 Buy
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#paperSellModal">
+                                        🔴 Sell
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                                    <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
+                                        <tr>
+                                            <th style="color: var(--text-primary);">Symbol</th>
+                                            <th style="color: var(--text-primary);">Shares</th>
+                                            <th style="color: var(--text-primary);">Avg Price</th>
+                                            <th style="color: var(--text-primary);">Current</th>
+                                            <th style="color: var(--text-primary);">Value</th>
+                                            <th style="color: var(--text-primary);">P/L</th>
+                                            <th style="color: var(--text-primary);">Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="color: var(--text-secondary);">
+                                        {% for item in paper_portfolio %}
+                                        <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                            <td style="color: var(--text-primary);">{{ item.symbol }}</td>
+                                            <td>{{ "%.2f"|format(item.shares) }}</td>
+                                            <td>${{ "%.2f"|format(item.average_price) }}</td>
+                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
+                                            <td>${{ "%.2f"|format(item.position_value) }}</td>
+                                            <td class="{{ 'positive-change' if item.profit_loss > 0 else 'negative-change' }}">
+                                                ${{ "%.2f"|format(item.profit_loss) }}
+                                            </td>
+                                            <td class="{{ 'positive-change' if item.change_percent > 0 else 'negative-change' }}">
+                                                {{ "%.2f"|format(item.change_percent) }}%
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Transaction History -->
+                        <div class="col-lg-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4>📊 Recent Trades</h4>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="loadPaperTransactions()">
+                                    🔄 Refresh
+                                </button>
+                            </div>
+                            <div id="paperTransactionHistory" style="max-height: 300px; overflow-y: auto;">
+                                <p class="text-muted">Loading transaction history...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stock Comparison Section -->
             <div class="col-md-12 mt-4">
                 <div class="metrics-card">
@@ -800,6 +911,115 @@
                     </div>
                     
                     <div id="timeSeriesError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paper Trading Buy Modal -->
+    <div class="modal fade" id="paperBuyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🟢 Paper Trading - Buy Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('paper_buy') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Stock Symbol</label>
+                            <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Number of Shares</label>
+                            <input type="number" class="form-control" name="shares" placeholder="Enter shares" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>💰 Virtual Cash Available:</strong> ${{ "%.2f"|format(paper_summary.cash_balance) }}
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>📋 Note:</strong> This is paper trading with virtual money. Orders will execute at current market price.
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Execute Buy Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paper Trading Sell Modal -->
+    <div class="modal fade" id="paperSellModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🔴 Paper Trading - Sell Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('paper_sell') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Stock Symbol</label>
+                            <select class="form-control" name="symbol" required>
+                                <option value="">Select a stock to sell</option>
+                                {% for item in paper_portfolio %}
+                                <option value="{{ item.symbol }}">{{ item.symbol }} ({{ "%.2f"|format(item.shares) }} shares)</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Number of Shares</label>
+                            <input type="number" class="form-control" name="shares" placeholder="Enter shares to sell" step="0.01" min="0.01" required>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>📊 Current Holdings:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for item in paper_portfolio %}
+                                <li>{{ item.symbol }}: {{ "%.2f"|format(item.shares) }} shares @ ${{ "%.2f"|format(item.current_price) }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>📋 Note:</strong> This is paper trading with virtual money. Orders will execute at current market price.
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Execute Sell Order</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paper Trading Info Modal -->
+    <div class="modal fade" id="paperTradingInfoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ℹ️ Paper Trading Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>What is Paper Trading?</h6>
+                    <p>Paper trading allows you to practice buying and selling stocks with virtual money. It's a risk-free way to test investment strategies and learn about the market.</p>
+                    
+                    <h6>Features:</h6>
+                    <ul>
+                        <li><strong>Virtual Cash:</strong> Start with $100,000 in virtual money</li>
+                        <li><strong>Real Prices:</strong> Uses real-time stock prices for realistic simulation</li>
+                        <li><strong>Full Trading:</strong> Buy and sell stocks just like real trading</li>
+                        <li><strong>Performance Tracking:</strong> Track your virtual portfolio performance</li>
+                        <li><strong>Transaction History:</strong> View all your virtual trades</li>
+                    </ul>
+                    
+                    <h6>How to Use:</h6>
+                    <ol>
+                        <li>Use the "Buy" button to purchase stocks with virtual money</li>
+                        <li>Use the "Sell" button to sell stocks from your virtual portfolio</li>
+                        <li>Monitor your performance and learn from your decisions</li>
+                        <li>Reset your portfolio anytime to start fresh</li>
+                    </ol>
+                    
+                    <div class="alert alert-success">
+                        <strong>💡 Tip:</strong> Paper trading is perfect for testing new strategies before using real money!
+                    </div>
                 </div>
             </div>
         </div>
@@ -1395,6 +1615,57 @@
             Plotly.newPlot('volatilityForecastChart', [volTrace], volLayout);
         }
     }
+
+    // Paper Trading Functions
+    function loadPaperTransactions() {
+        fetch('/paper_transactions')
+            .then(response => response.json())
+            .then(data => {
+                const historyDiv = document.getElementById('paperTransactionHistory');
+                if (data.length === 0) {
+                    historyDiv.innerHTML = '<p class="text-muted">No transactions yet</p>';
+                    return;
+                }
+                
+                let html = '<div class="transaction-list">';
+                data.forEach(transaction => {
+                    const typeColor = transaction.type === 'BUY' ? 'success' : 'danger';
+                    const typeIcon = transaction.type === 'BUY' ? '🟢' : '🔴';
+                    html += `
+                        <div class="transaction-item mb-2 p-2" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${typeIcon} ${transaction.symbol}</strong><br>
+                                    <small class="text-muted">${transaction.shares} shares @ $${transaction.price.toFixed(2)}</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-${typeColor}">$${transaction.total.toFixed(2)}</div>
+                                    <small class="text-muted">${transaction.date}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                historyDiv.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading transactions:', error);
+                document.getElementById('paperTransactionHistory').innerHTML = '<p class="text-danger">Error loading transactions</p>';
+            });
+    }
+
+    function confirmResetPaperPortfolio() {
+        if (confirm('Are you sure you want to reset your paper trading portfolio? This will delete all positions and transactions, and reset your virtual cash to $100,000.')) {
+            window.location.href = '/reset_paper_portfolio';
+        }
+    }
+
+    // Load transaction history on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPaperTransactions();
+    });
+
     </script>
 </body>
 </html>
