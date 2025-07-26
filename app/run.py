@@ -637,13 +637,49 @@ def dashboard():
         'total_return_percent': ((total_value - total_cost) / total_cost * 100) if total_cost > 0 else 0
     }
 
+    # Paper Trading Data
+    paper_portfolio = db.query(PaperPortfolio).filter_by(user_id=current_user.id).all()
+    paper_cash_balance = get_or_create_paper_cash_balance(current_user.id)
+
+    paper_portfolio_data = []
+    paper_total_value = 0
+    paper_total_cost = 0
+
+    for item in paper_portfolio:
+        current_price = get_current_price(item.stock_symbol)
+        if current_price:
+            position_value = item.shares * current_price
+            position_cost = item.shares * item.average_price
+            paper_total_value += position_value
+            paper_total_cost += position_cost
+
+            paper_portfolio_data.append({
+                'symbol': item.stock_symbol,
+                'shares': item.shares,
+                'average_price': item.average_price,
+                'current_price': current_price,
+                'position_value': position_value,
+                'profit_loss': position_value - position_cost,
+                'change_percent': ((current_price - item.average_price) / item.average_price * 100) if item.average_price > 0 else 0
+            })
+
+    paper_summary = {
+        'total_value': paper_total_value,
+        'total_cost': paper_total_cost,
+        'cash_balance': paper_cash_balance.cash_balance,
+        'total_account_value': paper_total_value + paper_cash_balance.cash_balance,
+        'total_profit_loss': paper_total_value - paper_total_cost,
+        'total_return_percent': ((paper_total_value - paper_total_cost) / paper_total_cost * 100) if paper_total_cost > 0 else 0
+    }
     
     return render_template('dashboard.html',
                          portfolio=portfolio_data,
                          watchlist=watchlist_data,
                          alerts=alerts_data,
                          notifications=notifications,
-                         summary=portfolio_summary)
+                         summary=portfolio_summary,
+                         paper_portfolio=paper_portfolio_data,
+                         paper_summary=paper_summary)
 
 @app.route('/add_to_portfolio', methods=['POST'])
 @login_required
