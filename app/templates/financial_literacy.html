@@ -708,6 +708,621 @@
             margin: 0 10px 10px 0;
         }
 
+        /* Paper Trading Enhanced Styles */
+        .paper-trading-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paper-trading-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .paper-trading-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+
+        .paper-trading-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .trading-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .practice-badge {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .paper-trading-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+        }
+
+        .paper-trading-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-glass {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-glass:hover {
+            background: rgba(59, 130, 246, 0.25);
+            color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-warning-glass {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning-glass:hover {
+            background: rgba(245, 158, 11, 0.25);
+            color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-success-glass {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-glass:hover {
+            background: rgba(16, 185, 129, 0.25);
+            color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-danger-glass {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger-glass:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-outline-glass {
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-glass:hover {
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .practice-alert {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .alert-content {
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .alert-content strong {
+            color: #3b82f6;
+        }
+
+        /* Enhanced Trading Stats Grid */
+        .trading-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card-modern {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card-modern:hover::before {
+            opacity: 1;
+        }
+
+        .cash-card { border-left: 4px solid #10b981; }
+        .portfolio-card { border-left: 4px solid #3b82f6; }
+        .total-card { border-left: 4px solid #8b5cf6; }
+        .profit-card { border-left: 4px solid #10b981; }
+        .loss-card { border-left: 4px solid #ef4444; }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            flex-shrink: 0;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .profit-text { color: #10b981; }
+        .loss-text { color: #ef4444; }
+
+        /* Enhanced Holdings Section */
+        .holdings-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .holdings-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .holdings-count {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .trading-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .holdings-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .holdings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+        }
+
+        .holdings-table th {
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(59, 130, 246, 0.1));
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .holdings-table th i {
+            margin-right: 5px;
+            color: var(--accent);
+        }
+
+        .holding-row {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .holding-row:hover {
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+        }
+
+        .holdings-table td {
+            padding: 15px 12px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .symbol-cell {
+            font-weight: 600;
+        }
+
+        .symbol-badge {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .purchase-price-cell {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .pl-cell, .return-cell {
+            font-weight: 600;
+        }
+
+        .profit-cell { color: #10b981; }
+        .loss-cell { color: #ef4444; }
+
+        .pl-value {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .return-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .profit-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .loss-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Empty State Styling */
+        .empty-portfolio-row {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(16, 185, 129, 0.05));
+        }
+
+        .empty-portfolio-cell {
+            padding: 40px 20px !important;
+            text-align: center;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+
+        .empty-title {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .empty-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 400px;
+            line-height: 1.4;
+        }
+
+        /* Enhanced Transaction History */
+        .transactions-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            height: fit-content;
+        }
+
+        .transactions-title {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-history-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .transaction-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .transaction-symbol {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .transaction-details {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .buy-transaction { border-left: 4px solid #10b981; }
+        .sell-transaction { border-left: 4px solid #ef4444; }
+
+        /* No Transactions State */
+        .no-transactions-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-primary) !important; /* Force white color in dark mode */
+        }
+
+        [data-theme="dark"] .no-transactions-state {
+            color: var(--text-primary) !important;
+        }
+
+        .no-transactions-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .no-transactions-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary) !important;
+        }
+
+        .no-transactions-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .paper-trading-container {
+                padding: 20px;
+            }
+            
+            .paper-trading-title {
+                font-size: 1.8rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .trading-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .paper-trading-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn-glass, .btn-warning-glass {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .holdings-table-container {
+                font-size: 0.8rem;
+            }
+            
+            .holdings-table th,
+            .holdings-table td {
+                padding: 10px 8px;
+            }
+            
+            .trading-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-success-glass,
+            .btn-danger-glass {
+                width: 100%;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .market-options {
@@ -757,128 +1372,6 @@
                 <p class="hero-subtitle">Master the fundamentals of investing and financial planning</p>
                 <div class="market-indicator" id="marketIndicator">
                     <i class="fas fa-map-marker-alt"></i> <span id="currentMarket">Loading...</span>
-                </div>
-            </div>
-
-            <!-- Paper Trading Section -->
-            <div class="mb-5">
-                <div class="metrics-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>💰 Paper Trading Practice</h2>
-                        <div>
-                            <button class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperTradingInfoModal">
-                                ℹ️ Info
-                            </button>
-                            <button class="btn btn-warning btn-sm me-2" onclick="confirmResetPaperPortfolio()">
-                                🔄 Reset
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info mb-4">
-                        <strong>📚 Learning Through Practice:</strong> Use this risk-free paper trading simulator to practice investing strategies with virtual money. Perfect for applying the financial concepts you're learning!
-                    </div>
-                    
-                    <!-- Paper Trading Summary Stats -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">${{ "%.2f"|format(paper_summary.cash_balance) }}</div>
-                                <div class="stat-label">Virtual Cash</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_value) }}</div>
-                                <div class="stat-label">Stock Value</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_account_value) }}</div>
-                                <div class="stat-label">Total Account</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value {{ 'positive' if paper_summary.total_profit_loss > 0 else 'negative' }}">${{ "%.2f"|format(paper_summary.total_profit_loss) }}</div>
-                                <div class="stat-label">Profit/Loss</div>
-                                <div class="stat-change {{ 'positive' if paper_summary.total_return_percent > 0 else 'negative' }}">
-                                    {{ "%.2f"|format(paper_summary.total_return_percent) }}%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Paper Portfolio Holdings -->
-                        <div class="col-lg-8">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4>📈 Virtual Holdings</h4>
-                                <div>
-                                    <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperBuyModal">
-                                        🟢 Buy
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#paperSellModal">
-                                        🔴 Sell
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="table-responsive">
-                                <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                                    <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
-                                        <tr>
-                                            <th style="color: var(--text-primary);">Symbol</th>
-                                            <th style="color: var(--text-primary);">Shares</th>
-                                            <th style="color: var(--text-primary);">Purchase Price</th>
-                                            <th style="color: var(--text-primary);">Current Price</th>
-                                            <th style="color: var(--text-primary);">Total Cost</th>
-                                            <th style="color: var(--text-primary);">Current Value</th>
-                                            <th style="color: var(--text-primary);">P/L</th>
-                                            <th style="color: var(--text-primary);">Return %</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="color: var(--text-secondary);">
-                                        {% for item in paper_portfolio %}
-                                        <tr style="background: var(--card-bg); border-color: var(--border-color);">
-                                            <td style="color: var(--text-primary); font-weight: bold;">{{ item.symbol }}</td>
-                                            <td>{{ "%.2f"|format(item.shares) }}</td>
-                                            <td style="color: var(--accent); font-weight: bold;">${{ "%.2f"|format(item.average_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.shares * item.average_price) }}</td>
-                                            <td>${{ "%.2f"|format(item.position_value) }}</td>
-                                            <td class="{{ 'positive-change' if item.profit_loss > 0 else 'negative-change' }}">
-                                                ${{ "%.2f"|format(item.profit_loss) }}
-                                            </td>
-                                            <td class="{{ 'positive-change' if item.change_percent > 0 else 'negative-change' }}">
-                                                {{ "%.2f"|format(item.change_percent) }}%
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                        {% if not paper_portfolio %}
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted">No positions yet. Click "Buy" to start practicing!</td>
-                                        </tr>
-                                        {% endif %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Transaction History -->
-                        <div class="col-lg-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4>📊 Recent Trades</h4>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="loadPaperTransactions()">
-                                    🔄 Refresh
-                                </button>
-                            </div>
-                            <div id="paperTransactionHistory" style="max-height: 300px; overflow-y: auto;">
-                                <p class="text-muted">Loading transaction history...</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1201,6 +1694,175 @@
                                     <div id="rentBuyResult" class="result-box">
                                         <div class="result-value"></div>
                                         <div class="result-details"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paper Trading Practice Section -->
+            <div class="mb-5">
+                <div class="paper-trading-container">
+                    <div class="paper-trading-header">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h2 class="paper-trading-title">
+                                    <span class="trading-icon">💰</span>
+                                    <span class="gradient-text">Paper Trading Practice</span>
+                                    <span class="practice-badge">Risk Free</span>
+                                </h2>
+                                <p class="paper-trading-subtitle">Master investing with virtual money - Apply what you've learned!</p>
+                            </div>
+                            <div class="paper-trading-controls">
+                                <button class="btn btn-glass btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperTradingInfoModal">
+                                    <i class="fas fa-info-circle"></i> Learn More
+                                </button>
+                                <button class="btn btn-warning-glass btn-sm" onclick="confirmResetPaperPortfolio()">
+                                    <i class="fas fa-redo-alt"></i> Reset Portfolio
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="practice-alert">
+                            <div class="alert-icon">📚</div>
+                            <div class="alert-content">
+                                <strong>Educational Focus:</strong> This risk-free simulator lets you practice investment strategies with $100,000 virtual money. Perfect for testing the concepts you've learned above!
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Paper Trading Stats -->
+                    <div class="trading-stats-grid mb-4">
+                        <div class="stat-card-modern cash-card">
+                            <div class="stat-icon">💵</div>
+                            <div class="stat-content">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.cash_balance) }}</div>
+                                <div class="stat-label">Virtual Cash</div>
+                                <div class="stat-trend">Available to invest</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-modern portfolio-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_value) }}</div>
+                                <div class="stat-label">Stock Value</div>
+                                <div class="stat-trend">Current positions</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-modern total-card">
+                            <div class="stat-icon">🏦</div>
+                            <div class="stat-content">
+                                <div class="stat-value">${{ "%.2f"|format(paper_summary.total_account_value) }}</div>
+                                <div class="stat-label">Total Account</div>
+                                <div class="stat-trend">Portfolio value</div>
+                            </div>
+                        </div>
+                        <div class="stat-card-modern {{ 'profit-card' if paper_summary.total_profit_loss > 0 else 'loss-card' }}">
+                            <div class="stat-icon">{{ '🚀' if paper_summary.total_profit_loss > 0 else '📉' }}</div>
+                            <div class="stat-content">
+                                <div class="stat-value {{ 'profit-text' if paper_summary.total_profit_loss > 0 else 'loss-text' }}">${{ "%.2f"|format(paper_summary.total_profit_loss) }}</div>
+                                <div class="stat-label">Profit/Loss</div>
+                                <div class="stat-change {{ 'profit-text' if paper_summary.total_return_percent > 0 else 'loss-text' }}">
+                                    {{ "%.2f"|format(paper_summary.total_return_percent) }}% return
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Enhanced Portfolio Holdings -->
+                        <div class="col-lg-8">
+                            <div class="holdings-section">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="holdings-title">
+                                        <i class="fas fa-chart-line"></i> Virtual Holdings
+                                        <span class="holdings-count">({{ paper_portfolio|length }} positions)</span>
+                                    </h4>
+                                    <div class="trading-buttons">
+                                        <button class="btn btn-success-glass btn-sm me-2" data-bs-toggle="modal" data-bs-target="#paperBuyModal">
+                                            <i class="fas fa-plus-circle"></i> Buy Stock
+                                        </button>
+                                        <button class="btn btn-danger-glass btn-sm" data-bs-toggle="modal" data-bs-target="#paperSellModal">
+                                            <i class="fas fa-minus-circle"></i> Sell Stock
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="holdings-table-container">
+                                    <table class="holdings-table">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="fas fa-tag"></i> Symbol</th>
+                                                <th><i class="fas fa-layer-group"></i> Shares</th>
+                                                <th><i class="fas fa-shopping-cart"></i> Purchase Price</th>
+                                                <th><i class="fas fa-dollar-sign"></i> Current Price</th>
+                                                <th><i class="fas fa-receipt"></i> Total Cost</th>
+                                                <th><i class="fas fa-coins"></i> Current Value</th>
+                                                <th><i class="fas fa-chart-area"></i> P/L</th>
+                                                <th><i class="fas fa-percentage"></i> Return %</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in paper_portfolio %}
+                                            <tr class="holding-row">
+                                                <td class="symbol-cell">
+                                                    <div class="symbol-badge">{{ item.symbol }}</div>
+                                                </td>
+                                                <td class="shares-cell">{{ "%.2f"|format(item.shares) }}</td>
+                                                <td class="purchase-price-cell">${{ "%.2f"|format(item.average_price) }}</td>
+                                                <td class="current-price-cell">${{ "%.2f"|format(item.current_price) }}</td>
+                                                <td class="cost-cell">${{ "%.2f"|format(item.shares * item.average_price) }}</td>
+                                                <td class="value-cell">${{ "%.2f"|format(item.position_value) }}</td>
+                                                <td class="pl-cell {{ 'profit-cell' if item.profit_loss > 0 else 'loss-cell' }}">
+                                                    <div class="pl-value">
+                                                        <i class="fas {{ 'fa-arrow-up' if item.profit_loss > 0 else 'fa-arrow-down' }}"></i>
+                                                        ${{ "%.2f"|format(item.profit_loss) }}
+                                                    </div>
+                                                </td>
+                                                <td class="return-cell {{ 'profit-cell' if item.change_percent > 0 else 'loss-cell' }}">
+                                                    <div class="return-badge {{ 'profit-badge' if item.change_percent > 0 else 'loss-badge' }}">
+                                                        {{ "%.2f"|format(item.change_percent) }}%
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if not paper_portfolio %}
+                                            <tr class="empty-portfolio-row">
+                                                <td colspan="8" class="empty-portfolio-cell">
+                                                    <div class="empty-state">
+                                                        <div class="empty-icon">📊</div>
+                                                        <div class="empty-title">Ready to Start Trading?</div>
+                                                        <div class="empty-subtitle">No positions yet. Click "Buy Stock" to start your investment journey!</div>
+                                                        <button class="btn btn-success-glass btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#paperBuyModal">
+                                                            <i class="fas fa-rocket"></i> Make Your First Trade
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Enhanced Transaction History -->
+                        <div class="col-lg-4">
+                            <div class="transactions-section">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="transactions-title">
+                                        <i class="fas fa-history"></i> Trading History
+                                    </h4>
+                                    <button class="btn btn-outline-glass btn-sm" onclick="loadPaperTransactions()">
+                                        <i class="fas fa-sync-alt"></i> Refresh
+                                    </button>
+                                </div>
+                                <div id="paperTransactionHistory" class="transaction-history-container">
+                                    <div class="loading-state">
+                                        <div class="loading-spinner"></div>
+                                        <div class="loading-text">Loading your trading history...</div>
                                     </div>
                                 </div>
                             </div>
@@ -8494,34 +9156,70 @@
             }
         };
 
-        // Initialize
+        // Initialize with improved error handling and performance
         document.addEventListener('DOMContentLoaded', function() {
-            // Show market selector on page load
-            document.getElementById('marketSelector').style.display = 'flex';
+            try {
+                // Show market selector on page load with a small delay to prevent freezing
+                setTimeout(() => {
+                    const marketSelector = document.getElementById('marketSelector');
+                    if (marketSelector) {
+                        marketSelector.style.display = 'flex';
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error initializing market selector:', error);
+                // Fallback: show content directly if market selector fails
+                document.getElementById('financialContent').classList.add('active');
+                document.getElementById('currentMarket').textContent = 'Saudi Arabia 🇸🇦';
+                selectMarket('saudi');
+            }
         });
 
-        // Market selection
+        // Market selection with improved performance
         function selectMarket(market) {
-            currentMarket = market;
-            currentCurrency = marketData[market].currency;
-            
-            // Hide market selector
-            document.getElementById('marketSelector').style.display = 'none';
-            
-            // Show main content
-            document.getElementById('financialContent').classList.add('active');
-            
-            // Update market indicator
-            document.getElementById('currentMarket').textContent = marketData[market].name;
-            
-            // Update currency buttons
-            updateCurrencyButtons();
-            
-            // Populate videos for the selected market
-            populateVideos();
-            
-            // Don't populate concepts on initial load - wait for level selection
-            showLevel('beginner'); // Show beginner by default
+            try {
+                currentMarket = market;
+                currentCurrency = marketData[market].currency;
+                
+                // Hide market selector with smooth transition
+                const marketSelector = document.getElementById('marketSelector');
+                if (marketSelector) {
+                    marketSelector.style.opacity = '0';
+                    setTimeout(() => {
+                        marketSelector.style.display = 'none';
+                    }, 300);
+                }
+                
+                // Show main content with delay to prevent UI blocking
+                setTimeout(() => {
+                    const financialContent = document.getElementById('financialContent');
+                    if (financialContent) {
+                        financialContent.classList.add('active');
+                    }
+                    
+                    // Update market indicator
+                    const currentMarketElement = document.getElementById('currentMarket');
+                    if (currentMarketElement) {
+                        currentMarketElement.textContent = marketData[market].name;
+                    }
+                    
+                    // Update currency buttons (if they exist)
+                    updateCurrencyButtons();
+                    
+                    // Populate content asynchronously to prevent blocking
+                    requestAnimationFrame(() => {
+                        populateVideos();
+                        showLevel('beginner'); // Show beginner by default
+                    });
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error selecting market:', error);
+                // Fallback to prevent complete failure
+                currentMarket = 'saudi';
+                currentCurrency = 'SAR';
+                document.getElementById('financialContent').classList.add('active');
+            }
         }
 
         // Update currency display
@@ -8533,32 +9231,55 @@
 
 
 
-        // Content population
+        // Content population with error handling
         function populateVideos() {
-            const videoGrid = document.getElementById('videoGrid');
-            const videos = marketData[currentMarket].videos;
-            
-            if (!videoGrid) {
-                console.error('Video grid element not found!');
-                return;
-            }
-            
-            if (!videos || videos.length === 0) {
-                console.error('No videos found for market:', currentMarket);
-                return;
-            }
-            
-            videoGrid.innerHTML = videos.map(video => `
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="video-card" onclick="playVideo('${video.title}')">
-                        <div class="video-thumbnail">
-                            <i class="fas fa-${video.icon}"></i>
+            try {
+                const videoGrid = document.getElementById('videoGrid');
+                const videos = marketData[currentMarket]?.videos;
+                
+                if (!videoGrid) {
+                    console.error('Video grid element not found!');
+                    return;
+                }
+                
+                if (!videos || videos.length === 0) {
+                    console.error('No videos found for market:', currentMarket);
+                    videoGrid.innerHTML = '<div class="col-12"><p class="text-center text-muted">Videos coming soon for this market!</p></div>';
+                    return;
+                }
+                
+                // Use document fragment for better performance
+                const fragment = document.createDocumentFragment();
+                const tempDiv = document.createElement('div');
+                
+                tempDiv.innerHTML = videos.map(video => `
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="video-card" onclick="playVideo('${video.title.replace(/'/g, "\\'")}')">
+                            <div class="video-thumbnail">
+                                <i class="fas fa-${video.icon}"></i>
+                            </div>
+                            <div class="video-title">${video.title}</div>
+                            <div class="video-duration">${video.duration}</div>
                         </div>
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-duration">${video.duration}</div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+                
+                // Move all children to fragment
+                while (tempDiv.firstChild) {
+                    fragment.appendChild(tempDiv.firstChild);
+                }
+                
+                // Clear and append in one operation
+                videoGrid.innerHTML = '';
+                videoGrid.appendChild(fragment);
+                
+            } catch (error) {
+                console.error('Error populating videos:', error);
+                const videoGrid = document.getElementById('videoGrid');
+                if (videoGrid) {
+                    videoGrid.innerHTML = '<div class="col-12"><p class="text-center text-muted">Error loading videos. Please refresh the page.</p></div>';
+                }
+            }
         }
 
         // Level-based education content
@@ -9845,30 +10566,50 @@ Try asking about specific topics like "How do I start investing?" or "What is di
     <script>
         // Paper Trading Functions
         function loadPaperTransactions() {
+            const historyDiv = document.getElementById('paperTransactionHistory');
+            
+            // Show loading state
+            historyDiv.innerHTML = `
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading your trading history...</div>
+                </div>
+            `;
+            
             fetch('/paper_transactions')
                 .then(response => response.json())
                 .then(data => {
-                    const historyDiv = document.getElementById('paperTransactionHistory');
                     if (data.length === 0) {
-                        historyDiv.innerHTML = '<p class="text-muted">No transactions yet. Start practicing by buying some stocks!</p>';
+                        historyDiv.innerHTML = `
+                            <div class="no-transactions-state">
+                                <div class="no-transactions-icon">📊</div>
+                                <div class="no-transactions-title">Ready to Start Trading?</div>
+                                <div class="no-transactions-subtitle">No transactions yet. Start practicing by buying some stocks!</div>
+                            </div>
+                        `;
                         return;
                     }
                     
                     let html = '<div class="transaction-list">';
                     data.forEach(transaction => {
-                        const typeColor = transaction.type === 'BUY' ? 'success' : 'danger';
+                        const typeClass = transaction.type === 'BUY' ? 'buy-transaction' : 'sell-transaction';
+                        const typeColor = transaction.type === 'BUY' ? 'profit-text' : 'loss-text';
                         const typeIcon = transaction.type === 'BUY' ? '🟢' : '🔴';
+                        const typeSign = transaction.type === 'BUY' ? '-' : '+';
+                        
                         html += `
-                            <div class="transaction-item mb-2 p-2" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>${typeIcon} ${transaction.symbol}</strong><br>
-                                        <small class="text-muted">${transaction.shares} shares @ $${transaction.price.toFixed(2)}</small>
+                            <div class="transaction-item ${typeClass}">
+                                <div class="transaction-header">
+                                    <div class="transaction-symbol">
+                                        ${typeIcon} <strong>${transaction.symbol}</strong>
                                     </div>
-                                    <div class="text-end">
-                                        <div class="text-${typeColor}">$${transaction.total.toFixed(2)}</div>
-                                        <small class="text-muted">${transaction.date}</small>
+                                    <div class="transaction-amount ${typeColor}">
+                                        ${typeSign}$${transaction.total.toFixed(2)}
                                     </div>
+                                </div>
+                                <div class="transaction-details">
+                                    <span>${transaction.shares} shares @ $${transaction.price.toFixed(2)}</span>
+                                    <span>${transaction.date}</span>
                                 </div>
                             </div>
                         `;
@@ -9878,7 +10619,13 @@ Try asking about specific topics like "How do I start investing?" or "What is di
                 })
                 .catch(error => {
                     console.error('Error loading transactions:', error);
-                    document.getElementById('paperTransactionHistory').innerHTML = '<p class="text-danger">Error loading transactions</p>';
+                    historyDiv.innerHTML = `
+                        <div class="no-transactions-state">
+                            <div class="no-transactions-icon">⚠️</div>
+                            <div class="no-transactions-title">Loading Error</div>
+                            <div class="no-transactions-subtitle">Unable to load transaction history. Please try again.</div>
+                        </div>
+                    `;
                 });
         }
 
@@ -9888,12 +10635,21 @@ Try asking about specific topics like "How do I start investing?" or "What is di
             }
         }
 
-        // Load transaction history on page load
+        // Load transaction history on page load with safety checks
         document.addEventListener('DOMContentLoaded', function() {
-            // Only load if we're in the authenticated state and the element exists
-            if (document.getElementById('paperTransactionHistory')) {
-                loadPaperTransactions();
-            }
+            // Only load if we're in the authenticated state, the element exists, and we're not in the market selector
+            setTimeout(() => {
+                const historyContainer = document.getElementById('paperTransactionHistory');
+                const financialContent = document.getElementById('financialContent');
+                
+                if (historyContainer && financialContent && financialContent.classList.contains('active')) {
+                    // Check if user is likely authenticated by looking for paper trading data
+                    const paperTradingContainer = document.querySelector('.paper-trading-container');
+                    if (paperTradingContainer) {
+                        loadPaperTransactions();
+                    }
+                }
+            }, 500); // Delay to ensure page is fully loaded
         });
     </script>
 </body>
