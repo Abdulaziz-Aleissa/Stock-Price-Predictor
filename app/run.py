@@ -109,13 +109,7 @@ scheduler.add_job(
     name='Check price alerts every 5 minutes'
 )
 
-# Schedule historical prediction updates
-scheduler.add_job(
-    func=update_historical_predictions,
-    trigger=IntervalTrigger(hours=1),
-    id='update_predictions',
-    name='Update historical predictions hourly'
-)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -424,6 +418,14 @@ def calculate_rolling_accuracy(predictions, days):
 
 
 
+
+# Schedule historical prediction updates
+scheduler.add_job(
+    func=update_historical_predictions,
+    trigger=IntervalTrigger(hours=1),
+    id='update_predictions',
+    name='Update historical predictions hourly'
+)
 
 @app.route('/')
 def index():
