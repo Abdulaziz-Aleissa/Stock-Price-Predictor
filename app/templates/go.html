@@ -212,148 +212,74 @@
             </div>
         </div>
 
-        <!-- Backtest Results Section -->
-        {% if backtest_metrics %}
+        <!-- Backtest Analysis Section -->
         <div class="row mt-4">
             <div class="col-12">
                 <div class="metrics-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h4>📊 Backtest Results</h4>
-                            <small class="text-muted">Historical performance analysis (up to 1 year of predictions)</small>
+                            <h4>📊 Backtest Analysis</h4>
+                            <small class="text-muted">Evaluate historical prediction accuracy over different time periods</small>
                         </div>
-                        <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#backtestSection" aria-expanded="true" aria-controls="backtestSection">
-                            <span class="backtest-toggle-text">Hide</span>
-                        </button>
                     </div>
                     
-                    <div class="collapse show" id="backtestSection">
-                        <!-- Performance Metrics Overview -->
-                        <div class="row mb-4">
-                            <div class="col-md-3">
-                                <div class="backtest-metric-card">
-                                    <div class="metric-value">{{ backtest_metrics.total_predictions }}</div>
-                                    <div class="metric-label">Total Predictions</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="backtest-metric-card">
-                                    <div class="metric-value">${{ "%.2f"|format(backtest_metrics.mae) }}</div>
-                                    <div class="metric-label">Avg Error (MAE)</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="backtest-metric-card">
-                                    <div class="metric-value">{{ "%.1f"|format(backtest_metrics.directional_accuracy) }}%</div>
-                                    <div class="metric-label">Direction Accuracy</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="backtest-metric-card">
-                                    <div class="metric-value">${{ "%.2f"|format(backtest_metrics.rmse) }}</div>
-                                    <div class="metric-label">RMSE</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Hit Rates -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5>🎯 Accuracy Hit Rates</h5>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="hit-rate-card">
-                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_2_dollars) }}%</div>
-                                            <div class="hit-rate-label">Within $2</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="hit-rate-card">
-                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_5_dollars) }}%</div>
-                                            <div class="hit-rate-label">Within $5</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="hit-rate-card">
-                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_10_dollars) }}%</div>
-                                            <div class="hit-rate-label">Within $10</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Rolling Performance -->
-                        {% if backtest_metrics.rolling_accuracy %}
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5>📈 Rolling Performance</h5>
-                                <div class="row">
-                                    {% if backtest_metrics.rolling_accuracy['7_days'] %}
-                                    <div class="col-md-4">
-                                        <div class="rolling-metric-card">
-                                            <div class="rolling-header">7 Days</div>
-                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['7_days'].mae) }}</div>
-                                            <div class="rolling-label">Avg Error</div>
-                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['7_days'].directional_accuracy) }}% Direction</div>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    {% if backtest_metrics.rolling_accuracy['30_days'] %}
-                                    <div class="col-md-4">
-                                        <div class="rolling-metric-card">
-                                            <div class="rolling-header">30 Days</div>
-                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['30_days'].mae) }}</div>
-                                            <div class="rolling-label">Avg Error</div>
-                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['30_days'].directional_accuracy) }}% Direction</div>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                    {% if backtest_metrics.rolling_accuracy['90_days'] %}
-                                    <div class="col-md-4">
-                                        <div class="rolling-metric-card">
-                                            <div class="rolling-header">90 Days</div>
-                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['90_days'].mae) }}</div>
-                                            <div class="rolling-label">Avg Error</div>
-                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['90_days'].directional_accuracy) }}% Direction</div>
-                                        </div>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Charts -->
-                        <div class="row">
+                    <!-- Backtest Controls -->
+                    <div class="backtest-controls mb-4">
+                        <div class="row align-items-end">
                             <div class="col-md-6">
-                                <div id="backtestChart" class="backtest-chart"></div>
+                                <label for="backtestDuration" class="form-label">Select Analysis Period</label>
+                                <select id="backtestDuration" class="form-select">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365" selected>Last 1 Year</option>
+                                </select>
                             </div>
                             <div class="col-md-6">
-                                <div id="errorDistributionChart" class="backtest-chart"></div>
+                                <button id="runBacktestBtn" class="btn btn-primary w-100" onclick="runBacktest()">
+                                    <span class="btn-icon">🚀</span>
+                                    <span class="btn-text">Run Backtest Analysis</span>
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="metrics-card">
-                    <h4>📊 Backtest Results</h4>
-                    <div class="alert alert-info" role="alert">
+                    
+                    <!-- Loading State -->
+                    <div id="backtestLoading" class="backtest-loading" style="display: none;">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Analyzing historical predictions...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div id="backtestError" class="alert alert-warning" style="display: none;" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="backtestErrorMessage"></span>
+                    </div>
+                    
+                    <!-- Results Section -->
+                    <div id="backtestResults" style="display: none;">
+                        <!-- Results will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Initial Instructions -->
+                    <div id="backtestInstructions" class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Generating Historical Backtest Data</strong><br>
-                        Populating {{ ticker }} with historical prediction data to show comprehensive backtest results.
-                        This includes up to 1 year of historical predictions and their accuracy.
-                        <br><br>
-                        <strong>Refresh the page to see your complete backtest results!</strong>
+                        <strong>Ready to analyze {{ ticker }} prediction accuracy!</strong><br>
+                        Select your preferred analysis period above and click "Run Backtest Analysis" to see:
+                        <ul class="mt-2 mb-0">
+                            <li>Historical prediction accuracy metrics</li>
+                            <li>Mean Absolute Error (MAE) and directional accuracy</li>
+                            <li>Hit rates within different price ranges</li>
+                            <li>Interactive charts comparing predictions vs actual prices</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-        {% endif %}
 
         <div class="time-selector">
             <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
@@ -467,27 +393,200 @@
             });
         }
 
-        // Backtest section toggle functionality
-        const backtestToggleBtn = document.querySelector('[data-bs-target="#backtestSection"]');
-        const backtestToggleText = document.querySelector('.backtest-toggle-text');
-        const backtestSection = document.getElementById('backtestSection');
-        
-        if (backtestToggleBtn && backtestToggleText && backtestSection) {
-            // Listen to Bootstrap collapse events
-            backtestSection.addEventListener('shown.bs.collapse', function () {
-                backtestToggleText.textContent = 'Hide';
-            });
+        // Interactive Backtest functionality
+        function runBacktest() {
+            const ticker = '{{ ticker }}';
+            const duration = document.getElementById('backtestDuration').value;
+            const runBtn = document.getElementById('runBacktestBtn');
+            const loading = document.getElementById('backtestLoading');
+            const error = document.getElementById('backtestError');
+            const results = document.getElementById('backtestResults');
+            const instructions = document.getElementById('backtestInstructions');
             
-            backtestSection.addEventListener('hidden.bs.collapse', function () {
-                backtestToggleText.textContent = 'Show';
+            // Show loading state
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running Analysis...';
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            results.style.display = 'none';
+            instructions.style.display = 'none';
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('ticker', ticker);
+            formData.append('duration', duration);
+            
+            // Make request to backend
+            fetch('/run_backtest', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">Run Backtest Analysis</span>';
+                
+                if (data.success) {
+                    displayBacktestResults(data.metrics);
+                } else {
+                    showBacktestError(data.error, data.message);
+                }
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">Run Backtest Analysis</span>';
+                showBacktestError('Network error occurred', 'Please try again in a moment.');
+                console.error('Backtest error:', err);
             });
         }
+        
+        function showBacktestError(error, message) {
+            const errorDiv = document.getElementById('backtestError');
+            const errorMessage = document.getElementById('backtestErrorMessage');
+            
+            errorMessage.innerHTML = `<strong>${error}</strong><br>${message || ''}`;
+            errorDiv.style.display = 'block';
+        }
+        
+        function displayBacktestResults(metrics) {
+            const resultsDiv = document.getElementById('backtestResults');
+            
+            // Create results HTML
+            const resultsHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5>📊 Analysis Results</h5>
+                        <small class="text-muted">Performance over ${metrics.duration_label}</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#backtestSection" aria-expanded="true" aria-controls="backtestSection">
+                        <span class="backtest-toggle-text">Hide</span>
+                    </button>
+                </div>
+                
+                <div class="collapse show" id="backtestSection">
+                    <!-- Performance Metrics Overview -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="backtest-metric-card">
+                                <div class="metric-value">${metrics.total_predictions}</div>
+                                <div class="metric-label">Total Predictions</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="backtest-metric-card">
+                                <div class="metric-value">$${metrics.mae.toFixed(2)}</div>
+                                <div class="metric-label">Avg Error (MAE)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="backtest-metric-card">
+                                <div class="metric-value">${metrics.directional_accuracy.toFixed(1)}%</div>
+                                <div class="metric-label">Direction Accuracy</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="backtest-metric-card">
+                                <div class="metric-value">$${metrics.rmse.toFixed(2)}</div>
+                                <div class="metric-label">RMSE</div>
+                            </div>
+                        </div>
+                    </div>
 
-        // Create backtest charts
-        {% if backtest_metrics %}
-        function createBacktestCharts() {
+                    <!-- Hit Rates -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>🎯 Accuracy Hit Rates</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="hit-rate-card">
+                                        <div class="hit-rate-value">${metrics.hit_rates.within_2_dollars.toFixed(1)}%</div>
+                                        <div class="hit-rate-label">Within $2</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="hit-rate-card">
+                                        <div class="hit-rate-value">${metrics.hit_rates.within_5_dollars.toFixed(1)}%</div>
+                                        <div class="hit-rate-label">Within $5</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="hit-rate-card">
+                                        <div class="hit-rate-value">${metrics.hit_rates.within_10_dollars.toFixed(1)}%</div>
+                                        <div class="hit-rate-label">Within $10</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rolling Performance -->
+                    ${metrics.rolling_accuracy ? `
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>📈 Rolling Performance</h5>
+                            <div class="row">
+                                ${metrics.rolling_accuracy['7_days'] ? `
+                                <div class="col-md-4">
+                                    <div class="rolling-metric-card">
+                                        <div class="rolling-header">7 Days</div>
+                                        <div class="rolling-value">$${metrics.rolling_accuracy['7_days'].mae.toFixed(2)}</div>
+                                        <div class="rolling-label">Avg Error</div>
+                                        <div class="rolling-direction">${metrics.rolling_accuracy['7_days'].directional_accuracy.toFixed(1)}% Direction</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${metrics.rolling_accuracy['30_days'] ? `
+                                <div class="col-md-4">
+                                    <div class="rolling-metric-card">
+                                        <div class="rolling-header">30 Days</div>
+                                        <div class="rolling-value">$${metrics.rolling_accuracy['30_days'].mae.toFixed(2)}</div>
+                                        <div class="rolling-label">Avg Error</div>
+                                        <div class="rolling-direction">${metrics.rolling_accuracy['30_days'].directional_accuracy.toFixed(1)}% Direction</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${metrics.rolling_accuracy['90_days'] ? `
+                                <div class="col-md-4">
+                                    <div class="rolling-metric-card">
+                                        <div class="rolling-header">90 Days</div>
+                                        <div class="rolling-value">$${metrics.rolling_accuracy['90_days'].mae.toFixed(2)}</div>
+                                        <div class="rolling-label">Avg Error</div>
+                                        <div class="rolling-direction">${metrics.rolling_accuracy['90_days'].directional_accuracy.toFixed(1)}% Direction</div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Charts -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div id="backtestChart" class="backtest-chart"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="errorDistributionChart" class="backtest-chart"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = resultsHTML;
+            resultsDiv.style.display = 'block';
+            
+            // Create charts with the new data
+            createBacktestCharts(metrics);
+            
+            // Setup toggle functionality for the new section
+            setupBacktestToggle();
+        }
+        
+        function createBacktestCharts(metrics) {
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const chartData = {{ backtest_metrics.chart_data | tojson }};
+            const chartData = metrics.chart_data;
             
             // Historical Predictions vs Actual Chart
             if (chartData && chartData.length > 0) {
@@ -547,7 +646,7 @@
             }
 
             // Error Distribution Chart
-            const errorData = {{ backtest_metrics.error_distribution.errors | tojson }};
+            const errorData = metrics.error_distribution.errors;
             if (errorData && errorData.length > 0) {
                 const trace = {
                     x: errorData,
@@ -587,15 +686,30 @@
                 Plotly.newPlot('errorDistributionChart', [trace], layout, {responsive: true});
             }
         }
-
-        // Create backtest charts when page loads
-        createBacktestCharts();
-
-        // Update backtest charts when theme changes
-        document.querySelector('.theme-switch').addEventListener('click', () => {
-            setTimeout(createBacktestCharts, 100);
-        });
-        {% endif %}
+        
+        function setupBacktestToggle() {
+            const backtestToggleBtn = document.querySelector('[data-bs-target="#backtestSection"]');
+            const backtestToggleText = document.querySelector('.backtest-toggle-text');
+            const backtestSection = document.getElementById('backtestSection');
+            
+            if (backtestToggleBtn && backtestToggleText && backtestSection) {
+                // Remove old event listeners by cloning the button
+                const newBtn = backtestToggleBtn.cloneNode(true);
+                backtestToggleBtn.parentNode.replaceChild(newBtn, backtestToggleBtn);
+                
+                // Get the new text element  
+                const newToggleText = document.querySelector('.backtest-toggle-text');
+                
+                // Listen to Bootstrap collapse events
+                backtestSection.addEventListener('shown.bs.collapse', function () {
+                    newToggleText.textContent = 'Hide';
+                });
+                
+                backtestSection.addEventListener('hidden.bs.collapse', function () {
+                    newToggleText.textContent = 'Show';
+                });
+            }
+        }
     </script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>

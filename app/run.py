@@ -833,9 +833,6 @@ def predict():
         
         # Populate historical data if needed for backtesting (for user who has been predicting for a year)
         populate_historical_data_for_testing(stock_ticker)
-        
-        # Calculate backtest metrics for full available history
-        backtest_metrics = calculate_backtest_metrics(stock_ticker, days_back=365)
 
         return render_template(
             'go.html',
@@ -855,13 +852,53 @@ def predict():
             },
             news_articles=news_articles,
             news_summary=news_summary,
-            news_error_message=news_error_message,
-            backtest_metrics=backtest_metrics
+            news_error_message=news_error_message
         )
 
     except Exception as e:
         logger.error(f"Error in prediction: {str(e)}")
         return render_template('error.html', error=str(e))
+
+
+@app.route('/run_backtest', methods=['POST'])
+def run_backtest():
+    """Handle backtest requests with user-selected duration"""
+    try:
+        stock_ticker = request.form.get('ticker', '').upper()
+        duration_days = int(request.form.get('duration', 365))
+        
+        if not stock_ticker:
+            return jsonify({'error': 'Stock ticker is required'}), 400
+            
+        # Validate duration options
+        valid_durations = [7, 30, 90, 365]
+        if duration_days not in valid_durations:
+            return jsonify({'error': 'Invalid duration selected'}), 400
+        
+        # Populate historical data if needed
+        populate_historical_data_for_testing(stock_ticker)
+        
+        # Calculate backtest metrics for selected duration
+        backtest_metrics = calculate_backtest_metrics(stock_ticker, days_back=duration_days)
+        
+        if not backtest_metrics:
+            return jsonify({
+                'error': 'No historical data available',
+                'message': f'No predictions found for {stock_ticker} in the last {duration_days} days. Try a longer duration or make some predictions first.'
+            }), 404
+        
+        # Add duration info to metrics
+        backtest_metrics['duration_days'] = duration_days
+        backtest_metrics['duration_label'] = f"{duration_days} days" if duration_days < 365 else "1 year"
+        
+        return jsonify({
+            'success': True,
+            'metrics': backtest_metrics
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in run_backtest: {str(e)}")
+        return jsonify({'error': f'Backtest calculation failed: {str(e)}'}), 500
 
 
 @app.route('/signup', methods=['GET', 'POST'])
