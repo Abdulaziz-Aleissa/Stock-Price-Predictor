@@ -66,36 +66,50 @@ def load_data(stock_name):
 
 def clean_data(df):
     """
-    Prepares stock data with NaN handling
+    Prepares stock data with NaN handling and infinity protection
     """
     try:
         # Ensure datetime index
         df.index = pd.to_datetime(df.index)
         
-        # Basic calculations
+        # Basic calculations with robust handling
         df['Price_Change'] = df['Close'].pct_change().fillna(0)
         df['Volume_Change'] = df['Volume'].pct_change().fillna(0)
         df['High_Low_Range'] = df['High'] - df['Low']
         df['Daily_Return'] = df['Close'].pct_change().fillna(0)
+        
+        # Replace infinite values with zero
+        df['Price_Change'] = df['Price_Change'].replace([np.inf, -np.inf], 0)
+        df['Volume_Change'] = df['Volume_Change'].replace([np.inf, -np.inf], 0)
+        df['Daily_Return'] = df['Daily_Return'].replace([np.inf, -np.inf], 0)
         
         # Handle rolling calculations
         df['Volatility'] = df['Daily_Return'].rolling(window=20).std().fillna(0)
         df['SMA_20'] = df['Close'].rolling(window=20).mean().fillna(method='bfill').fillna(df['Close'])
         df['SMA_50'] = df['Close'].rolling(window=50).mean().fillna(method='bfill').fillna(df['Close'])
         
-        # RSI
+        # RSI with robust division handling
         delta = df['Close'].diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=14).mean().fillna(0)
         loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean().fillna(0)
-        rs = gain / loss
-        df['RSI'] = 100 - (100 / (1 + rs))
-        df['RSI'] = df['RSI'].fillna(50)  # Neutral RSI for NaN values
         
-        # MACD
+        # Prevent division by zero in RSI calculation
+        rs = np.where(loss != 0, gain / loss, 0)
+        df['RSI'] = np.where(rs != 0, 100 - (100 / (1 + rs)), 50)
+        df['RSI'] = pd.Series(df['RSI']).fillna(50)  # Neutral RSI for NaN values
+        
+        # Replace any infinite RSI values
+        df['RSI'] = df['RSI'].replace([np.inf, -np.inf], 50)
+        
+        # MACD with robust calculation
         exp1 = df['Close'].ewm(span=12, adjust=False).mean()
         exp2 = df['Close'].ewm(span=26, adjust=False).mean()
         df['MACD'] = (exp1 - exp2).fillna(0)
         df['MACD_Signal'] = df['MACD'].ewm(span=9, adjust=False).mean().fillna(0)
+        
+        # Replace infinite MACD values
+        df['MACD'] = df['MACD'].replace([np.inf, -np.inf], 0)
+        df['MACD_Signal'] = df['MACD_Signal'].replace([np.inf, -np.inf], 0)
         
         # Target variable - shifted close price
         df["Tomorrow"] = df['Close'].shift(-1)
@@ -106,8 +120,21 @@ def clean_data(df):
         # Drop the last row as it will have NaN in Tomorrow
         df = df.iloc[:-1].copy()
         
-        # Final check for any remaining NaN
+        # Final comprehensive cleanup
+        # Replace any remaining infinite values
+        numeric_columns = df.select_dtypes(include=[np.number]).columns
+        df[numeric_columns] = df[numeric_columns].replace([np.inf, -np.inf], 0)
+        
+        # Fill any remaining NaN values
         df = df.fillna(0)
+        
+        # Final validation - ensure no infinite or extremely large values
+        for col in numeric_columns:
+            if col != 'Date':  # Skip date column
+                max_val = df[col].abs().max()
+                if max_val > 1e10:  # If values are extremely large
+                    logger.warning(f"Large values detected in {col}, capping at reasonable limits")
+                    df[col] = df[col].clip(-1e6, 1e6)
         
         return df
         

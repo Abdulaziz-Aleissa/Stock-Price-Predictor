@@ -3,114 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Stock Price Predictor</title>
+    <title>Professional Dashboard - Stock Analytics Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta name="description" content="Professional stock analytics dashboard with portfolio tracking, advanced analytics, and real-time market insights.">
 </head>
 <body>
-    <div class="theme-switch">
-        <div class="switch-track">
-            <div class="switch-icons">
-                <div class="sun">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                </div>
-                <div class="moon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-                </div>
-            </div>
-            <div class="switch-circle"></div>
-        </div>
-    </div>
-
-    <div class="notifications-container">
-        {% for notification in notifications %}
-        <div class="notification-item">
-            {{ notification.message }}
-            <a href="{{ url_for('mark_notification_read', notification_id=notification.id) }}" 
-               class="btn-close notification-close"></a>
-        </div>
-        {% endfor %}
-    </div>
-
-    <div class="content-box dashboard">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Dashboard</h1>
-            <div>
-                <a href="{{ url_for('financial_literacy') }}" class="btn btn-custom me-2">📚 Financial Literacy</a>
-                <a href="{{ url_for('index') }}" class="btn btn-custom me-2">New Prediction</a>
-                <button class="btn btn-custom me-2" data-bs-toggle="modal" data-bs-target="#stockScoringModal">
-                    Stock Scoring
-                </button>
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Portfolio Summary Card -->
-            <div class="col-12 mb-4">
-                <div class="metrics-card">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="summary-item">
-                                <div class="label">Total Value</div>
-                                <div class="value">${{ "%.2f"|format(summary.total_value) }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="summary-item">
-                                <div class="label">Total Cost</div>
-                                <div class="value">${{ "%.2f"|format(summary.total_cost) }}</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="summary-item">
-                                <div class="label">Total P/L</div>
-                                <div class="value {{ 'positive-change' if summary.total_profit_loss > 0 else 'negative-change' }}">
-                                    ${{ "%.2f"|format(summary.total_profit_loss) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="summary-item">
-                                <div class="label">Total Return</div>
-                                <div class="value {{ 'positive-change' if summary.total_return_percent > 0 else 'negative-change' }}">
-                                    {{ "%.2f"|format(summary.total_return_percent) }}%
-                                </div>
-                            </div>
-                        </div>
+    <div class="app-container">
+        <!-- Professional Theme Switch -->
+        <div class="theme-switch">
+            <div class="switch-track">
+                <div class="switch-icons">
+                    <div class="sun">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    </div>
+                    <div class="moon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     </div>
                 </div>
+                <div class="switch-circle"></div>
             </div>
+        </div>
 
-            <!-- Portfolio Section -->
-            <div class="col-md-6">
-                <div class="metrics-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>Portfolio</h2>
-                        <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#addPortfolioModal">
-                            Add Stock
-                        </button>
+        <!-- Professional Navigation Header -->
+        <div class="nav-header">
+            <div class="nav-container">
+                <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
+                <div class="nav-links">
+                    <span class="user-welcome">👤 {{ current_user.username }}</span>
+                    <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 Education</a>
+                    <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🔍 New Analysis</a>
+                    <button class="btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#stockScoringModal">
+                        📊 Scoring
+                    </button>
+                    <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        {% if notifications %}
+        <div class="notifications-container animate-fade-in">
+            {% for notification in notifications %}
+            <div class="alert alert-info notification-item">
+                {{ notification.message }}
+                <a href="{{ url_for('mark_notification_read', notification_id=notification.id) }}" 
+                   class="btn-close notification-close"></a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Main Dashboard Content -->
+        <div class="content-wrapper">
+            <div class="content-box dashboard animate-fade-in">
+                
+                <!-- Dashboard Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="mb-2">Professional Dashboard</h1>
+                        <p class="text-muted mb-0 dashboard-welcome-text">Welcome back, {{ current_user.username }}! Your comprehensive analytics platform.</p>
                     </div>
+                </div>
+                <!-- Portfolio Summary Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card animate-slide-in">
+                        <div class="stat-value">${{ "%.2f"|format(summary.total_value) }}</div>
+                        <div class="stat-label">Total Portfolio Value</div>
+                    </div>
+                    <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
+                        <div class="stat-value">${{ "%.2f"|format(summary.total_cost) }}</div>
+                        <div class="stat-label">Total Investment</div>
+                    </div>
+                    <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
+                        <div class="stat-value {{ 'positive' if summary.total_profit_loss > 0 else 'negative' }}">${{ "%.2f"|format(summary.total_profit_loss) }}</div>
+                        <div class="stat-label">Profit/Loss</div>
+                        <div class="stat-change {{ 'positive' if summary.total_return_percent > 0 else 'negative' }}">
+                            {{ "%.2f"|format(summary.total_return_percent) }}%
+                        </div>
+                    </div>
+                    <div class="stat-card animate-slide-in" style="animation-delay: 0.3s;">
+                        <div class="stat-value">{{ portfolio|length }}</div>
+                        <div class="stat-label">Active Positions</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Portfolio Section -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title">📊 Portfolio Holdings</h3>
+                                    <button class="btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addPortfolioModal">
+                                        + Add Stock
+                                    </button>
+                                </div>
+                            </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Shares</th>
-                                    <th>Buy Price</th>
-                                    <th>Current</th>
-                                    <th>Value</th>
-                                    <th>P/L</th>
-                                    <th>Change</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Shares</th>
+                                    <th style="color: var(--text-primary);">Buy Price</th>
+                                    <th style="color: var(--text-primary);">Current</th>
+                                    <th style="color: var(--text-primary);">Value</th>
+                                    <th style="color: var(--text-primary);">P/L</th>
+                                    <th style="color: var(--text-primary);">Change</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for item in portfolio %}
-                                <tr>
-                                    <td>{{ item.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ item.symbol }}</td>
                                     <td>{{ "%.2f"|format(item.shares) }}</td>
                                     <td>${{ "%.2f"|format(item.purchase_price) }}</td>
                                     <td>${{ "%.2f"|format(item.current_price) }}</td>
@@ -144,20 +153,20 @@
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Target</th>
-                                    <th>Current</th>
-                                    <th>Distance</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Target</th>
+                                    <th style="color: var(--text-primary);">Current</th>
+                                    <th style="color: var(--text-primary);">Distance</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for item in watchlist %}
-                                <tr>
-                                    <td>{{ item.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ item.symbol }}</td>
                                     <td>${{ "%.2f"|format(item.target_price) }}</td>
                                     <td>${{ "%.2f"|format(item.current_price) }}</td>
                                     <td class="{{ 'positive-change' if item.current_price >= item.target_price else 'negative-change' }}">
@@ -186,21 +195,21 @@
                     </div>
                     
                     <div class="table-responsive">
-                        <table class="table table-dark table-hover">
-                            <thead>
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th>Symbol</th>
-                                    <th>Condition</th>
-                                    <th>Target Price</th>
-                                    <th>Current Price</th>
-                                    <th>Status</th>
-                                    <th></th>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Condition</th>
+                                    <th style="color: var(--text-primary);">Target Price</th>
+                                    <th style="color: var(--text-primary);">Current Price</th>
+                                    <th style="color: var(--text-primary);">Status</th>
+                                    <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody style="color: var(--text-secondary);">
                                 {% for alert in alerts %}
-                                <tr>
-                                    <td>{{ alert.symbol }}</td>
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ alert.symbol }}</td>
                                     <td>Goes {{ alert.condition }}</td>
                                     <td>${{ "%.2f"|format(alert.target_price) }}</td>
                                     <td>${{ "%.2f"|format(alert.current_price) }}</td>
@@ -233,6 +242,63 @@
                         </button>
                     </div>
                     <div id="comparisonChart"></div>
+                </div>
+            </div>
+
+            <!-- Advanced Analytics Section -->
+            <div class="col-md-12 mt-4">
+                <div class="metrics-card">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+                        <div class="mb-3 mb-md-0">
+                            <h2 class="mb-1">🚀 Advanced Analytics</h2>
+                            <p class="text-muted dashboard-description mb-0">Professional quantitative analysis tools for informed investment decisions</p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-3" role="group">
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
+                                📊 Monte Carlo
+                            </button>
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#backtestingModal">
+                                📈 Backtesting
+                            </button>
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#varAnalysisModal">
+                                ⚠️ Value at Risk
+                            </button>
+                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
+                                📈 Time Series
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mb-3">
+                        <strong>💡 Advanced Risk Analysis Tools:</strong> Comprehensive suite of quantitative analytics for professional-grade investment analysis and risk management.
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="analytics-feature">
+                                <h5>📊 Monte Carlo Simulations</h5>
+                                <p><strong>Risk Modeling:</strong> Generate thousands of potential price paths using statistical simulation to assess investment risk and return distributions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="analytics-feature">
+                                <h5>📈 Strategy Backtesting</h5>
+                                <p><strong>Performance Testing:</strong> Evaluate trading strategies against historical data with comprehensive performance metrics and risk-adjusted returns</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="analytics-feature">
+                                <h5>⚠️ Value at Risk (VaR)</h5>
+                                <p><strong>Risk Assessment:</strong> Quantify potential losses using Historical, Parametric, and Monte Carlo VaR methods with Expected Shortfall analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="analytics-feature">
+                                <h5>📈 Time Series Forecasting</h5>
+                                <p><strong>Predictive Analytics:</strong> Advanced ARIMA and GARCH models for price and volatility forecasting with statistical validation</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -372,27 +438,368 @@
                         <hr>
                         <h6>Analysis Results</h6>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover">
-                                <thead>
+                            <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                                <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                     <tr>
-                                        <th>Symbol</th>
-                                        <th>P/E</th>
-                                        <th>P/B</th>
-                                        <th>ROE</th>
-                                        <th>EV/EBITDA</th>
-                                        <th>RSI</th>
-                                        <th>Volatility</th>
-                                        <th>Total Score</th>
-                                        <th>Recommendation</th>
+                                        <th style="color: var(--text-primary);">Symbol</th>
+                                        <th style="color: var(--text-primary);">P/E</th>
+                                        <th style="color: var(--text-primary);">P/B</th>
+                                        <th style="color: var(--text-primary);">ROE</th>
+                                        <th style="color: var(--text-primary);">EV/EBITDA</th>
+                                        <th style="color: var(--text-primary);">RSI</th>
+                                        <th style="color: var(--text-primary);">Volatility</th>
+                                        <th style="color: var(--text-primary);">Total Score</th>
+                                        <th style="color: var(--text-primary);">Recommendation</th>
                                     </tr>
                                 </thead>
-                                <tbody id="scoringTableBody">
+                                <tbody id="scoringTableBody" style="color: var(--text-secondary);">
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     
                     <div id="scoringError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monte Carlo Simulation Modal -->
+    <div class="modal fade" id="monteCarloModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📊 Monte Carlo Risk Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="monteCarloForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Investment Amount ($)</label>
+                                    <input type="number" class="form-control" name="investment_amount" value="10000" min="100" max="1000000" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Simulation Days</label>
+                                    <input type="number" class="form-control" name="days" value="30" min="1" max="365" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Number of Simulations</label>
+                                    <select class="form-control" name="simulations">
+                                        <option value="1000">1,000 (Fast)</option>
+                                        <option value="5000" selected>5,000 (Recommended)</option>
+                                        <option value="10000">10,000 (Detailed)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="monteCarloSpinner"></span>
+                            Run Monte Carlo Simulation
+                        </button>
+                    </form>
+                    
+                    <div id="monteCarloResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Risk Metrics</h6>
+                                <div id="riskMetrics"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Price Scenarios</h6>
+                                <div id="priceScenarios"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Simulation Visualization</h6>
+                            <div id="monteCarloChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Risk Assessment</h6>
+                            <div id="riskRecommendations"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="monteCarloError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backtesting Modal -->
+    <div class="modal fade" id="backtestingModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📈 Strategy Backtesting</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="backtestingForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Strategy</label>
+                                    <select class="form-control" name="strategy">
+                                        <option value="buy_and_hold">Buy & Hold</option>
+                                        <option value="moving_average_crossover" selected>Moving Average Crossover</option>
+                                        <option value="rsi_strategy">RSI Strategy</option>
+                                        <option value="macd_strategy">MACD Strategy</option>
+                                        <option value="bollinger_bands">Bollinger Bands</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Initial Capital ($)</label>
+                                    <input type="number" class="form-control" name="initial_capital" value="10000" min="1000" max="1000000" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="backtestingSpinner"></span>
+                            Run Backtest
+                        </button>
+                    </form>
+                    
+                    <div id="backtestingResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Performance Summary</h6>
+                                <div id="performanceMetrics"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Key Statistics</h6>
+                                <div id="backtestingStats"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Equity Curve</h6>
+                            <div id="backtestingChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Recent Trades</h6>
+                            <div id="recentTrades"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="backtestingError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Value at Risk Analysis Modal -->
+    <div class="modal fade" id="varAnalysisModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">⚠️ Value at Risk (VaR) Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="varAnalysisForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Portfolio Value ($)</label>
+                                    <input type="number" class="form-control" name="portfolio_value" value="10000" min="1000" max="10000000" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Holding Period (Days)</label>
+                                    <select class="form-control" name="holding_period">
+                                        <option value="1" selected>1 Day</option>
+                                        <option value="5">5 Days (1 Week)</option>
+                                        <option value="10">10 Days</option>
+                                        <option value="21">21 Days (1 Month)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Confidence Levels</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="confidence_95" value="0.95" checked>
+                                        <label class="form-check-label">95% Confidence</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="confidence_99" value="0.99" checked>
+                                        <label class="form-check-label">99% Confidence</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Analysis Type</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="include_historical" checked>
+                                        <label class="form-check-label">Historical VaR</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="include_parametric" checked>
+                                        <label class="form-check-label">Parametric VaR</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="include_monte_carlo" checked>
+                                        <label class="form-check-label">Monte Carlo VaR</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="varAnalysisSpinner"></span>
+                            Run VaR Analysis
+                        </button>
+                    </form>
+                    
+                    <div id="varAnalysisResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Risk Metrics Overview</h6>
+                                <div id="varRiskMetrics"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>VaR Comparison</h6>
+                                <div id="varComparison"></div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6>Expected Shortfall (CVaR)</h6>
+                                <div id="expectedShortfall"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Risk Assessment</h6>
+                                <div id="varRiskAssessment"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Risk Distribution Visualization</h6>
+                            <div id="varChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Risk Management Recommendations</h6>
+                            <div id="varRecommendations"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="varAnalysisError" class="alert alert-danger mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Series Forecasting Modal -->
+    <div class="modal fade" id="timeSeriesModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">📈 Time Series Forecasting (ARIMA/GARCH)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="timeSeriesForm">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Stock Symbol</label>
+                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Forecast Horizon (Days)</label>
+                                    <select class="form-control" name="forecast_days">
+                                        <option value="7">7 Days</option>
+                                        <option value="14">14 Days</option>
+                                        <option value="30" selected>30 Days</option>
+                                        <option value="60">60 Days</option>
+                                        <option value="90">90 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Analysis Type</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="include_price_forecast" checked>
+                                        <label class="form-check-label">Price Forecasting (ARIMA)</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="include_volatility_forecast" checked>
+                                        <label class="form-check-label">Volatility Forecasting (GARCH)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>🔬 Advanced Models:</strong> ARIMA models capture price trends and patterns, while GARCH models forecast volatility clustering and market risk dynamics.
+                        </div>
+                        <button type="submit" class="btn btn-custom w-100">
+                            <span class="spinner-border spinner-border-sm d-none" id="timeSeriesSpinner"></span>
+                            Generate Forecasts
+                        </button>
+                    </form>
+                    
+                    <div id="timeSeriesResults" class="mt-4" style="display: none;">
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Forecast Summary</h6>
+                                <div id="forecastSummary"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Model Performance</h6>
+                                <div id="modelPerformance"></div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Price Forecast Visualization</h6>
+                            <div id="priceForecastChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Volatility Forecast Visualization</h6>
+                            <div id="volatilityForecastChart"></div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Investment Insights & Recommendations</h6>
+                            <div id="forecastInsights"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="timeSeriesError" class="alert alert-danger mt-3" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -559,6 +966,435 @@
             });
         }
     });
+
+    // Monte Carlo Simulation Form Handler
+    document.getElementById('monteCarloForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('monteCarloSpinner');
+        const resultsDiv = document.getElementById('monteCarloResults');
+        const errorDiv = document.getElementById('monteCarloError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/monte_carlo_simulation', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayMonteCarloResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during simulation. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Backtesting Form Handler
+    document.getElementById('backtestingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('backtestingSpinner');
+        const resultsDiv = document.getElementById('backtestingResults');
+        const errorDiv = document.getElementById('backtestingError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/backtesting', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayBacktestingResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during backtesting. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // VaR Analysis Form Handler
+    document.getElementById('varAnalysisForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('varAnalysisSpinner');
+        const resultsDiv = document.getElementById('varAnalysisResults');
+        const errorDiv = document.getElementById('varAnalysisError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/value_at_risk', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayVarAnalysisResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during VaR analysis. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    // Time Series Forecasting Form Handler
+    document.getElementById('timeSeriesForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const spinner = document.getElementById('timeSeriesSpinner');
+        const resultsDiv = document.getElementById('timeSeriesResults');
+        const errorDiv = document.getElementById('timeSeriesError');
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        resultsDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        fetch('/time_series_forecasting', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            displayTimeSeriesResults(data.results);
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            errorDiv.textContent = 'An error occurred during forecasting. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    function displayVarAnalysisResults(results) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        // Risk Metrics Overview
+        document.getElementById('varRiskMetrics').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Portfolio Value</div>
+                    <div class="metric-value">$${results.portfolio_value.toLocaleString()}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Data Points</div>
+                    <div class="metric-value">${results.data_points} days</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Risk Level</div>
+                    <div class="metric-value ${results.risk_assessment.risk_level.toLowerCase() === 'high' ? 'negative-change' : results.risk_assessment.risk_level.toLowerCase() === 'medium' ? 'neutral' : 'positive-change'}">
+                        ${results.risk_assessment.risk_level}
+                    </div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Volatility</div>
+                    <div class="metric-value">${results.risk_metrics.volatility.toFixed(2)}%</div>
+                </div>
+            </div>
+        `;
+        
+        // VaR Comparison
+        const var95Methods = ['Historical', 'Parametric', 'MC'];
+        let varComparisonHTML = '<div class="table-responsive"><table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);"><thead style="background: var(--bg-tertiary);"><tr><th style="color: var(--text-primary);">Method</th><th style="color: var(--text-primary);">95% VaR</th><th style="color: var(--text-primary);">99% VaR</th></tr></thead><tbody style="color: var(--text-secondary);">';
+        
+        var95Methods.forEach(method => {
+            const var95 = method === 'Historical' ? results.historical_var.VaR_95 :
+                         method === 'Parametric' ? results.parametric_var.Parametric_VaR_95 :
+                         results.monte_carlo_var.MC_VaR_95;
+            const var99 = method === 'Historical' ? results.historical_var.VaR_99 :
+                         method === 'Parametric' ? results.parametric_var.Parametric_VaR_99 :
+                         results.monte_carlo_var.MC_VaR_99;
+            
+            if (var95 !== undefined && var99 !== undefined) {
+                varComparisonHTML += `
+                    <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                        <td style="color: var(--text-primary);"><strong>${method}</strong></td>
+                        <td class="negative-change">${var95.toFixed(2)}%</td>
+                        <td class="negative-change">${var99.toFixed(2)}%</td>
+                    </tr>
+                `;
+            }
+        });
+        varComparisonHTML += '</tbody></table></div>';
+        document.getElementById('varComparison').innerHTML = varComparisonHTML;
+        
+        // Expected Shortfall
+        document.getElementById('expectedShortfall').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">ES 95% (CVaR)</div>
+                    <div class="metric-value negative-change">${results.expected_shortfall.ES_95.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">ES 99% (CVaR)</div>
+                    <div class="metric-value negative-change">${results.expected_shortfall.ES_99.toFixed(2)}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">ES 95% ($)</div>
+                    <div class="metric-value negative-change">$${results.expected_shortfall.ES_95_dollars.toFixed(0)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">ES 99% ($)</div>
+                    <div class="metric-value negative-change">$${results.expected_shortfall.ES_99_dollars.toFixed(0)}</div>
+                </div>
+            </div>
+        `;
+        
+        // Risk Assessment
+        document.getElementById('varRiskAssessment').innerHTML = `
+            <div class="alert alert-${results.risk_assessment.risk_level.toLowerCase() === 'high' ? 'danger' : results.risk_assessment.risk_level.toLowerCase() === 'medium' ? 'warning' : 'success'}">
+                <strong>Risk Assessment:</strong> ${results.risk_assessment.risk_level} Risk Level<br>
+                <strong>Average VaR (95%):</strong> ${results.risk_assessment.average_var_95.toFixed(2)}%<br>
+                <strong>Sharpe Ratio:</strong> ${results.risk_metrics.sharpe_ratio.toFixed(3)}<br>
+                <strong>Max Drawdown:</strong> ${results.risk_metrics.max_drawdown.toFixed(2)}%
+            </div>
+        `;
+        
+        // Recommendations
+        document.getElementById('varRecommendations').innerHTML = `
+            <div class="alert alert-info">
+                ${results.risk_assessment.recommendations.map(rec => `<div>• ${rec}</div>`).join('')}
+            </div>
+        `;
+        
+        // Chart - Returns Distribution
+        const trace = {
+            x: results.returns_data.returns,
+            type: 'histogram',
+            name: 'Daily Returns',
+            nbinsx: 50,
+            marker: { color: 'rgba(100, 150, 200, 0.7)' }
+        };
+        
+        const layout = {
+            title: `Risk Distribution - ${results.symbol}`,
+            paper_bgcolor: 'transparent',
+            plot_bgcolor: 'transparent',
+            font: { color: isDark ? '#e0e0e0' : '#1a202c' },
+            xaxis: { 
+                title: 'Daily Returns (%)',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            yaxis: { 
+                title: 'Frequency',
+                gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+            },
+            showlegend: false
+        };
+        
+        Plotly.newPlot('varChart', [trace], layout);
+    }
+
+    function displayTimeSeriesResults(results) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        
+        // Forecast Summary
+        document.getElementById('forecastSummary').innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">Current Price</div>
+                    <div class="metric-value">$${results.current_price.toFixed(2)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Forecast Horizon</div>
+                    <div class="metric-value">${results.forecast_days} days</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Data Points</div>
+                    <div class="metric-value">${results.data_points} days</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Price Method</div>
+                    <div class="metric-value">${results.price_forecast ? results.price_forecast.method : 'N/A'}</div>
+                </div>
+            </div>
+        `;
+        
+        // Model Performance
+        let performanceHTML = '<div class="metrics-grid">';
+        if (results.accuracy_metrics && !results.accuracy_metrics.error) {
+            performanceHTML += `
+                <div class="metric-item">
+                    <div class="metric-label">MAE</div>
+                    <div class="metric-value">$${results.accuracy_metrics.mae.toFixed(2)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">RMSE</div>
+                    <div class="metric-value">$${results.accuracy_metrics.rmse.toFixed(2)}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">MAPE</div>
+                    <div class="metric-value">${results.accuracy_metrics.mape.toFixed(2)}%</div>
+                </div>
+            `;
+        }
+        if (results.price_forecast && results.price_forecast.model_info) {
+            performanceHTML += `
+                <div class="metric-item">
+                    <div class="metric-label">ARIMA Order</div>
+                    <div class="metric-value">(${results.price_forecast.arima_order ? results.price_forecast.arima_order.join(',') : 'N/A'})</div>
+                </div>
+            `;
+        }
+        performanceHTML += '</div>';
+        document.getElementById('modelPerformance').innerHTML = performanceHTML;
+        
+        // Investment Insights
+        document.getElementById('forecastInsights').innerHTML = `
+            <div class="alert alert-info">
+                <h6>Market Insights</h6>
+                ${results.analysis.insights.map(insight => `<div>• ${insight}</div>`).join('')}
+                <hr>
+                <h6>Investment Recommendations</h6>
+                ${results.analysis.recommendations.map(rec => `<div>• ${rec}</div>`).join('')}
+            </div>
+        `;
+        
+        // Price Forecast Chart
+        if (results.price_forecast && results.price_forecast.success) {
+            const historicalTrace = {
+                x: results.historical_data.dates,
+                y: results.historical_data.prices,
+                name: 'Historical Prices',
+                type: 'scatter',
+                line: { color: '#00ff88', width: 2 }
+            };
+            
+            const forecastTrace = {
+                x: results.price_forecast.forecast_dates,
+                y: results.price_forecast.forecast_prices,
+                name: 'Price Forecast',
+                type: 'scatter',
+                line: { color: '#ff6b6b', width: 2, dash: 'dash' }
+            };
+            
+            const upperBoundTrace = {
+                x: results.price_forecast.forecast_dates,
+                y: results.price_forecast.confidence_intervals.upper_95,
+                name: 'Upper 95% CI',
+                type: 'scatter',
+                line: { color: 'rgba(255, 107, 107, 0.3)', width: 1 },
+                fill: 'tonexty',
+                fillcolor: 'rgba(255, 107, 107, 0.1)',
+                showlegend: false
+            };
+            
+            const lowerBoundTrace = {
+                x: results.price_forecast.forecast_dates,
+                y: results.price_forecast.confidence_intervals.lower_95,
+                name: 'Lower 95% CI',
+                type: 'scatter',
+                line: { color: 'rgba(255, 107, 107, 0.3)', width: 1 },
+                showlegend: false
+            };
+            
+            const priceLayout = {
+                title: `Price Forecast - ${results.symbol}`,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: isDark ? '#e0e0e0' : '#1a202c' },
+                xaxis: { 
+                    title: 'Date',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                },
+                yaxis: { 
+                    title: 'Price ($)',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                },
+                showlegend: true,
+                legend: { x: 0, y: 1 }
+            };
+            
+            Plotly.newPlot('priceForecastChart', [historicalTrace, lowerBoundTrace, upperBoundTrace, forecastTrace], priceLayout);
+        }
+        
+        // Volatility Forecast Chart
+        if (results.volatility_forecast && results.volatility_forecast.success) {
+            const volTrace = {
+                x: results.volatility_forecast.forecast_dates,
+                y: results.volatility_forecast.annualized_forecast_vol,
+                name: 'Volatility Forecast',
+                type: 'scatter',
+                line: { color: '#ffc107', width: 2 }
+            };
+            
+            const volLayout = {
+                title: `Volatility Forecast - ${results.symbol} (${results.volatility_forecast.method})`,
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: isDark ? '#e0e0e0' : '#1a202c' },
+                xaxis: { 
+                    title: 'Date',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                },
+                yaxis: { 
+                    title: 'Annualized Volatility (%)',
+                    gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
+                },
+                showlegend: true,
+                legend: { x: 0, y: 1 }
+            };
+            
+            Plotly.newPlot('volatilityForecastChart', [volTrace], volLayout);
+        }
+    }
     </script>
 </body>
 </html>

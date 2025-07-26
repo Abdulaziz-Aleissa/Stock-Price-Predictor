@@ -2,6 +2,12 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import os
 from app.utils.stock_scoring import StockScoring
+from app.utils.news_api import news_api
+from app.utils.monte_carlo import monte_carlo_simulator
+from app.utils.backtesting import backtesting_framework
+from app.utils.options_pricing import options_pricing
+from app.utils.value_at_risk import var_analyzer
+from app.utils.time_series_forecasting import ts_forecaster
 import pandas as pd
 import numpy as np
 from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
@@ -27,6 +33,10 @@ from models.train_classifier import (
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.impute import SimpleImputer
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 
@@ -40,7 +50,7 @@ app = Flask(__name__,
            template_folder='templates',
            static_folder='static')
 
-app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this in production
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')  # Use env var or fallback
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -323,15 +333,43 @@ def predict():
         if 'Date' in X.columns:
             X = X.drop(columns=['Date'])
             
-        # Final check for NaN values
+        # Comprehensive data validation and cleaning
+        # Replace infinite values
+        numeric_columns = X.select_dtypes(include=[np.number]).columns
+        X[numeric_columns] = X[numeric_columns].replace([np.inf, -np.inf], 0)
+        
+        # Fill NaN values
         if X.isna().any().any():
             X = X.fillna(0)
             logger.info("Filled remaining NaN values with 0")
         
+        # Check for extremely large values and cap them
+        for col in numeric_columns:
+            max_val = X[col].abs().max()
+            if max_val > 1e10:
+                logger.warning(f"Capping extremely large values in {col}")
+                X[col] = X[col].clip(-1e6, 1e6)
+        
+        # Final validation before scaling
+        if np.isinf(X.values).any() or np.isnan(X.values).any():
+            logger.error("Data still contains infinite or NaN values after cleaning")
+            return render_template('error.html', error="Data processing error: Invalid values detected")
+        
         # Scale features and make predictions
-        X_scaled = scaler.transform(X)
-        predicted_prices = model.predict(X_scaled).tolist()
-        tomorrow_prediction = predicted_prices[-1]
+        try:
+            X_scaled = scaler.transform(X)
+            
+            # Additional check after scaling
+            if np.isinf(X_scaled).any() or np.isnan(X_scaled).any():
+                logger.error("Scaled data contains infinite or NaN values")
+                return render_template('error.html', error="Data scaling error: Invalid values after scaling")
+            
+            predicted_prices = model.predict(X_scaled).tolist()
+            tomorrow_prediction = predicted_prices[-1]
+            
+        except Exception as e:
+            logger.error(f"Error in prediction: {str(e)}")
+            return render_template('error.html', error=f"Prediction error: {str(e)}")
         
         # Get actual prices
         actual_prices = df['Close'].tolist()
@@ -345,6 +383,32 @@ def predict():
 
         # Calculate change percentage
         price_change_pct = ((tomorrow_prediction - current_price) / current_price) * 100
+        
+        # Fetch news articles for the stock
+        news_api_key_configured = bool(os.getenv('ALPHA_VANTAGE_API_KEY'))
+        news_error_message = None
+        
+        try:
+            news_articles = news_api.get_stock_news(stock_ticker, limit=8)
+            news_summary = news_api.get_news_summary(stock_ticker)
+            
+            if not news_articles and not news_api_key_configured:
+                news_error_message = "To get real news articles, please configure your Alpha Vantage API key in the .env file. See NEWS_SETUP.md for instructions."
+            
+            logger.info(f"Fetched {len(news_articles)} news articles for {stock_ticker}")
+        except Exception as e:
+            logger.error(f"Error fetching news for {stock_ticker}: {str(e)}")
+            news_articles = []
+            news_summary = {
+                'total_articles': 0,
+                'avg_sentiment_score': 0,
+                'sentiment_label': 'Neutral',
+                'bullish_count': 0,
+                'bearish_count': 0,
+                'neutral_count': 0
+            }
+            if not news_api_key_configured:
+                news_error_message = "To get real news articles, please configure your Alpha Vantage API key in the .env file. See NEWS_SETUP.md for instructions."
 
         logger.info(f"Prediction complete for {stock_ticker}")
         logger.info(f"Current Price: ${current_price:.2f}")
@@ -366,7 +430,10 @@ def predict():
                 'r2_score': f"{metrics.get('r2', 0):.3f}",
                 'mae': f"${metrics.get('mae', 0):.2f}",
                 'rmse': f"${metrics.get('rmse', 0):.2f}"
-            }
+            },
+            news_articles=news_articles,
+            news_summary=news_summary,
+            news_error_message=news_error_message
         )
 
     except Exception as e:
@@ -631,6 +698,235 @@ def compare_stocks():
     }
     
     return jsonify(data)
+
+@app.route('/monte_carlo_simulation', methods=['POST'])
+@login_required
+def monte_carlo_simulation():
+    """Handle Monte Carlo simulation requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        days = int(request.form.get('days', 30))
+        simulations = int(request.form.get('simulations', 1000))
+        investment_amount = float(request.form.get('investment_amount', 10000))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Limit parameters for performance
+        days = min(max(days, 1), 365)  # 1 to 365 days
+        simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
+        investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
+        
+        # Run risk analysis
+        results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Simulation failed: {str(e)}'})
+
+@app.route('/backtesting', methods=['POST'])
+@login_required
+def backtesting():
+    """Handle backtesting requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        strategy = request.form.get('strategy', 'moving_average_crossover')
+        initial_capital = float(request.form.get('initial_capital', 10000))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Limit initial capital
+        initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
+        
+        # Valid strategies
+        valid_strategies = [
+            'buy_and_hold',
+            'moving_average_crossover',
+            'rsi_strategy',
+            'macd_strategy',
+            'bollinger_bands'
+        ]
+        
+        if strategy not in valid_strategies:
+            return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
+        
+        # Run backtest
+        results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Backtesting failed: {str(e)}'})
+
+@app.route('/value_at_risk', methods=['POST'])
+@login_required
+def value_at_risk():
+    """Handle Value at Risk analysis requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        portfolio_value = float(request.form.get('portfolio_value', 10000))
+        holding_period = int(request.form.get('holding_period', 1))
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if portfolio_value <= 0:
+            return jsonify({'error': 'Portfolio value must be positive'})
+        
+        if holding_period <= 0 or holding_period > 252:  # Max 1 year
+            return jsonify({'error': 'Holding period must be between 1 and 252 days'})
+        
+        # Get confidence levels from checkboxes
+        confidence_levels = []
+        if request.form.get('confidence_95'):
+            confidence_levels.append(0.95)
+        if request.form.get('confidence_99'):
+            confidence_levels.append(0.99)
+        
+        if not confidence_levels:
+            confidence_levels = [0.95, 0.99]  # Default
+        
+        # Run VaR analysis
+        results = var_analyzer.comprehensive_var_analysis(
+            symbol, portfolio_value, confidence_levels, holding_period
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'VaR analysis failed: {str(e)}'})
+
+@app.route('/time_series_forecasting', methods=['POST'])
+@login_required
+def time_series_forecasting():
+    """Handle time series forecasting requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        forecast_days = int(request.form.get('forecast_days', 30))
+        include_price_forecast = request.form.get('include_price_forecast') is not None
+        include_volatility_forecast = request.form.get('include_volatility_forecast') is not None
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if forecast_days <= 0 or forecast_days > 365:  # Max 1 year
+            return jsonify({'error': 'Forecast days must be between 1 and 365'})
+        
+        if not include_price_forecast and not include_volatility_forecast:
+            return jsonify({'error': 'Please select at least one analysis type'})
+        
+        # Run forecasting analysis
+        results = ts_forecaster.comprehensive_forecast(
+            symbol, forecast_days, include_volatility_forecast
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Time series forecasting failed: {str(e)}'})
+
+@app.route('/options_pricing', methods=['POST'])
+@login_required
+def options_pricing_route():
+    """Handle options pricing requests"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        strike_price = float(request.form.get('strike_price'))
+        expiration_days = int(request.form.get('expiration_days'))
+        option_type = request.form.get('option_type', 'call').lower()
+        custom_volatility = request.form.get('custom_volatility')
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Validate parameters
+        if strike_price <= 0:
+            return jsonify({'error': 'Strike price must be positive'})
+        
+        if expiration_days <= 0 or expiration_days > 1825:  # Max 5 years
+            return jsonify({'error': 'Expiration days must be between 1 and 1825'})
+        
+        if option_type not in ['call', 'put']:
+            return jsonify({'error': 'Option type must be "call" or "put"'})
+        
+        # Process custom volatility
+        volatility = None
+        if custom_volatility:
+            try:
+                volatility = float(custom_volatility) / 100  # Convert percentage to decimal
+                if volatility <= 0 or volatility > 5:  # Max 500% volatility
+                    return jsonify({'error': 'Volatility must be between 0% and 500%'})
+            except:
+                return jsonify({'error': 'Invalid volatility value'})
+        
+        # Price option
+        results = options_pricing.price_option(
+            symbol, strike_price, expiration_days, option_type, volatility
+        )
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except ValueError as e:
+        return jsonify({'error': 'Invalid input parameters'})
+    except Exception as e:
+        return jsonify({'error': f'Options pricing failed: {str(e)}'})
 
 @app.errorhandler(404)
 def not_found_error(error):
