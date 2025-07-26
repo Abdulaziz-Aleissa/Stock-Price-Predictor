@@ -19,7 +19,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperTransaction, PaperCashBalance, engine
+from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperTransaction, PaperCashBalance, PredictionHistory, engine
 from sqlalchemy.orm import sessionmaker
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -107,6 +107,14 @@ scheduler.add_job(
     trigger=IntervalTrigger(minutes=5),
     id='check_price_alerts',
     name='Check price alerts every 5 minutes'
+)
+
+# Schedule historical prediction updates
+scheduler.add_job(
+    func=update_historical_predictions,
+    trigger=IntervalTrigger(hours=1),
+    id='update_predictions',
+    name='Update historical predictions hourly'
 )
 
 @login_manager.user_loader
@@ -225,6 +233,190 @@ def get_market_context(ticker):
             'year_low': info.get('fiftyTwoWeekLow', 'N/A')
         }
     except:
+        return None
+
+def store_prediction(stock_symbol, predicted_price, current_price, price_change_pct, metrics):
+    """Store prediction in database for future backtesting"""
+    try:
+        target_date = datetime.now() + timedelta(days=1)
+        
+        prediction = PredictionHistory(
+            stock_symbol=stock_symbol,
+            target_date=target_date,
+            predicted_price=predicted_price,
+            current_price=current_price,
+            price_change_pct=price_change_pct,
+            model_accuracy=metrics.get('r2', 0),
+            mae=metrics.get('mae', 0),
+            rmse=metrics.get('rmse', 0)
+        )
+        
+        db.add(prediction)
+        db.commit()
+        logger.info(f"Stored prediction for {stock_symbol}: ${predicted_price:.2f}")
+        
+    except Exception as e:
+        logger.error(f"Error storing prediction: {str(e)}")
+
+def update_historical_predictions():
+    """Update historical predictions with actual prices"""
+    try:
+        # Get predictions that need actual price data (target date has passed)
+        predictions_to_update = db.query(PredictionHistory)\
+            .filter(PredictionHistory.actual_price == None)\
+            .filter(PredictionHistory.target_date <= datetime.now())\
+            .all()
+        
+        for prediction in predictions_to_update:
+            try:
+                # Get actual price for the target date
+                stock = yf.Ticker(prediction.stock_symbol)
+                # Get data around the target date
+                start_date = prediction.target_date - timedelta(days=2)
+                end_date = prediction.target_date + timedelta(days=2)
+                hist = stock.history(start=start_date, end=end_date)
+                
+                if not hist.empty:
+                    # Get the closest available price to target date
+                    actual_price = hist['Close'].iloc[-1]
+                    
+                    # Calculate actual percentage change
+                    actual_change_pct = ((actual_price - prediction.current_price) / prediction.current_price) * 100
+                    
+                    # Calculate prediction error
+                    prediction_error = abs(prediction.predicted_price - actual_price)
+                    
+                    # Check if direction was correct
+                    predicted_direction = prediction.price_change_pct > 0
+                    actual_direction = actual_change_pct > 0
+                    direction_correct = predicted_direction == actual_direction
+                    
+                    # Update the prediction record
+                    prediction.actual_price = float(actual_price)
+                    prediction.actual_change_pct = actual_change_pct
+                    prediction.prediction_error = prediction_error
+                    prediction.direction_correct = direction_correct
+                    prediction.updated_at = datetime.now()
+                    
+                    logger.info(f"Updated prediction for {prediction.stock_symbol}: actual=${actual_price:.2f}, error=${prediction_error:.2f}")
+                
+            except Exception as e:
+                logger.error(f"Error updating prediction {prediction.id}: {str(e)}")
+        
+        db.commit()
+        
+    except Exception as e:
+        logger.error(f"Error in update_historical_predictions: {str(e)}")
+
+def calculate_backtest_metrics(stock_symbol, days_back=30):
+    """Calculate comprehensive backtest metrics for a stock"""
+    try:
+        # Get historical predictions with actual prices
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=days_back)
+        
+        predictions = db.query(PredictionHistory)\
+            .filter(PredictionHistory.stock_symbol == stock_symbol)\
+            .filter(PredictionHistory.actual_price != None)\
+            .filter(PredictionHistory.prediction_date >= start_date)\
+            .order_by(PredictionHistory.prediction_date.desc())\
+            .all()
+        
+        if not predictions:
+            return None
+        
+        # Calculate metrics
+        total_predictions = len(predictions)
+        errors = [p.prediction_error for p in predictions if p.prediction_error is not None]
+        direction_correct = [p.direction_correct for p in predictions if p.direction_correct is not None]
+        
+        if not errors:
+            return None
+        
+        # Basic accuracy metrics
+        mae = sum(errors) / len(errors)
+        rmse = np.sqrt(sum([e**2 for e in errors]) / len(errors))
+        
+        # Directional accuracy
+        directional_accuracy = sum(direction_correct) / len(direction_correct) * 100 if direction_correct else 0
+        
+        # Hit rate for different confidence levels
+        small_errors = sum(1 for e in errors if e <= 2.0)  # Within $2
+        medium_errors = sum(1 for e in errors if e <= 5.0)  # Within $5
+        large_errors = sum(1 for e in errors if e <= 10.0)  # Within $10
+        
+        hit_rate_2 = (small_errors / total_predictions) * 100
+        hit_rate_5 = (medium_errors / total_predictions) * 100
+        hit_rate_10 = (large_errors / total_predictions) * 100
+        
+        # Calculate rolling accuracy for different periods
+        rolling_7_days = calculate_rolling_accuracy(predictions, 7)
+        rolling_30_days = calculate_rolling_accuracy(predictions, 30)
+        rolling_90_days = calculate_rolling_accuracy(predictions, 90)
+        
+        # Prepare historical data for charting
+        chart_data = []
+        for p in predictions[:20]:  # Last 20 predictions for chart
+            chart_data.append({
+                'date': p.target_date.strftime('%Y-%m-%d'),
+                'predicted': float(p.predicted_price),
+                'actual': float(p.actual_price) if p.actual_price else None,
+                'error': float(p.prediction_error) if p.prediction_error else None,
+                'direction_correct': p.direction_correct
+            })
+        
+        return {
+            'total_predictions': total_predictions,
+            'mae': mae,
+            'rmse': rmse,
+            'directional_accuracy': directional_accuracy,
+            'hit_rates': {
+                'within_2_dollars': hit_rate_2,
+                'within_5_dollars': hit_rate_5,
+                'within_10_dollars': hit_rate_10
+            },
+            'rolling_accuracy': {
+                '7_days': rolling_7_days,
+                '30_days': rolling_30_days,
+                '90_days': rolling_90_days
+            },
+            'chart_data': chart_data,
+            'error_distribution': {
+                'min_error': min(errors),
+                'max_error': max(errors),
+                'avg_error': mae,
+                'errors': errors[:20]  # Last 20 errors for distribution chart
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating backtest metrics: {str(e)}")
+        return None
+
+def calculate_rolling_accuracy(predictions, days):
+    """Calculate rolling accuracy for a specific time period"""
+    try:
+        if len(predictions) < days:
+            return None
+        
+        recent_predictions = predictions[:days]
+        errors = [p.prediction_error for p in recent_predictions if p.prediction_error is not None]
+        direction_correct = [p.direction_correct for p in recent_predictions if p.direction_correct is not None]
+        
+        if not errors:
+            return None
+        
+        mae = sum(errors) / len(errors)
+        directional_accuracy = sum(direction_correct) / len(direction_correct) * 100 if direction_correct else 0
+        
+        return {
+            'mae': mae,
+            'directional_accuracy': directional_accuracy,
+            'sample_size': len(recent_predictions)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating rolling accuracy: {str(e)}")
         return None
 
 
@@ -497,6 +689,12 @@ def predict():
         logger.info(f"Tomorrow's Prediction: ${tomorrow_prediction:.2f}")
         logger.info(f"Expected Change: {price_change_pct:.2f}%")
 
+        # Store the prediction for future backtesting
+        store_prediction(stock_ticker, tomorrow_prediction, current_price, price_change_pct, metrics)
+        
+        # Calculate backtest metrics
+        backtest_metrics = calculate_backtest_metrics(stock_ticker, days_back=90)
+
         return render_template(
             'go.html',
             ticker=stock_ticker,
@@ -515,7 +713,8 @@ def predict():
             },
             news_articles=news_articles,
             news_summary=news_summary,
-            news_error_message=news_error_message
+            news_error_message=news_error_message,
+            backtest_metrics=backtest_metrics
         )
 
     except Exception as e:

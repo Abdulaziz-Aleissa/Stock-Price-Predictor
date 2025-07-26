@@ -212,6 +212,144 @@
             </div>
         </div>
 
+        <!-- Backtest Results Section -->
+        {% if backtest_metrics %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="metrics-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>📊 Backtest Results</h4>
+                        <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#backtestSection" aria-expanded="true" aria-controls="backtestSection">
+                            <span class="backtest-toggle-text">Hide</span>
+                        </button>
+                    </div>
+                    
+                    <div class="collapse show" id="backtestSection">
+                        <!-- Performance Metrics Overview -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="backtest-metric-card">
+                                    <div class="metric-value">{{ backtest_metrics.total_predictions }}</div>
+                                    <div class="metric-label">Total Predictions</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="backtest-metric-card">
+                                    <div class="metric-value">${{ "%.2f"|format(backtest_metrics.mae) }}</div>
+                                    <div class="metric-label">Avg Error (MAE)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="backtest-metric-card">
+                                    <div class="metric-value">{{ "%.1f"|format(backtest_metrics.directional_accuracy) }}%</div>
+                                    <div class="metric-label">Direction Accuracy</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="backtest-metric-card">
+                                    <div class="metric-value">${{ "%.2f"|format(backtest_metrics.rmse) }}</div>
+                                    <div class="metric-label">RMSE</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hit Rates -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>🎯 Accuracy Hit Rates</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="hit-rate-card">
+                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_2_dollars) }}%</div>
+                                            <div class="hit-rate-label">Within $2</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="hit-rate-card">
+                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_5_dollars) }}%</div>
+                                            <div class="hit-rate-label">Within $5</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="hit-rate-card">
+                                            <div class="hit-rate-value">{{ "%.1f"|format(backtest_metrics.hit_rates.within_10_dollars) }}%</div>
+                                            <div class="hit-rate-label">Within $10</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rolling Performance -->
+                        {% if backtest_metrics.rolling_accuracy %}
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5>📈 Rolling Performance</h5>
+                                <div class="row">
+                                    {% if backtest_metrics.rolling_accuracy['7_days'] %}
+                                    <div class="col-md-4">
+                                        <div class="rolling-metric-card">
+                                            <div class="rolling-header">7 Days</div>
+                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['7_days'].mae) }}</div>
+                                            <div class="rolling-label">Avg Error</div>
+                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['7_days'].directional_accuracy) }}% Direction</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if backtest_metrics.rolling_accuracy['30_days'] %}
+                                    <div class="col-md-4">
+                                        <div class="rolling-metric-card">
+                                            <div class="rolling-header">30 Days</div>
+                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['30_days'].mae) }}</div>
+                                            <div class="rolling-label">Avg Error</div>
+                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['30_days'].directional_accuracy) }}% Direction</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if backtest_metrics.rolling_accuracy['90_days'] %}
+                                    <div class="col-md-4">
+                                        <div class="rolling-metric-card">
+                                            <div class="rolling-header">90 Days</div>
+                                            <div class="rolling-value">${{ "%.2f"|format(backtest_metrics.rolling_accuracy['90_days'].mae) }}</div>
+                                            <div class="rolling-label">Avg Error</div>
+                                            <div class="rolling-direction">{{ "%.1f"|format(backtest_metrics.rolling_accuracy['90_days'].directional_accuracy) }}% Direction</div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Charts -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="backtestChart" class="backtest-chart"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="errorDistributionChart" class="backtest-chart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="metrics-card">
+                    <h4>📊 Backtest Results</h4>
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Building Historical Data</strong><br>
+                        No historical predictions available yet for {{ ticker }}. 
+                        Backtest results will appear here after a few predictions have been made and their accuracy can be measured.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="time-selector">
             <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
             <button class="time-btn" onclick="updateTimeframe('3M')">3M</button>
@@ -323,6 +461,136 @@
                 toggleText.textContent = 'Show';
             });
         }
+
+        // Backtest section toggle functionality
+        const backtestToggleBtn = document.querySelector('[data-bs-target="#backtestSection"]');
+        const backtestToggleText = document.querySelector('.backtest-toggle-text');
+        const backtestSection = document.getElementById('backtestSection');
+        
+        if (backtestToggleBtn && backtestToggleText && backtestSection) {
+            // Listen to Bootstrap collapse events
+            backtestSection.addEventListener('shown.bs.collapse', function () {
+                backtestToggleText.textContent = 'Hide';
+            });
+            
+            backtestSection.addEventListener('hidden.bs.collapse', function () {
+                backtestToggleText.textContent = 'Show';
+            });
+        }
+
+        // Create backtest charts
+        {% if backtest_metrics %}
+        function createBacktestCharts() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const chartData = {{ backtest_metrics.chart_data | tojson }};
+            
+            // Historical Predictions vs Actual Chart
+            if (chartData && chartData.length > 0) {
+                const dates = chartData.map(d => d.date);
+                const predicted = chartData.map(d => d.predicted);
+                const actual = chartData.map(d => d.actual);
+                
+                const trace1 = {
+                    x: dates,
+                    y: actual,
+                    mode: 'lines+markers',
+                    name: 'Actual Prices',
+                    line: { color: '#22c55e', width: 3 },
+                    marker: { size: 6 }
+                };
+
+                const trace2 = {
+                    x: dates,
+                    y: predicted,
+                    mode: 'lines+markers',
+                    name: 'Predicted Prices',
+                    line: { color: '#f59e0b', dash: 'dash', width: 2 },
+                    marker: { size: 4 }
+                };
+
+                const layout = {
+                    title: {
+                        text: 'Historical Predictions vs Actual Prices',
+                        font: { size: 16, color: isDark ? '#e0e0e0' : '#1a202c' }
+                    },
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { 
+                        color: isDark ? '#e0e0e0' : '#1a202c',
+                        size: 12
+                    },
+                    xaxis: {
+                        title: 'Date',
+                        gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                    },
+                    yaxis: {
+                        title: 'Price ($)',
+                        gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                    },
+                    showlegend: true,
+                    legend: {
+                        x: 0,
+                        y: 1,
+                        bgcolor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.3)'
+                    },
+                    margin: { t: 50, r: 20, b: 50, l: 60 }
+                };
+
+                Plotly.newPlot('backtestChart', [trace1, trace2], layout, {responsive: true});
+            }
+
+            // Error Distribution Chart
+            const errorData = {{ backtest_metrics.error_distribution.errors | tojson }};
+            if (errorData && errorData.length > 0) {
+                const trace = {
+                    x: errorData,
+                    type: 'histogram',
+                    name: 'Prediction Errors',
+                    marker: {
+                        color: '#3b82f6',
+                        opacity: 0.7
+                    },
+                    nbinsx: Math.min(10, errorData.length)
+                };
+
+                const layout = {
+                    title: {
+                        text: 'Prediction Error Distribution',
+                        font: { size: 16, color: isDark ? '#e0e0e0' : '#1a202c' }
+                    },
+                    paper_bgcolor: 'transparent',
+                    plot_bgcolor: 'transparent',
+                    font: { 
+                        color: isDark ? '#e0e0e0' : '#1a202c',
+                        size: 12
+                    },
+                    xaxis: {
+                        title: 'Prediction Error ($)',
+                        gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                    },
+                    yaxis: {
+                        title: 'Frequency',
+                        gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
+                    },
+                    margin: { t: 50, r: 20, b: 50, l: 60 }
+                };
+
+                Plotly.newPlot('errorDistributionChart', [trace], layout, {responsive: true});
+            }
+        }
+
+        // Create backtest charts when page loads
+        createBacktestCharts();
+
+        // Update backtest charts when theme changes
+        document.querySelector('.theme-switch').addEventListener('click', () => {
+            setTimeout(createBacktestCharts, 100);
+        });
+        {% endif %}
     </script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
 </body>

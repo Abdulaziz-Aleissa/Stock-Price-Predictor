@@ -82,5 +82,24 @@ class PaperCashBalance(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+class PredictionHistory(Base):
+    __tablename__ = 'prediction_history'
+    id = Column(Integer, primary_key=True)
+    stock_symbol = Column(String(10), nullable=False)
+    prediction_date = Column(DateTime, default=datetime.now)
+    target_date = Column(DateTime, nullable=False)  # Date the prediction was for
+    predicted_price = Column(Float, nullable=False)
+    current_price = Column(Float, nullable=False)  # Price when prediction was made
+    actual_price = Column(Float)  # Actual price on target date (filled later)
+    price_change_pct = Column(Float)  # Predicted percentage change
+    actual_change_pct = Column(Float)  # Actual percentage change (filled later)
+    model_accuracy = Column(Float)  # R2 score at time of prediction
+    mae = Column(Float)  # Mean absolute error at time of prediction
+    rmse = Column(Float)  # Root mean square error at time of prediction
+    prediction_error = Column(Float)  # |predicted - actual| (filled later)
+    direction_correct = Column(Boolean)  # Whether direction was correct (filled later)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
 engine = create_engine('sqlite:///stock_predictor.db')
 Base.metadata.create_all(engine)

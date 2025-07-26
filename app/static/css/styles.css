@@ -1821,4 +1821,200 @@ p {
         font-size: 1rem;
     }
 }
+
+/* Backtest Results Styles */
+.backtest-metric-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.backtest-metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+}
+
+.backtest-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.backtest-metric-card .metric-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.backtest-metric-card .metric-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.hit-rate-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hit-rate-card::before {
+    content: '🎯';
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    font-size: 1.5rem;
+    opacity: 0.3;
+}
+
+.hit-rate-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--success-500);
+}
+
+.hit-rate-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--success-500);
+    margin-bottom: 0.5rem;
+}
+
+.hit-rate-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.rolling-metric-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.rolling-metric-card::before {
+    content: '📈';
+    position: absolute;
+    top: -5px;
+    right: 10px;
+    font-size: 1.2rem;
+    opacity: 0.3;
+}
+
+.rolling-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--accent);
+}
+
+.rolling-header {
+    font-size: 0.9rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rolling-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.rolling-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.rolling-direction {
+    font-size: 0.75rem;
+    color: var(--success-500);
+    font-weight: 500;
+}
+
+.backtest-chart {
+    min-height: 300px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.backtest-toggle-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Responsive Design for Backtest */
+@media (max-width: 768px) {
+    .backtest-metric-card,
+    .hit-rate-card,
+    .rolling-metric-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .backtest-metric-card .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .hit-rate-value {
+        font-size: 1.25rem;
+    }
+    
+    .rolling-value {
+        font-size: 1.1rem;
+    }
+    
+    .backtest-chart {
+        min-height: 250px;
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .backtest-metric-card .metric-value {
+        font-size: 1.25rem;
+    }
+    
+    .hit-rate-value {
+        font-size: 1.1rem;
+    }
+    
+    .rolling-value {
+        font-size: 1rem;
+    }
+    
+    .backtest-chart {
+        min-height: 200px;
+        padding: 0.5rem;
+    }
+}
 }
