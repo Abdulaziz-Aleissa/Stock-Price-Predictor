@@ -218,7 +218,10 @@
             <div class="col-12">
                 <div class="metrics-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>📊 Backtest Results</h4>
+                        <div>
+                            <h4>📊 Backtest Results</h4>
+                            <small class="text-muted">Historical performance analysis (up to 1 year of predictions)</small>
+                        </div>
                         <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#backtestSection" aria-expanded="true" aria-controls="backtestSection">
                             <span class="backtest-toggle-text">Hide</span>
                         </button>
@@ -341,9 +344,11 @@
                     <h4>📊 Backtest Results</h4>
                     <div class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Building Historical Data</strong><br>
-                        No historical predictions available yet for {{ ticker }}. 
-                        Backtest results will appear here after a few predictions have been made and their accuracy can be measured.
+                        <strong>Generating Historical Backtest Data</strong><br>
+                        Populating {{ ticker }} with historical prediction data to show comprehensive backtest results.
+                        This includes up to 1 year of historical predictions and their accuracy.
+                        <br><br>
+                        <strong>Refresh the page to see your complete backtest results!</strong>
                     </div>
                 </div>
             </div>
