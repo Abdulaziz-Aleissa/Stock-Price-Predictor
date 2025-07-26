@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 1040;
         }
 
         [data-theme="light"] .market-selector {
@@ -706,6 +706,19 @@
 
         .nav-links .btn {
             margin: 0 10px 10px 0;
+        }
+
+        /* Bootstrap Modal Z-Index Fix */
+        .modal-backdrop {
+            z-index: 10050 !important;
+        }
+        
+        .modal {
+            z-index: 10055 !important;
+        }
+        
+        .modal-dialog {
+            z-index: 10060 !important;
         }
 
         /* Paper Trading Enhanced Styles */
@@ -9364,7 +9377,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
@@ -9764,7 +9777,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
@@ -9861,7 +9874,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                z-index: 9999;
+                z-index: 1040;
             `;
             
             modal.innerHTML = `
