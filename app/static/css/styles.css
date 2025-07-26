@@ -1762,6 +1762,11 @@ p {
     animation: fadeIn 0.3s ease-out;
 }
 
+/* Dashboard welcome text - white in dark mode */
+[data-theme="dark"] .dashboard-welcome-text {
+    color: #fdfdfd !important;
+}
+
 /* Enhanced Responsive Design */
 @media (max-width: 768px) {
     .content-wrapper {
