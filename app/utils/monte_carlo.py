@@ -22,12 +22,13 @@ class MonteCarloSimulator:
             stock = yf.Ticker(symbol)
             data = stock.history(period=period)
             if not data.empty:
+                self.logger.info(f"Successfully fetched real data for {symbol}")
                 return data
         except Exception as e:
             self.logger.error(f"Error fetching data for {symbol}: {str(e)}")
         
         # Fallback to mock data for demo purposes
-        self.logger.info(f"Using mock data for {symbol} - network connectivity issue")
+        self.logger.info(f"Using mock data for {symbol} - network connectivity issue or invalid symbol")
         return self._generate_mock_data(symbol)
     
     def _generate_mock_data(self, symbol):
@@ -82,18 +83,34 @@ class MonteCarloSimulator:
             Dictionary with simulation results
         """
         try:
+            self.logger.info(f"Running Monte Carlo simulation for {symbol}: {simulations} simulations, {days} days")
+            
             # Get historical data (with fallback to mock data)
             data = self.get_stock_data(symbol, period="1y")
             if data is None or data.empty:
-                return {"error": "Unable to fetch or generate historical data"}
+                error_msg = f"Unable to fetch or generate historical data for {symbol}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
             
             # Calculate parameters
             prices = data['Close']
             returns = self.calculate_returns(prices)
             
+            if len(returns) == 0:
+                error_msg = f"Insufficient price data to calculate returns for {symbol}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+            
             current_price = prices.iloc[-1]
             mu = returns.mean()  # Average daily return
             sigma = returns.std()  # Volatility
+            
+            if pd.isna(mu) or pd.isna(sigma) or sigma == 0:
+                error_msg = f"Invalid statistical parameters calculated for {symbol}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+            
+            self.logger.info(f"Simulation parameters for {symbol}: mu={mu:.6f}, sigma={sigma:.6f}, current_price=${current_price:.2f}")
             
             # Generate simulation paths
             dt = 1  # Daily time step
@@ -139,6 +156,8 @@ class MonteCarloSimulator:
             # Select sample paths for visualization (max 50 for performance)
             sample_paths = price_paths[:min(50, simulations), :]
             
+            self.logger.info(f"Monte Carlo simulation completed successfully for {symbol}")
+            
             return {
                 "success": True,
                 "symbol": symbol,
@@ -159,8 +178,9 @@ class MonteCarloSimulator:
             }
             
         except Exception as e:
-            self.logger.error(f"Monte Carlo simulation error: {str(e)}")
-            return {"error": f"Simulation failed: {str(e)}"}
+            error_msg = f"Monte Carlo simulation error for {symbol}: {str(e)}"
+            self.logger.error(error_msg)
+            return {"error": error_msg}
     
     def risk_analysis(self, symbol, investment_amount=10000):
         """

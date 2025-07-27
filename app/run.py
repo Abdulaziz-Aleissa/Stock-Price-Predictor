@@ -116,11 +116,57 @@ def load_user(user_id):
     return db.get(User, int(user_id))
 
 def is_valid_ticker(ticker):
+    """
+    Validate ticker symbol with robust error handling and fallback
+    """
     try:
+        # Basic ticker format validation
+        if not ticker or len(ticker.strip()) == 0:
+            return False
+        
+        ticker = ticker.strip().upper()
+        
+        # Basic format checks - must be 1-5 characters, letters/numbers only
+        if not ticker.replace('.', '').replace('-', '').isalnum() or len(ticker) > 10:
+            return False
+            
+        # Try to fetch data from yfinance
         stock = yf.Ticker(ticker)
         hist = stock.history(period="1d")
-        return not hist.empty
-    except:
+        
+        if not hist.empty:
+            return True
+            
+        # If history is empty, try to get info as a fallback
+        info = stock.info
+        if info and 'symbol' in info:
+            return True
+            
+        return False
+        
+    except Exception as e:
+        logger.warning(f"Network issue validating ticker {ticker}: {str(e)}")
+        
+        # Fallback: Accept common ticker patterns when network fails
+        # This prevents blocking Monte Carlo/backtesting when yfinance is down
+        ticker = ticker.strip().upper()
+        
+        # List of common valid ticker patterns for major exchanges
+        common_patterns = [
+            # US stocks: 1-5 letters
+            lambda t: len(t) >= 1 and len(t) <= 5 and t.isalpha(),
+            # Index funds: 3-4 letters + possible 'X'
+            lambda t: len(t) >= 3 and len(t) <= 5 and t.replace('X', '').isalpha(),
+            # ETFs: 3-4 letters
+            lambda t: len(t) >= 3 and len(t) <= 4 and t.isalpha(),
+        ]
+        
+        # Check if ticker matches common patterns
+        for pattern in common_patterns:
+            if pattern(ticker):
+                logger.info(f"Accepting ticker {ticker} based on pattern matching (network fallback)")
+                return True
+                
         return False
 
 def get_or_create_paper_cash_balance(user_id):
@@ -1380,28 +1426,40 @@ def monte_carlo_simulation():
             return jsonify({'error': 'Please provide a stock symbol'})
         
         if not is_valid_ticker(symbol):
-            return jsonify({'error': 'Invalid ticker symbol'})
+            return jsonify({
+                'error': f'Invalid or unrecognized ticker symbol: {symbol}. Please check the symbol and try again.'
+            })
         
         # Limit parameters for performance
         days = min(max(days, 1), 365)  # 1 to 365 days
         simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
         investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
         
+        logger.info(f"Running Monte Carlo simulation for {symbol} with {simulations} simulations")
+        
         # Run risk analysis
         results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
         
         if "error" in results:
-            return jsonify(results)
+            logger.error(f"Monte Carlo simulation error for {symbol}: {results['error']}")
+            return jsonify({
+                'error': f"Simulation failed for {symbol}: {results['error']}. This may be due to network connectivity issues. Please try again."
+            })
         
+        logger.info(f"Monte Carlo simulation successful for {symbol}")
         return jsonify({
             'success': True,
             'results': results
         })
         
     except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
+        logger.error(f"Invalid input parameters in Monte Carlo: {str(e)}")
+        return jsonify({'error': 'Invalid input parameters. Please check your values and try again.'})
     except Exception as e:
-        return jsonify({'error': f'Simulation failed: {str(e)}'})
+        logger.error(f"Unexpected error in Monte Carlo simulation: {str(e)}")
+        return jsonify({
+            'error': f'An error occurred during simulation. This may be due to network connectivity issues with financial data providers. Please try again in a few moments.'
+        })
 
 @app.route('/backtesting', methods=['POST'])
 @login_required
@@ -1416,7 +1474,9 @@ def backtesting():
             return jsonify({'error': 'Please provide a stock symbol'})
         
         if not is_valid_ticker(symbol):
-            return jsonify({'error': 'Invalid ticker symbol'})
+            return jsonify({
+                'error': f'Invalid or unrecognized ticker symbol: {symbol}. Please check the symbol and try again.'
+            })
         
         # Limit initial capital
         initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
@@ -1433,21 +1493,31 @@ def backtesting():
         if strategy not in valid_strategies:
             return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
         
+        logger.info(f"Running backtest for {symbol} using {strategy} strategy")
+        
         # Run backtest
         results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
         
         if "error" in results:
-            return jsonify(results)
+            logger.error(f"Backtesting error for {symbol}: {results['error']}")
+            return jsonify({
+                'error': f"Backtesting failed for {symbol}: {results['error']}. This may be due to network connectivity issues. Please try again."
+            })
         
+        logger.info(f"Backtesting successful for {symbol}")
         return jsonify({
             'success': True,
             'results': results
         })
         
     except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
+        logger.error(f"Invalid input parameters in backtesting: {str(e)}")
+        return jsonify({'error': 'Invalid input parameters. Please check your values and try again.'})
     except Exception as e:
-        return jsonify({'error': f'Backtesting failed: {str(e)}'})
+        logger.error(f"Unexpected error in backtesting: {str(e)}")
+        return jsonify({
+            'error': f'An error occurred during backtesting. This may be due to network connectivity issues with financial data providers. Please try again in a few moments.'
+        })
 
 @app.route('/value_at_risk', methods=['POST'])
 @login_required

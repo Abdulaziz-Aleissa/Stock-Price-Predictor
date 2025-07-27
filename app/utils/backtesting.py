@@ -22,12 +22,13 @@ class BacktestingFramework:
             stock = yf.Ticker(symbol)
             data = stock.history(period=period)
             if not data.empty:
+                self.logger.info(f"Successfully fetched real data for {symbol} ({period})")
                 return data
         except Exception as e:
             self.logger.error(f"Error fetching data for {symbol}: {str(e)}")
         
         # Fallback to mock data for demo purposes
-        self.logger.info(f"Using mock data for {symbol} - network connectivity issue")
+        self.logger.info(f"Using mock data for {symbol} - network connectivity issue or invalid symbol")
         return self._generate_mock_data(symbol, period)
     
     def _generate_mock_data(self, symbol, period="2y"):
@@ -111,9 +112,13 @@ class BacktestingFramework:
         
         # Generate signals
         df['Signal'] = 0
-        df['Signal'][short_window:] = np.where(
-            df[f'SMA_{short_window}'][short_window:] > df[f'SMA_{long_window}'][short_window:], 1, 0
-        )
+        
+        # Create boolean mask for signals
+        mask = (df[f'SMA_{short_window}'] > df[f'SMA_{long_window}']) & \
+               (df[f'SMA_{short_window}'].notna()) & \
+               (df[f'SMA_{long_window}'].notna())
+        
+        df.loc[mask, 'Signal'] = 1
         
         # Generate trading orders
         df['Position'] = df['Signal'].diff()
@@ -232,10 +237,19 @@ class BacktestingFramework:
             Backtesting results dictionary
         """
         try:
+            self.logger.info(f"Running backtest for {symbol} using {strategy_name} strategy with ${initial_capital} initial capital")
+            
             # Get historical data (with fallback to mock data)
             data = self.get_historical_data(symbol, period="2y")
             if data is None or data.empty:
-                return {"error": "Unable to fetch or generate historical data"}
+                error_msg = f"Unable to fetch or generate historical data for {symbol}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+            
+            if len(data) < 50:  # Need at least 50 days for meaningful backtest
+                error_msg = f"Insufficient historical data for {symbol} (only {len(data)} days available)"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
             
             # Apply strategy
             if strategy_name == "moving_average_crossover":
@@ -249,7 +263,14 @@ class BacktestingFramework:
             elif strategy_name == "buy_and_hold":
                 strategy_data = self.buy_and_hold_strategy(data)
             else:
-                return {"error": f"Unknown strategy: {strategy_name}"}
+                error_msg = f"Unknown strategy: {strategy_name}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+            
+            if strategy_data is None or strategy_data.empty:
+                error_msg = f"Strategy {strategy_name} failed to generate signals for {symbol}"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
             
             # Simulate trading
             portfolio_value = initial_capital
@@ -259,7 +280,7 @@ class BacktestingFramework:
             portfolio_values = []
             
             for i, row in strategy_data.iterrows():
-                if pd.isna(row['Signal']):
+                if pd.isna(row.get('Signal', np.nan)):
                     portfolio_values.append(portfolio_value)
                     continue
                 
@@ -297,12 +318,22 @@ class BacktestingFramework:
                 portfolio_value = cash + (position * current_price)
                 portfolio_values.append(portfolio_value)
             
+            if len(portfolio_values) == 0:
+                error_msg = f"No portfolio values generated for {symbol} - strategy may have failed"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+            
             # Calculate returns
             strategy_returns = pd.Series(portfolio_values).pct_change().dropna()
             benchmark_returns = data['Close'].pct_change().dropna()
             
             # Align returns
             min_length = min(len(strategy_returns), len(benchmark_returns))
+            if min_length == 0:
+                error_msg = f"Unable to calculate returns for {symbol} backtest"
+                self.logger.error(error_msg)
+                return {"error": error_msg}
+                
             strategy_returns = strategy_returns.iloc[-min_length:]
             benchmark_returns = benchmark_returns.iloc[-min_length:]
             
@@ -314,6 +345,8 @@ class BacktestingFramework:
             dates = data.index.strftime('%Y-%m-%d').tolist()
             cumulative_strategy = (1 + strategy_returns).cumprod() * initial_capital
             cumulative_benchmark = (1 + benchmark_returns).cumprod() * initial_capital
+            
+            self.logger.info(f"Backtesting completed successfully for {symbol}: {len(trades)} trades, final value ${portfolio_values[-1]:.2f}")
             
             return {
                 "success": True,
@@ -332,8 +365,9 @@ class BacktestingFramework:
             }
             
         except Exception as e:
-            self.logger.error(f"Backtesting error: {str(e)}")
-            return {"error": f"Backtesting failed: {str(e)}"}
+            error_msg = f"Backtesting error for {symbol}: {str(e)}"
+            self.logger.error(error_msg)
+            return {"error": error_msg}
     
     def compare_strategies(self, symbol, strategies=None):
         """Compare multiple strategies side by side"""
