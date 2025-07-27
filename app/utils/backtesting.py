@@ -67,6 +67,8 @@ class BacktestingFramework:
             'Volume': np.random.randint(1000000, 10000000, days)
         }, index=dates)
         
+        self.logger.info(f"Generated mock data for {symbol} ({period}): {len(mock_data)} days, starting at ${start_price:.2f}")
+        
         return mock_data
     
     def calculate_technical_indicators(self, data):

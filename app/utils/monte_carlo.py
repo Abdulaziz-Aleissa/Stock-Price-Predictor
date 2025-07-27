@@ -64,6 +64,8 @@ class MonteCarloSimulator:
             'Volume': np.random.randint(1000000, 10000000, 252)
         }, index=dates)
         
+        self.logger.info(f"Generated mock data for {symbol}: {len(mock_data)} days, starting at ${start_price:.2f}")
+        
         return mock_data
     
     def calculate_returns(self, prices):
