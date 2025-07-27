@@ -840,6 +840,23 @@ def predict():
         # Get feature importance from ensemble
         feature_importance = ensemble_model.get_feature_importance(top_n=10)
         
+        # Convert feature importance to dictionary format for template
+        feature_importance_dict = {}
+        if feature_importance is not None:
+            if isinstance(feature_importance, dict):
+                # If it's already a dict (multiple importance types), convert Series values to dict
+                for key, value in feature_importance.items():
+                    if hasattr(value, 'to_dict'):
+                        feature_importance_dict[key] = value.to_dict()
+                    else:
+                        feature_importance_dict[key] = value
+            elif hasattr(feature_importance, 'to_dict'):
+                # If it's a pandas Series, convert to dict
+                feature_importance_dict = feature_importance.to_dict()
+            else:
+                # If it's already in some other format, use as is
+                feature_importance_dict = feature_importance
+        
         return render_template(
             'go.html',
             ticker=stock_ticker,
@@ -869,7 +886,7 @@ def predict():
                     'upper': monte_carlo_results['confidence_intervals']['90%']['upper']
                 }
             },
-            feature_importance=feature_importance.to_dict() if feature_importance is not None else {},
+            feature_importance=feature_importance_dict,
             news_articles=news_articles,
             news_summary=news_summary,
             news_error_message=news_error_message
