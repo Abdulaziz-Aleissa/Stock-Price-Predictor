@@ -774,12 +774,6 @@
                             <p class="text-muted dashboard-description mb-0">Professional quantitative analysis tools for informed investment decisions</p>
                         </div>
                         <div class="d-flex flex-wrap gap-3" role="group">
-                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
-                                📊 Monte Carlo
-                            </button>
-                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#backtestingModal">
-                                📈 Backtesting
-                            </button>
                             <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#varAnalysisModal">
                                 ⚠️ Value at Risk
                             </button>
@@ -792,27 +786,13 @@
                         <strong>💡 Advanced Risk Analysis Tools:</strong> Comprehensive suite of quantitative analytics for professional-grade investment analysis and risk management.
                     </div>
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="analytics-feature">
-                                <h5>📊 Monte Carlo Simulations</h5>
-                                <p><strong>Risk Modeling:</strong> Generate thousands of potential price paths using statistical simulation to assess investment risk and return distributions</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="analytics-feature">
-                                <h5>📈 Strategy Backtesting</h5>
-                                <p><strong>Performance Testing:</strong> Evaluate trading strategies against historical data with comprehensive performance metrics and risk-adjusted returns</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="analytics-feature">
                                 <h5>⚠️ Value at Risk (VaR)</h5>
-                                <p><strong>Risk Assessment:</strong> Quantify potential losses using Historical, Parametric, and Monte Carlo VaR methods with Expected Shortfall analysis</p>
+                                <p><strong>Risk Assessment:</strong> Quantify potential losses using Historical and Parametric VaR methods with Expected Shortfall analysis</p>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
+                        <div class="col-md-6 mb-3">
                             <div class="analytics-feature">
                                 <h5>📈 Time Series Forecasting</h5>
                                 <p><strong>Predictive Analytics:</strong> Advanced ARIMA and GARCH models for price and volatility forecasting with statistical validation</p>
@@ -1141,82 +1121,6 @@
                     </div>
                     
                     <div id="scoringError" class="alert alert-danger mt-3" style="display: none;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Monte Carlo Simulation Modal -->
-    <div class="modal fade" id="monteCarloModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">📊 Monte Carlo Risk Analysis</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="monteCarloForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Stock Symbol</label>
-                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Investment Amount ($)</label>
-                                    <input type="number" class="form-control" name="investment_amount" value="10000" min="100" max="1000000" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Simulation Days</label>
-                                    <input type="number" class="form-control" name="days" value="30" min="1" max="365" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Number of Simulations</label>
-                                    <select class="form-control" name="simulations">
-                                        <option value="1000">1,000 (Fast)</option>
-                                        <option value="5000" selected>5,000 (Recommended)</option>
-                                        <option value="10000">10,000 (Detailed)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-custom w-100">
-                            <span class="spinner-border spinner-border-sm d-none" id="monteCarloSpinner"></span>
-                            Run Monte Carlo Simulation
-                        </button>
-                    </form>
-                    
-                    <div id="monteCarloResults" class="mt-4" style="display: none;">
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Risk Metrics</h6>
-                                <div id="riskMetrics"></div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Price Scenarios</h6>
-                                <div id="priceScenarios"></div>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <h6>Simulation Visualization</h6>
-                            <div id="monteCarloChart"></div>
-                        </div>
-                        <div class="mt-3">
-                            <h6>Risk Assessment</h6>
-                            <div id="riskRecommendations"></div>
-                        </div>
-                    </div>
-                    
-                    <div id="monteCarloError" class="alert alert-danger mt-3" style="display: none;"></div>
                 </div>
             </div>
         </div>

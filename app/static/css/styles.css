@@ -2113,3 +2113,102 @@ p {
     }
 }
 }
+/* Language Switcher Styles */
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+}
+
+.language-switcher .btn {
+    background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+    border: 1px solid rgba(var(--primary-rgb, 59, 130, 246), 0.3);
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.language-switcher .btn:hover {
+    background: rgba(var(--primary-rgb, 59, 130, 246), 0.2);
+    border-color: var(--primary-500);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(var(--primary-rgb, 59, 130, 246), 0.3);
+}
+
+.language-switcher .dropdown-menu {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(var(--primary-rgb, 59, 130, 246), 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.language-switcher .dropdown-item {
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin: 4px;
+    transition: all 0.2s ease;
+}
+
+.language-switcher .dropdown-item:hover {
+    background: rgba(var(--primary-rgb, 59, 130, 246), 0.1);
+    color: var(--text-primary);
+}
+
+/* RTL Support */
+[dir='rtl'] {
+    text-align: right;
+}
+
+[dir='rtl'] .language-switcher {
+    right: auto;
+    left: 20px;
+}
+
+[dir='rtl'] .theme-switch {
+    left: auto;
+    right: 20px;
+}
+
+[dir='rtl'] .nav-pills {
+    flex-direction: row-reverse;
+}
+
+[dir='rtl'] .search-group {
+    flex-direction: row-reverse;
+}
+
+[dir='rtl'] .search-group input {
+    border-radius: 0 20px 20px 0;
+}
+
+[dir='rtl'] .search-group button {
+    border-radius: 20px 0 0 20px;
+}
+
+[dir='rtl'] .stats-grid {
+    direction: rtl;
+}
+
+[dir='rtl'] .nav-link {
+    margin: 0 0 0 8px;
+}
+
+/* Arabic Font Support */
+[dir='rtl'] body {
+    font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Helvetica Neue', sans-serif;
+}
+
+[dir='rtl'] .main-title,
+[dir='rtl'] .stat-label,
+[dir='rtl'] .nav-link {
+    font-weight: 700;
+}
+

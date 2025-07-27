@@ -1,7 +1,8 @@
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 import os
 from dotenv import load_dotenv
+from flask_babel import Babel, _, get_locale, ngettext
 import yfinance as yf
 import joblib  
 import numpy as np
@@ -14,8 +15,7 @@ from data.process_data import load_data, clean_data, save_data
 from models.train_classifier import load_data as load_db_data, evaluate_model
 from app.utils.stock_scoring import StockScoring
 from app.utils.news_api import news_api
-from app.utils.monte_carlo import monte_carlo_simulator
-from app.utils.backtesting import backtesting_framework
+
 from app.utils.options_pricing import options_pricing
 from app.utils.value_at_risk import var_analyzer
 from app.utils.time_series_forecasting import ts_forecaster
@@ -43,6 +43,26 @@ app = Flask(__name__,
            static_folder='static')
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-here')  # Use env var or fallback
+
+# Configure Babel for internationalization
+app.config['LANGUAGES'] = {
+    'en': 'English',
+    'ar': 'العربية'
+}
+app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC'
+
+# Initialize Babel
+babel = Babel(app)
+
+@babel.localeselector
+def get_locale():
+    # Check if user explicitly chose a language
+    if 'language' in session:
+        return session['language']
+    # Try to guess the language from user's browser settings
+    return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or app.config['BABEL_DEFAULT_LOCALE']
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -589,6 +609,13 @@ scheduler.add_job(
 @app.route('/')
 def index():
     return render_template('main.html')
+
+@app.route('/set_language/<language>')
+def set_language(language=None):
+    """Set the user's preferred language"""
+    if language in app.config['LANGUAGES']:
+        session['language'] = language
+    return redirect(request.referrer or url_for('index'))
 
 @app.route('/financial-literacy')
 @login_required
@@ -1409,112 +1436,9 @@ def compare_stocks():
     
     return jsonify(data)
 
-@app.route('/monte_carlo_simulation', methods=['POST'])
-@login_required
-def monte_carlo_simulation():
-    """Handle Monte Carlo simulation requests"""
-    try:
-        symbol = request.form.get('symbol', '').strip().upper()
-        days = int(request.form.get('days', 30))
-        simulations = int(request.form.get('simulations', 1000))
-        investment_amount = float(request.form.get('investment_amount', 10000))
-        
-        if not symbol:
-            return jsonify({'error': 'Please provide a stock symbol'})
-        
-        if not is_valid_ticker(symbol):
-            return jsonify({
-                'error': f'Invalid or unrecognized ticker symbol: {symbol}. Please check the symbol and try again.'
-            })
-        
-        # Limit parameters for performance
-        days = min(max(days, 1), 365)  # 1 to 365 days
-        simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
-        investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
-        
-        logger.info(f"Running Monte Carlo simulation for {symbol} with {simulations} simulations")
-        
-        # Run risk analysis
-        results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
-        
-        if "error" in results:
-            logger.error(f"Monte Carlo simulation error for {symbol}: {results['error']}")
-            return jsonify({
-                'error': f"Simulation failed for {symbol}: {results['error']}. This may be due to network connectivity issues. Please try again."
-            })
-        
-        logger.info(f"Monte Carlo simulation successful for {symbol}")
-        return jsonify({
-            'success': True,
-            'results': results
-        })
-        
-    except ValueError as e:
-        logger.error(f"Invalid input parameters in Monte Carlo: {str(e)}")
-        return jsonify({'error': 'Invalid input parameters. Please check your values and try again.'})
-    except Exception as e:
-        logger.error(f"Unexpected error in Monte Carlo simulation: {str(e)}")
-        return jsonify({
-            'error': f'An error occurred during simulation. This may be due to network connectivity issues with financial data providers. Please try again in a few moments.'
-        })
 
-@app.route('/backtesting', methods=['POST'])
-@login_required
-def backtesting():
-    """Handle backtesting requests"""
-    try:
-        symbol = request.form.get('symbol', '').strip().upper()
-        strategy = request.form.get('strategy', 'moving_average_crossover')
-        initial_capital = float(request.form.get('initial_capital', 10000))
-        
-        if not symbol:
-            return jsonify({'error': 'Please provide a stock symbol'})
-        
-        if not is_valid_ticker(symbol):
-            return jsonify({
-                'error': f'Invalid or unrecognized ticker symbol: {symbol}. Please check the symbol and try again.'
-            })
-        
-        # Limit initial capital
-        initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
-        
-        # Valid strategies
-        valid_strategies = [
-            'buy_and_hold',
-            'moving_average_crossover',
-            'rsi_strategy',
-            'macd_strategy',
-            'bollinger_bands'
-        ]
-        
-        if strategy not in valid_strategies:
-            return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
-        
-        logger.info(f"Running backtest for {symbol} using {strategy} strategy")
-        
-        # Run backtest
-        results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
-        
-        if "error" in results:
-            logger.error(f"Backtesting error for {symbol}: {results['error']}")
-            return jsonify({
-                'error': f"Backtesting failed for {symbol}: {results['error']}. This may be due to network connectivity issues. Please try again."
-            })
-        
-        logger.info(f"Backtesting successful for {symbol}")
-        return jsonify({
-            'success': True,
-            'results': results
-        })
-        
-    except ValueError as e:
-        logger.error(f"Invalid input parameters in backtesting: {str(e)}")
-        return jsonify({'error': 'Invalid input parameters. Please check your values and try again.'})
-    except Exception as e:
-        logger.error(f"Unexpected error in backtesting: {str(e)}")
-        return jsonify({
-            'error': f'An error occurred during backtesting. This may be due to network connectivity issues with financial data providers. Please try again in a few moments.'
-        })
+
+
 
 @app.route('/value_at_risk', methods=['POST'])
 @login_required
