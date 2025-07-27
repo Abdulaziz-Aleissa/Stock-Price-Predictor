@@ -30,6 +30,12 @@ from models.train_classifier import (
     evaluate_model,
     build_model
 )
+# Import advanced ensemble system
+from app.models.ensemble_predictor import AdvancedEnsemblePredictor
+from app.features.technical_indicators import AdvancedTechnicalIndicators
+from app.utils.risk_manager import RiskManager
+from app.utils.uncertainty_quantifier import UncertaintyQuantifier
+from app.validation.time_series_cv import TimeSeriesCV
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.impute import SimpleImputer
@@ -652,21 +658,21 @@ def predict():
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         market_context = get_market_context(stock_ticker)
         database_filepath = os.path.join('data', f'{stock_ticker}_StockData.db')
-        model_filepath = os.path.join('models', f'{stock_ticker}_model.pkl')
+        model_filepath = os.path.join('models', f'{stock_ticker}_ensemble_model.pkl')
 
-        # Load or train model
+        # Load or train advanced ensemble model
         if os.path.exists(model_filepath):
-            logger.info(f"Loading existing model for {stock_ticker}")
-            model_data = joblib.load(model_filepath)
-            model = model_data['model']
-            scaler = model_data['scaler']
-            metrics = model_data.get('metrics', {})
+            logger.info(f"Loading existing ensemble model for {stock_ticker}")
+            ensemble_model = AdvancedEnsemblePredictor.load_model(model_filepath)
+            metrics = ensemble_model.model_performances
         else:
-            logger.info(f"Training new model for {stock_ticker}")
+            logger.info(f"Training new ensemble model for {stock_ticker}")
             
             if not os.path.exists(database_filepath):
                 df = load_data(stock_ticker)
                 df = clean_data(df)
+                # Add advanced technical indicators
+                df = AdvancedTechnicalIndicators.calculate_all_indicators(df)
                 save_data(df, database_filepath)
             
             X, y = load_db_data(database_filepath)
@@ -675,27 +681,13 @@ def predict():
             if X.isna().any().any():
                 X = X.fillna(0)
             
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
+            # Initialize and train ensemble model
+            ensemble_model = AdvancedEnsemblePredictor(random_state=42)
+            ensemble_model.fit(X, y)
             
-            X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2)
-            
-            model = GradientBoostingRegressor(
-                n_estimators=100,
-                learning_rate=0.1,
-                max_depth=5,
-                random_state=42
-            )
-            
-            model.fit(X_train, y_train)
-            metrics = evaluate_model(model, X_test, y_test)
-            
-            model_data = {
-                'model': model,
-                'scaler': scaler,
-                'metrics': metrics
-            }
-            joblib.dump(model_data, model_filepath)
+            # Save the ensemble model
+            ensemble_model.save_model(model_filepath)
+            metrics = ensemble_model.get_model_performance()
 
         # Get fresh data with current price
         try:
@@ -710,6 +702,8 @@ def predict():
                 return render_template('error.html', error="Could not fetch current price")
             
             df = clean_data(df)
+            # Add advanced technical indicators
+            df = AdvancedTechnicalIndicators.calculate_all_indicators(df)
             
             # Update the latest price
             df.iloc[-1, df.columns.get_loc('Close')] = current_price
@@ -742,28 +736,49 @@ def predict():
                 logger.warning(f"Capping extremely large values in {col}")
                 X[col] = X[col].clip(-1e6, 1e6)
         
-        # Final validation before scaling
+        # Final validation before prediction
         if np.isinf(X.values).any() or np.isnan(X.values).any():
             logger.error("Data still contains infinite or NaN values after cleaning")
             return render_template('error.html', error="Data processing error: Invalid values detected")
         
-        # Scale features and make predictions
+        # Make ensemble predictions with uncertainty quantification
         try:
-            X_scaled = scaler.transform(X)
-            
-            # Additional check after scaling
-            if np.isinf(X_scaled).any() or np.isnan(X_scaled).any():
-                logger.error("Scaled data contains infinite or NaN values")
-                return render_template('error.html', error="Data scaling error: Invalid values after scaling")
-            
-            predicted_prices = model.predict(X_scaled).tolist()
+            # Get ensemble prediction with uncertainty
+            predicted_prices, prediction_std = ensemble_model.predict_with_uncertainty(X, return_std=True)
             tomorrow_prediction = predicted_prices[-1]
+            tomorrow_std = prediction_std[-1]
+            
+            # Initialize uncertainty quantifier and risk manager
+            uncertainty_quantifier = UncertaintyQuantifier(n_simulations=1000)
+            risk_manager = RiskManager()
+            
+            # Calculate prediction confidence
+            historical_accuracy = np.mean([perf.get('cv_mae', 0.5) for perf in metrics.values()]) if metrics else 0.7
+            prediction_confidence = risk_manager.calculate_prediction_confidence(
+                tomorrow_prediction, tomorrow_std, historical_accuracy
+            )
+            
+            # Assess market conditions for risk adjustment
+            market_conditions = risk_manager.assess_market_conditions(df[['High', 'Low', 'Close']], df['Volume'])
+            
+            # Calculate volatility for Monte Carlo simulation
+            returns = df['Close'].pct_change().dropna()
+            volatility = returns.std() * np.sqrt(252)  # Annualized volatility
+            
+            # Monte Carlo simulation for uncertainty
+            expected_return = (tomorrow_prediction - current_price) / current_price
+            monte_carlo_results = uncertainty_quantifier.monte_carlo_price_simulation(
+                current_price=current_price,
+                predicted_return=expected_return,
+                volatility=volatility,
+                time_horizon=1
+            )
             
         except Exception as e:
-            logger.error(f"Error in prediction: {str(e)}")
+            logger.error(f"Error in ensemble prediction: {str(e)}")
             return render_template('error.html', error=f"Prediction error: {str(e)}")
         
-        # Get actual prices
+        # Get actual prices for historical comparison
         actual_prices = df['Close'].tolist()
         
         # Add tomorrow's date
@@ -771,7 +786,8 @@ def predict():
         tomorrow_date = tomorrow.strftime('%Y-%m-%d')
         dates.append(tomorrow_date)
         actual_prices.append(None)  # No actual price for tomorrow
-        predicted_prices.append(tomorrow_prediction)
+        predicted_prices_list = predicted_prices.tolist()
+        predicted_prices_list.append(tomorrow_prediction)
 
         # Calculate change percentage
         price_change_pct = ((tomorrow_prediction - current_price) / current_price) * 100
@@ -806,13 +822,24 @@ def predict():
         logger.info(f"Current Price: ${current_price:.2f}")
         logger.info(f"Tomorrow's Prediction: ${tomorrow_prediction:.2f}")
         logger.info(f"Expected Change: {price_change_pct:.2f}%")
+        logger.info(f"Prediction Uncertainty: ±${tomorrow_std:.2f}")
 
-        # Store the prediction for future backtesting
-        store_prediction(stock_ticker, tomorrow_prediction, current_price, price_change_pct, metrics)
+        # Store the prediction with enhanced metrics
+        enhanced_metrics = {
+            'ensemble_mae': np.mean([perf.get('cv_mae', 0) for perf in metrics.values()]) if metrics else 0,
+            'prediction_std': tomorrow_std,
+            'confidence_score': prediction_confidence['overall_confidence'],
+            'model_count': len(ensemble_model.models),
+            'r2': 0.8  # Placeholder, could be calculated from ensemble performance
+        }
+        store_prediction(stock_ticker, tomorrow_prediction, current_price, price_change_pct, enhanced_metrics)
         
-        # Populate historical data if needed for backtesting (for user who has been predicting for a year)
+        # Populate historical data if needed for backtesting
         populate_historical_data_for_testing(stock_ticker)
 
+        # Get feature importance from ensemble
+        feature_importance = ensemble_model.get_feature_importance(top_n=10)
+        
         return render_template(
             'go.html',
             ticker=stock_ticker,
@@ -821,14 +848,28 @@ def predict():
             price_change_pct=round(price_change_pct, 2),
             dates=dates,
             actual_prices=actual_prices,
-            predicted_prices=predicted_prices,
+            predicted_prices=predicted_prices_list,
             market_context=market_context,
             current_time=current_time,
             confidence_metrics={
-                'r2_score': f"{metrics.get('r2', 0):.3f}",
-                'mae': f"${metrics.get('mae', 0):.2f}",
-                'rmse': f"${metrics.get('rmse', 0):.2f}"
+                'ensemble_models': len(ensemble_model.models),
+                'prediction_std': f"±${tomorrow_std:.2f}",
+                'confidence_score': f"{prediction_confidence['overall_confidence']:.3f}",
+                'confidence_level': prediction_confidence['confidence_level_text'],
+                'mae': f"${enhanced_metrics['ensemble_mae']:.2f}",
+                'market_regime': market_conditions['market_regime'],
+                'volatility_regime': market_conditions['volatility_regime']
             },
+            uncertainty_metrics={
+                'confidence_intervals': monte_carlo_results['confidence_intervals'],
+                'probability_positive': f"{monte_carlo_results['probabilities']['positive_return']:.1%}",
+                'var_95': f"${monte_carlo_results['risk_metrics']['var_95']:.2f}",
+                'expected_range': {
+                    'lower': monte_carlo_results['confidence_intervals']['90%']['lower'],
+                    'upper': monte_carlo_results['confidence_intervals']['90%']['upper']
+                }
+            },
+            feature_importance=feature_importance.to_dict() if feature_importance is not None else {},
             news_articles=news_articles,
             news_summary=news_summary,
             news_error_message=news_error_message
