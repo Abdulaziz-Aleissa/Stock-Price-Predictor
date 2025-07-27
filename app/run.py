@@ -1,6 +1,17 @@
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import os
+from dotenv import load_dotenv
+import yfinance as yf
+import joblib  
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import GradientBoostingRegressor
+from sqlalchemy.orm import sessionmaker
+from models.database import engine, User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperCashBalance, PaperTransaction, PredictionHistory
+from data.process_data import load_data, clean_data, save_data
+from models.train_classifier import load_data as load_db_data, evaluate_model
 from app.utils.stock_scoring import StockScoring
 from app.utils.news_api import news_api
 from app.utils.monte_carlo import monte_carlo_simulator
@@ -15,7 +26,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
-import os
 
 # Load environment variables from .env file
 load_dotenv()
