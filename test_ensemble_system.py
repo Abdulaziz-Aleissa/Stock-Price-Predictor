@@ -65,8 +65,8 @@ def test_ensemble_system():
     
     # Test ensemble predictor
     try:
-        print("Testing ensemble predictor...")
-        ensemble = AdvancedEnsemblePredictor(random_state=42)
+        print("Testing enhanced ensemble predictor...")
+        ensemble = AdvancedEnsemblePredictor(random_state=42, use_meta_learner=True)
         
         # Train on first 80% of data
         split_idx = int(len(X) * 0.8)
@@ -79,7 +79,8 @@ def test_ensemble_system():
         print("Making predictions with uncertainty...")
         predictions, uncertainties = ensemble.predict_with_uncertainty(X_test)
         
-        print(f"Model trained with {len(ensemble.models)} base models")
+        print(f"Enhanced model trained with {len(ensemble.models)} base models")
+        print(f"Meta-learner enabled: {ensemble.use_meta_learner}")
         print(f"Model weights: {ensemble.model_weights}")
         
         # Show some example predictions
@@ -91,7 +92,7 @@ def test_ensemble_system():
             print(f"Actual: ${actual:.2f}, Predicted: ${pred:.2f} ± ${std:.2f}, Error: ${error:.2f}")
         
     except Exception as e:
-        print(f"Error in ensemble predictor: {str(e)}")
+        print(f"Error in enhanced ensemble predictor: {str(e)}")
         return False
     
     # Test risk manager
