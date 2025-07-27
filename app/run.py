@@ -68,7 +68,7 @@ def get_locale():
     # Try to guess the language from user's browser settings
     return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or app.config['BABEL_DEFAULT_LOCALE']
 
-# Configure the locale selector
+# Configure the locale selector (Flask-Babel 4.0.0 method)
 babel.locale_selector_func = get_locale
 
 # Make get_locale available to templates
