@@ -1,13 +1,14 @@
 # Arabic translations for Stock Price Predictor.
 # Copyright (C) 2025 Stock Price Predictor
-# This file is distributed under the same license as the Stock Price Predictor project.
+# This file is distributed under the same license as the Stock Price
+# Predictor project.
 # Arabic Translator, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Stock Price Predictor 1.0\n"
 "Report-Msgid-Bugs-To: support@stockpredictor.com\n"
-"POT-Creation-Date: 2025-07-27 23:25+0000\n"
+"POT-Creation-Date: 2025-07-27 23:39+0000\n"
 "PO-Revision-Date: 2025-07-27 23:25+0000\n"
 "Last-Translator: Arabic Translator <translator@stockpredictor.com>\n"
 "Language: ar\n"
@@ -28,103 +29,108 @@ msgid ""
 "Advanced stock price prediction with professional analytics, news "
 "sentiment analysis, and comprehensive financial insights."
 msgstr ""
-"توقع أسعار الأسهم المتقدم مع التحليلات المهنية، وتحليل المشاعر الإخبارية، "
-"والرؤى المالية الشاملة."
+"توقع أسعار الأسهم المتقدم مع التحليلات المهنية، وتحليل المشاعر الإخبارية،"
+" والرؤى المالية الشاملة."
 
-#: app/templates/main.html:34
+#: app/templates/main.html:52
+#, python-format
 msgid "Welcome, %(username)s!"
 msgstr "مرحباً، %(username)s!"
 
-#: app/templates/main.html:38
+#: app/templates/main.html:60
 msgid "Stock Price Predictor"
 msgstr "متنبئ أسعار الأسهم"
 
-#: app/templates/main.html:42
+#: app/templates/main.html:62
 msgid ""
 "Professional-grade stock analysis with AI-powered predictions, real-time "
 "news sentiment, and advanced analytics"
 msgstr ""
-"تحليل الأسهم بمستوى مهني مع التنبؤات المدعومة بالذكاء الاصطناعي، "
-"ومشاعر الأخبار في الوقت الفعلي، والتحليلات المتقدمة"
+"تحليل الأسهم بمستوى مهني مع التنبؤات المدعومة بالذكاء الاصطناعي، ومشاعر "
+"الأخبار في الوقت الفعلي، والتحليلات المتقدمة"
 
-#: app/templates/main.html:48
+#: app/templates/main.html:67
 msgid "Enter stock ticker (e.g., AAPL, GOOGL, TSLA)..."
 msgstr "أدخل رمز السهم (مثل AAPL، GOOGL، TSLA)..."
 
-#: app/templates/main.html:52
+#: app/templates/main.html:69
 msgid "ANALYZE STOCK"
 msgstr "تحليل السهم"
 
-#: app/templates/main.html:56
+#: app/templates/main.html:81
 msgid "Advanced Analytics"
 msgstr "التحليلات المتقدمة"
 
-#: app/templates/main.html:60
+#: app/templates/main.html:82
 msgid "Technical Analysis • Indicators"
 msgstr "التحليل الفني • المؤشرات"
 
-#: app/templates/main.html:64
+#: app/templates/main.html:86
 msgid "Real-Time News"
 msgstr "الأخبار المباشرة"
 
-#: app/templates/main.html:68
+#: app/templates/main.html:87
 msgid "Sentiment Analysis • Market Insights"
 msgstr "تحليل المشاعر • رؤى السوق"
 
-#: app/templates/main.html:72
+#: app/templates/main.html:91
 msgid "AI Predictions"
 msgstr "توقعات الذكاء الاصطناعي"
 
-#: app/templates/main.html:76
+#: app/templates/main.html:92
 msgid "Machine Learning • High Accuracy"
 msgstr "التعلم الآلي • دقة عالية"
 
-#: app/templates/main.html:80
+#: app/templates/main.html:100
 msgid "Financial Education"
 msgstr "التعليم المالي"
 
-#: app/templates/main.html:84
+#: app/templates/main.html:104
 msgid "Dashboard"
 msgstr "لوحة التحكم"
 
-#: app/templates/main.html:88
+#: app/templates/main.html:107
 msgid "Logout"
 msgstr "تسجيل الخروج"
 
-#: app/templates/main.html:92
+#: app/templates/main.html:111
 msgid "Login"
 msgstr "تسجيل الدخول"
 
-#: app/templates/main.html:96
+#: app/templates/main.html:114
 msgid "Sign Up"
 msgstr "إنشاء حساب"
 
-#: app/templates/main.html:101
+#: app/templates/main.html:122
+#, python-format
 msgid "Welcome back, %(username)s!"
 msgstr "مرحباً بعودتك، %(username)s!"
 
-#: app/templates/main.html:106
+#: app/templates/main.html:123
+#, python-format
 msgid ""
 "Access your %(dashboard_link)s for portfolio tracking and advanced "
 "analytics."
-msgstr ""
-"ادخل إلى %(dashboard_link)s لتتبع المحفظة والتحليلات المتقدمة."
+msgstr "ادخل إلى %(dashboard_link)s لتتبع المحفظة والتحليلات المتقدمة."
 
-#: app/templates/main.html:112
+#: app/templates/main.html:123
 msgid "personalized dashboard"
 msgstr "لوحة التحكم الشخصية"
 
-#: app/templates/main.html:116
+#: app/templates/main.html:127
 msgid "Unlock Premium Features!"
 msgstr "اكتشف الميزات المميزة!"
 
-#: app/templates/main.html:121
+#: app/templates/main.html:128
+#, python-format
 msgid ""
 "%(signup_link)s to access portfolio tracking, advanced analytics, and "
 "personalized insights."
 msgstr ""
-"%(signup_link)s للوصول إلى تتبع المحفظة والتحليلات المتقدمة والرؤى الشخصية."
+"%(signup_link)s للوصول إلى تتبع المحفظة والتحليلات المتقدمة والرؤى "
+"الشخصية."
 
-#: app/templates/main.html:127
+#: app/templates/main.html:128
 msgid "Create an account"
 msgstr "إنشاء حساب"
+

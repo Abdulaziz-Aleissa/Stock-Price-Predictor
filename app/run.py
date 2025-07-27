@@ -1,6 +1,11 @@
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 import os
+import sys
+
+# Add parent directory to path for importing models and data modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from dotenv import load_dotenv
 from flask_babel import Babel, _, get_locale, ngettext
 import yfinance as yf
@@ -53,15 +58,23 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'en'
 app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC'
 
 # Initialize Babel
-babel = Babel(app)
+babel = Babel()
+babel.init_app(app)
 
-@babel.localeselector
 def get_locale():
     # Check if user explicitly chose a language
     if 'language' in session:
         return session['language']
     # Try to guess the language from user's browser settings
     return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or app.config['BABEL_DEFAULT_LOCALE']
+
+# Configure the locale selector
+babel.locale_selector_func = get_locale
+
+# Make get_locale available to templates
+app.jinja_env.globals['get_locale'] = get_locale
+
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
