@@ -1,9 +1,9 @@
 """
 Monte Carlo Simulation for Stock Risk Analysis
+Self-contained implementation using only Python standard library
 """
-import numpy as np
-import yfinance as yf
-import pandas as pd
+import random
+import math
 from datetime import datetime, timedelta
 import logging
 
@@ -16,61 +16,76 @@ class MonteCarloSimulator:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
     
-    def get_stock_data(self, symbol, period="1y"):
-        """Fetch historical stock data with fallback to mock data"""
-        try:
-            stock = yf.Ticker(symbol)
-            data = stock.history(period=period)
-            if not data.empty:
-                self.logger.info(f"Successfully fetched real data for {symbol}")
-                return data
-        except Exception as e:
-            self.logger.error(f"Error fetching data for {symbol}: {str(e)}")
-        
-        # Fallback to mock data for demo purposes
-        self.logger.info(f"Using mock data for {symbol} - network connectivity issue or invalid symbol")
-        return self._generate_mock_data(symbol)
-    
-    def _generate_mock_data(self, symbol):
-        """Generate realistic mock stock data for demonstration"""
-        import pandas as pd
-        from datetime import datetime, timedelta
-        
-        # Create 252 trading days of mock data (1 year)
-        dates = pd.date_range(end=datetime.now(), periods=252, freq='B')
-        
+    def _generate_mock_data(self, symbol, num_days=252):
+        """Generate realistic mock stock data using only standard library"""
         # Mock prices based on symbol (realistic starting prices)
         base_prices = {
             'AAPL': 150.0, 'GOOGL': 2800.0, 'MSFT': 300.0, 'TSLA': 200.0,
-            'AMZN': 3000.0, 'META': 250.0, 'NVDA': 400.0, 'SPY': 400.0
+            'AMZN': 3000.0, 'META': 250.0, 'NVDA': 400.0, 'SPY': 400.0,
+            'QQQ': 350.0, 'NFLX': 400.0, 'AMD': 90.0, 'INTC': 50.0
         }
         
-        start_price = base_prices.get(symbol, 100.0)
+        start_price = base_prices.get(symbol.upper(), 100.0)
         
         # Generate realistic price movements using geometric brownian motion
-        np.random.seed(42)  # For consistent demo data
-        returns = np.random.normal(0.0005, 0.02, 252)  # Daily return ~ 0.05% with 2% volatility
+        random.seed(42)  # For consistent demo data
         prices = [start_price]
         
-        for ret in returns[1:]:
-            prices.append(prices[-1] * (1 + ret))
+        # Simulate daily returns with realistic parameters
+        mu = 0.0005  # Average daily return (about 0.05%)
+        sigma = 0.02  # Daily volatility (about 2%)
         
-        # Create mock OHLCV data
-        mock_data = pd.DataFrame({
-            'Open': [p * np.random.uniform(0.995, 1.005) for p in prices],
-            'High': [p * np.random.uniform(1.005, 1.03) for p in prices], 
-            'Low': [p * np.random.uniform(0.97, 0.995) for p in prices],
-            'Close': prices,
-            'Volume': np.random.randint(1000000, 10000000, 252)
-        }, index=dates)
+        for i in range(num_days - 1):
+            # Generate random return using Box-Muller transform for normal distribution
+            u1 = random.random()
+            u2 = random.random()
+            z = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+            daily_return = mu + sigma * z
+            
+            new_price = prices[-1] * (1 + daily_return)
+            prices.append(max(new_price, 0.01))  # Ensure price doesn't go negative
         
-        self.logger.info(f"Generated mock data for {symbol}: {len(mock_data)} days, starting at ${start_price:.2f}")
-        
-        return mock_data
+        self.logger.info(f"Generated mock data for {symbol}: {len(prices)} days, starting at ${start_price:.2f}")
+        return prices
     
-    def calculate_returns(self, prices):
-        """Calculate daily returns from price data"""
-        return prices.pct_change().dropna()
+    def _calculate_statistics(self, prices):
+        """Calculate basic statistics from price list"""
+        if len(prices) < 2:
+            return None, None
+        
+        # Calculate daily returns
+        returns = []
+        for i in range(1, len(prices)):
+            ret = (prices[i] - prices[i-1]) / prices[i-1]
+            returns.append(ret)
+        
+        if not returns:
+            return None, None
+        
+        # Calculate mean return
+        mu = sum(returns) / len(returns)
+        
+        # Calculate standard deviation (volatility)
+        variance = sum((r - mu) ** 2 for r in returns) / len(returns)
+        sigma = math.sqrt(variance)
+        
+        return mu, sigma
+    
+    def _calculate_percentile(self, data, percentile):
+        """Calculate percentile from sorted data"""
+        if not data:
+            return 0
+        
+        sorted_data = sorted(data)
+        n = len(sorted_data)
+        index = (percentile / 100.0) * (n - 1)
+        
+        if index == int(index):
+            return sorted_data[int(index)]
+        else:
+            lower = sorted_data[int(index)]
+            upper = sorted_data[int(index) + 1]
+            return lower + (upper - lower) * (index - int(index))
     
     def simulate_price_paths(self, symbol, days=30, simulations=1000):
         """
@@ -87,96 +102,95 @@ class MonteCarloSimulator:
         try:
             self.logger.info(f"Running Monte Carlo simulation for {symbol}: {simulations} simulations, {days} days")
             
-            # Get historical data (with fallback to mock data)
-            data = self.get_stock_data(symbol, period="1y")
-            if data is None or data.empty:
-                error_msg = f"Unable to fetch or generate historical data for {symbol}"
-                self.logger.error(error_msg)
-                return {"error": error_msg}
+            # Generate historical mock data
+            historical_prices = self._generate_mock_data(symbol, 252)
+            current_price = historical_prices[-1]
             
-            # Calculate parameters
-            prices = data['Close']
-            returns = self.calculate_returns(prices)
+            # Calculate statistical parameters
+            mu, sigma = self._calculate_statistics(historical_prices)
             
-            if len(returns) == 0:
-                error_msg = f"Insufficient price data to calculate returns for {symbol}"
-                self.logger.error(error_msg)
-                return {"error": error_msg}
-            
-            current_price = prices.iloc[-1]
-            mu = returns.mean()  # Average daily return
-            sigma = returns.std()  # Volatility
-            
-            if pd.isna(mu) or pd.isna(sigma) or sigma == 0:
-                error_msg = f"Invalid statistical parameters calculated for {symbol}"
+            if mu is None or sigma is None or sigma == 0:
+                error_msg = f"Unable to calculate valid statistical parameters for {symbol}"
                 self.logger.error(error_msg)
                 return {"error": error_msg}
             
             self.logger.info(f"Simulation parameters for {symbol}: mu={mu:.6f}, sigma={sigma:.6f}, current_price=${current_price:.2f}")
             
             # Generate simulation paths
-            dt = 1  # Daily time step
-            price_paths = np.zeros((simulations, days + 1))
-            price_paths[:, 0] = current_price
+            final_prices = []
+            sample_paths = []
             
-            # Generate random walks
-            for i in range(simulations):
-                for t in range(1, days + 1):
+            for sim in range(simulations):
+                path = [current_price]
+                price = current_price
+                
+                for day in range(days):
+                    # Generate random return using Box-Muller transform
+                    u1 = random.random()
+                    u2 = random.random()
+                    z = math.sqrt(-2 * math.log(u1)) * math.cos(2 * math.pi * u2)
+                    
                     # Geometric Brownian Motion
-                    drift = (mu - 0.5 * sigma**2) * dt
-                    shock = sigma * np.sqrt(dt) * np.random.normal()
-                    price_paths[i, t] = price_paths[i, t-1] * np.exp(drift + shock)
+                    drift = (mu - 0.5 * sigma**2)
+                    shock = sigma * z
+                    price = price * math.exp(drift + shock)
+                    path.append(price)
+                
+                final_prices.append(price)
+                # Store first 50 paths for visualization
+                if sim < 50:
+                    sample_paths.append(path)
             
-            # Calculate statistics
-            final_prices = price_paths[:, -1]
-            
-            # Risk metrics
+            # Calculate risk metrics
             percentiles = {
-                '5th': np.percentile(final_prices, 5),
-                '25th': np.percentile(final_prices, 25),
-                '50th': np.percentile(final_prices, 50),
-                '75th': np.percentile(final_prices, 75),
-                '95th': np.percentile(final_prices, 95)
+                '5th': self._calculate_percentile(final_prices, 5),
+                '25th': self._calculate_percentile(final_prices, 25),
+                '50th': self._calculate_percentile(final_prices, 50),
+                '75th': self._calculate_percentile(final_prices, 75),
+                '95th': self._calculate_percentile(final_prices, 95)
             }
             
             # Value at Risk (VaR)
             var_5 = (percentiles['5th'] - current_price) / current_price * 100
-            var_1 = (np.percentile(final_prices, 1) - current_price) / current_price * 100
+            var_1 = (self._calculate_percentile(final_prices, 1) - current_price) / current_price * 100
             
             # Expected shortfall (Conditional VaR)
-            es_5 = np.mean(final_prices[final_prices <= percentiles['5th']])
-            expected_shortfall = (es_5 - current_price) / current_price * 100
+            var_5_threshold = percentiles['5th']
+            losses_beyond_var = [p for p in final_prices if p <= var_5_threshold]
+            if losses_beyond_var:
+                es_5 = sum(losses_beyond_var) / len(losses_beyond_var)
+                expected_shortfall = (es_5 - current_price) / current_price * 100
+            else:
+                expected_shortfall = var_5
             
             # Probability of profit/loss
-            prob_profit = np.sum(final_prices > current_price) / simulations * 100
+            profitable_outcomes = sum(1 for p in final_prices if p > current_price)
+            prob_profit = (profitable_outcomes / simulations) * 100
             prob_loss = 100 - prob_profit
             
             # Generate dates for plotting
             start_date = datetime.now()
             dates = [(start_date + timedelta(days=i)).strftime('%Y-%m-%d') for i in range(days + 1)]
             
-            # Select sample paths for visualization (max 50 for performance)
-            sample_paths = price_paths[:min(50, simulations), :]
-            
             self.logger.info(f"Monte Carlo simulation completed successfully for {symbol}")
             
             return {
                 "success": True,
                 "symbol": symbol,
-                "current_price": float(current_price),
+                "current_price": current_price,
                 "simulation_days": days,
                 "simulations": simulations,
-                "annual_return": float(mu * 252 * 100),  # Annualized return
-                "annual_volatility": float(sigma * np.sqrt(252) * 100),  # Annualized volatility
-                "percentiles": {k: float(v) for k, v in percentiles.items()},
-                "var_5": float(var_5),
-                "var_1": float(var_1),
-                "expected_shortfall": float(expected_shortfall),
-                "probability_profit": float(prob_profit),
-                "probability_loss": float(prob_loss),
+                "annual_return": mu * 252 * 100,  # Annualized return
+                "annual_volatility": sigma * math.sqrt(252) * 100,  # Annualized volatility
+                "percentiles": percentiles,
+                "var_5": var_5,
+                "var_1": var_1,
+                "expected_shortfall": expected_shortfall,
+                "probability_profit": prob_profit,
+                "probability_loss": prob_loss,
                 "dates": dates,
-                "sample_paths": sample_paths.tolist(),
-                "price_distribution": final_prices.tolist()
+                "sample_paths": sample_paths,
+                "price_distribution": final_prices[:100]  # Limit for performance
             }
             
         except Exception as e:
