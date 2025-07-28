@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Results - Stock Price Predictor</title>
+    <title>نتائج التوقع - متنبئ أسعار الأسهم</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -30,19 +30,19 @@
         <!-- Professional Navigation Header -->
         <div class="nav-header">
             <div class="nav-container">
-                <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
+                <a href="{{ url_for('index') }}" class="logo">منصة تحليل الأسهم المهنية</a>
                 <div class="nav-links">
                     {% if current_user.is_authenticated %}
                         <span class="user-welcome">👤 {{ current_user.username }}</span>
-                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
-                        <a href="{{ url_for('dashboard') }}" class="btn-secondary btn-sm">📊 Dashboard</a>
-                        <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 Education</a>
-                        <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 Logout</a>
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 الرئيسية</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn-secondary btn-sm">📊 لوحة التحكم</a>
+                        <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 التعليم</a>
+                        <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 تسجيل الخروج</a>
                     {% else %}
-                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
-                        <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 Education</a>
-                        <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 Login</a>
-                        <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ Sign Up</a>
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 الرئيسية</a>
+                        <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 التعليم</a>
+                        <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 تسجيل الدخول</a>
+                        <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ إنشاء حساب</a>
                     {% endif %}
                 </div>
             </div>
@@ -52,7 +52,7 @@
         <div class="content-wrapper">
             <div class="content-box animate-fade-in">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>{{ ticker }} Stock Analysis</h1>
+            <h1>تحليل سهم {{ ticker }}</h1>
             <div class="text-end">
             
             </div>
@@ -62,20 +62,20 @@
             <div class="col-md-8">
                 <div class="metrics-card">
                     <div class="current-price">
-                        <h4>Current Price</h4>
+                        <h4>السعر الحالي</h4>
                         <div class="price-value">${{ "%.2f"|format(current_price) }}</div>
                         
                     </div>
                     
                     <div class="prediction-section mt-4">
-                        <h4>Tomorrow's Prediction</h4>
+                        <h4>توقع الغد</h4>
                         <div class="price-prediction">${{ "%.2f"|format(prediction) }}</div>
                         <div class="prediction-change {{ 'positive-change' if price_change_pct > 0 else 'negative-change' }}">
                             {{ "%.2f"|format(price_change_pct) }}% 
                             {{ "▲" if price_change_pct > 0 else "▼" }}
                         </div>
                         <div class="prediction-details">
-                            Predicted Change: ${{ "%.2f"|format(prediction - current_price) }}
+                            التغيير المتوقع: ${{ "%.2f"|format(prediction - current_price) }}
                         </div>
                     </div>
                 </div>
@@ -84,19 +84,19 @@
             {% if market_context %}
             <div class="col-md-4">
                 <div class="metrics-card">
-                    <h4>Market Overview</h4>
+                    <h4>نظرة عامة على السوق</h4>
                     <div class="market-data">
-                        <p>Day Range: ${{ market_context.day_low }} - ${{ market_context.day_high }}</p>
-                        <p>Volume: {{ '{:,}'.format(market_context.volume) }}</p>
-                        <p>P/E Ratio: {{ '%.2f'|format(market_context.pe_ratio) if market_context.pe_ratio != 'N/A' else 'N/A' }}</p>
-                        <p>P/B Ratio: {{ '%.2f'|format(market_context.pb_ratio) if market_context.pb_ratio != 'N/A' else 'N/A' }}</p>
-                        <p>EV/EBITDA: {{ '%.2f'|format(market_context.ev_ebitda) if market_context.ev_ebitda != 'N/A' else 'N/A' }}</p>
-                        <p>ROE: {{ '%.2f'|format(market_context.roe) if market_context.roe != 'N/A' else 'N/A' }}</p>
-                        <p>14-Day RSI: {{ '%.2f'|format(market_context.rsi_14) if market_context.rsi_14 != 'N/A' else 'N/A' }}</p>
-                        <p>Dividend Yield: {{ '%.2f'|format(market_context.dividend_yield) if market_context.dividend_yield != 'N/A' else 'N/A' }}</p>
-                        <p>Market Cap: ${{ '{:,.0f}'.format(market_context.market_cap/1000000) }}M</p>
-                        <p>52W High: ${{ market_context.year_high }}</p>
-                        <p>52W Low: ${{ market_context.year_low }}</p>
+                        <p>نطاق اليوم: ${{ market_context.day_low }} - ${{ market_context.day_high }}</p>
+                        <p>حجم التداول: {{ '{:,}'.format(market_context.volume) }}</p>
+                        <p>نسبة السعر إلى الأرباح: {{ '%.2f'|format(market_context.pe_ratio) if market_context.pe_ratio != 'N/A' else 'غير متاح' }}</p>
+                        <p>نسبة السعر إلى القيمة الدفترية: {{ '%.2f'|format(market_context.pb_ratio) if market_context.pb_ratio != 'N/A' else 'غير متاح' }}</p>
+                        <p>قيمة الشركة إلى الأرباح: {{ '%.2f'|format(market_context.ev_ebitda) if market_context.ev_ebitda != 'N/A' else 'غير متاح' }}</p>
+                        <p>عائد على حقوق الملكية: {{ '%.2f'|format(market_context.roe) if market_context.roe != 'N/A' else 'غير متاح' }}</p>
+                        <p>مؤشر القوة النسبية (14 يوم): {{ '%.2f'|format(market_context.rsi_14) if market_context.rsi_14 != 'N/A' else 'غير متاح' }}</p>
+                        <p>عائد الأرباح: {{ '%.2f'|format(market_context.dividend_yield) if market_context.dividend_yield != 'N/A' else 'غير متاح' }}</p>
+                        <p>القيمة السوقية: ${{ '{:,.0f}'.format(market_context.market_cap/1000000) }}م</p>
+                        <p>أعلى سعر في 52 أسبوع: ${{ market_context.year_high }}</p>
+                        <p>أقل سعر في 52 أسبوع: ${{ market_context.year_low }}</p>
                     </div>
                 </div>
             </div>
@@ -108,9 +108,9 @@
             <div class="col-12">
                 <div class="metrics-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h4>Latest News</h4>
+                        <h4>آخر الأخبار</h4>
                         <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#newsSection" aria-expanded="true" aria-controls="newsSection">
-                            <span class="toggle-text">Hide</span>
+                            <span class="toggle-text">إخفاء</span>
                         </button>
                     </div>
                     
@@ -120,33 +120,33 @@
                             <div class="col-md-3">
                                 <div class="sentiment-stat">
                                     <div class="stat-number">{{ news_summary.total_articles }}</div>
-                                    <div class="stat-label">Articles</div>
+                                    <div class="stat-label">مقالات</div>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="sentiment-stat">
                                     <div class="stat-number sentiment-{{ news_summary.sentiment_label.lower() }}">
-                                        {{ news_summary.sentiment_label }}
+                                        {% if news_summary.sentiment_label == 'Bullish' %}صاعد{% elif news_summary.sentiment_label == 'Bearish' %}هابط{% else %}محايد{% endif %}
                                     </div>
-                                    <div class="stat-label">Overall Sentiment</div>
+                                    <div class="stat-label">المشاعر العامة</div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="sentiment-stat">
                                     <div class="stat-number positive-change">{{ news_summary.bullish_count }}</div>
-                                    <div class="stat-label">Bullish</div>
+                                    <div class="stat-label">صاعد</div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="sentiment-stat">
                                     <div class="stat-number">{{ news_summary.neutral_count }}</div>
-                                    <div class="stat-label">Neutral</div>
+                                    <div class="stat-label">محايد</div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="sentiment-stat">
                                     <div class="stat-number negative-change">{{ news_summary.bearish_count }}</div>
-                                    <div class="stat-label">Bearish</div>
+                                    <div class="stat-label">هابط</div>
                                 </div>
                             </div>
                         </div>
@@ -179,11 +179,11 @@
                                 </div>
                                 <div class="news-card-footer">
                                     <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer" class="read-more-link">
-                                        Read Full Article →
+                                        اقرأ المقال كاملاً ←
                                     </a>
                                     {% if article.sentiment %}
                                     <div class="sentiment-score">
-                                        Sentiment: {{ "%.2f"|format(article.sentiment.score) }}
+                                        المشاعر: {{ "%.2f"|format(article.sentiment.score) }}
                                     </div>
                                     {% endif %}
                                 </div>
@@ -195,14 +195,14 @@
                             {% if news_error_message %}
                             <div class="alert alert-warning" role="alert">
                                 <i class="fas fa-key"></i>
-                                <strong>API Key Required for Real News</strong><br>
+                                <strong>مطلوب مفتاح API للأخبار الحقيقية</strong><br>
                                 {{ news_error_message }}
                             </div>
                             {% else %}
                             <p class="text-center text-muted">
                                 <i class="fas fa-newspaper"></i><br>
-                                No recent news articles found for {{ ticker }}.<br>
-                                This could be due to API limitations or limited news coverage.
+                                لم يتم العثور على مقالات إخبارية حديثة لـ {{ ticker }}.<br>
+                                قد يكون هذا بسبب قيود API أو تغطية إخبارية محدودة.
                             </p>
                             {% endif %}
                         </div>
@@ -218,8 +218,8 @@
                 <div class="metrics-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h4>📊 Backtest Analysis</h4>
-                            <small class="text-muted">Evaluate historical prediction accuracy over different time periods</small>
+                            <h4>📊 تحليل الاختبار التراجعي</h4>
+                            <small class="text-muted">تقييم دقة التوقعات التاريخية عبر فترات زمنية مختلفة</small>
                         </div>
                     </div>
                     
@@ -227,18 +227,18 @@
                     <div class="backtest-controls mb-4">
                         <div class="row align-items-end">
                             <div class="col-md-6">
-                                <label for="backtestDuration" class="form-label">Select Analysis Period</label>
+                                <label for="backtestDuration" class="form-label">اختر فترة التحليل</label>
                                 <select id="backtestDuration" class="form-select">
-                                    <option value="7">Last 7 Days</option>
-                                    <option value="30">Last 30 Days</option>
-                                    <option value="90">Last 90 Days</option>
-                                    <option value="365" selected>Last 1 Year</option>
+                                    <option value="7">آخر 7 أيام</option>
+                                    <option value="30">آخر 30 يوماً</option>
+                                    <option value="90">آخر 90 يوماً</option>
+                                    <option value="365" selected>آخر سنة</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <button id="runBacktestBtn" class="btn btn-primary w-100" onclick="runBacktest()">
                                     <span class="btn-icon">🚀</span>
-                                    <span class="btn-text">Run Backtest Analysis</span>
+                                    <span class="btn-text">تشغيل تحليل الاختبار التراجعي</span>
                                 </button>
                             </div>
                         </div>
