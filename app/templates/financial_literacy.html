@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Education Hub - Stock Analytics Pro</title>
+    <title>مركز التعليم المالي - منصة تحليل الأسهم المهنية</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <meta name="description" content="Comprehensive financial education hub with professional insights on stock analysis, investment strategies, and market fundamentals.">
+    <meta name="description" content="مركز التعليم المالي الشامل مع رؤى مهنية حول تحليل الأسهم واستراتيجيات الاستثمار وأساسيات السوق.">
 </head>
 <body>
     <div class="app-container">
@@ -29,17 +29,17 @@
         <!-- Professional Navigation Header -->
         <div class="nav-header">
             <div class="nav-container">
-                <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
+                <a href="{{ url_for('index') }}" class="logo">منصة تحليل الأسهم المهنية</a>
                 <div class="nav-links">
                     {% if current_user.is_authenticated %}
                         <span class="user-welcome">👤 {{ current_user.username }}</span>
-                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
-                        <a href="{{ url_for('dashboard') }}" class="btn-secondary btn-sm">📊 Dashboard</a>
-                        <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 Logout</a>
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 الرئيسية</a>
+                        <a href="{{ url_for('dashboard') }}" class="btn-secondary btn-sm">📊 لوحة التحكم</a>
+                        <a href="{{ url_for('logout') }}" class="btn-outline btn-sm">🚪 تسجيل الخروج</a>
                     {% else %}
-                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 Home</a>
-                        <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 Login</a>
-                        <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ Sign Up</a>
+                        <a href="{{ url_for('index') }}" class="btn-secondary btn-sm">🏠 الرئيسية</a>
+                        <a href="{{ url_for('login') }}" class="btn-secondary btn-sm">🔐 تسجيل الدخول</a>
+                        <a href="{{ url_for('signup') }}" class="btn-outline btn-sm">✨ إنشاء حساب</a>
                     {% endif %}
                 </div>
             </div>

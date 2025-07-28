@@ -248,9 +248,9 @@
                     <div id="backtestLoading" class="backtest-loading" style="display: none;">
                         <div class="text-center py-4">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                                <span class="visually-hidden">جاري التحميل...</span>
                             </div>
-                            <p class="mt-2">Analyzing historical predictions...</p>
+                            <p class="mt-2">تحليل التوقعات التاريخية...</p>
                         </div>
                     </div>
                     
@@ -268,13 +268,13 @@
                     <!-- Initial Instructions -->
                     <div id="backtestInstructions" class="alert alert-info" role="alert">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Ready to analyze {{ ticker }} prediction accuracy!</strong><br>
-                        Select your preferred analysis period above and click "Run Backtest Analysis" to see:
+                        <strong>جاهز لتحليل دقة توقعات {{ ticker }}!</strong><br>
+                        اختر فترة التحليل المفضلة أعلاه وانقر على "تشغيل تحليل الاختبار التراجعي" لترى:
                         <ul class="mt-2 mb-0">
-                            <li>Historical prediction accuracy metrics</li>
-                            <li>Mean Absolute Error (MAE) and directional accuracy</li>
-                            <li>Hit rates within different price ranges</li>
-                            <li>Interactive charts comparing predictions vs actual prices</li>
+                            <li>مقاييس دقة التوقعات التاريخية</li>
+                            <li>متوسط الخطأ المطلق (MAE) ودقة الاتجاه</li>
+                            <li>معدلات الإصابة ضمن نطاقات أسعار مختلفة</li>
+                            <li>رسوم بيانية تفاعلية تقارن التوقعات مقابل الأسعار الفعلية</li>
                         </ul>
                     </div>
                 </div>
@@ -282,17 +282,17 @@
         </div>
 
         <div class="time-selector">
-            <button class="time-btn active" onclick="updateTimeframe('1M')">1M</button>
-            <button class="time-btn" onclick="updateTimeframe('3M')">3M</button>
-            <button class="time-btn" onclick="updateTimeframe('6M')">6M</button>
-            <button class="time-btn" onclick="updateTimeframe('1Y')">1Y</button>
-            <button class="time-btn" onclick="updateTimeframe('ALL')">ALL</button>
+            <button class="time-btn active" onclick="updateTimeframe('1M')">شهر</button>
+            <button class="time-btn" onclick="updateTimeframe('3M')">3 أشهر</button>
+            <button class="time-btn" onclick="updateTimeframe('6M')">6 أشهر</button>
+            <button class="time-btn" onclick="updateTimeframe('1Y')">سنة</button>
+            <button class="time-btn" onclick="updateTimeframe('ALL')">الكل</button>
         </div>
 
         <div id="chart"></div>
         
         <div class="text-center mt-4">
-            <a href="{{ url_for('index') }}" class="btn btn-custom">Back to Search</a>
+            <a href="{{ url_for('index') }}" class="btn btn-custom">العودة إلى البحث</a>
         </div>
             </div>
         </div>
@@ -310,7 +310,7 @@
                 x: dates.slice(startIndex),
                 y: actualPrices.slice(startIndex),
                 mode: 'lines',
-                name: 'Actual Prices',
+                name: 'الأسعار الفعلية',
                 line: { color: '#1f77b4', width: 2 }
             };
 
@@ -318,24 +318,24 @@
                 x: dates.slice(startIndex),
                 y: predictedPrices.slice(startIndex),
                 mode: 'lines',
-                name: 'Predicted Prices',
+                name: 'الأسعار المتوقعة',
                 line: { color: '#ff9800', dash: 'dashdot', width: 2 }
             };
 
             const layout = {
-                title: 'Stock Price Prediction vs Actual Prices',
+                title: 'توقع أسعار الأسهم مقابل الأسعار الفعلية',
                 paper_bgcolor: 'transparent',
                 plot_bgcolor: 'transparent',
                 font: { 
                     color: isDark ? '#e0e0e0' : '#1a202c',
                 },
                 xaxis: {
-                    title: 'Date',
+                    title: 'التاريخ',
                     gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                     zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
                 },
                 yaxis: {
-                    title: 'Price ($)',
+                    title: 'السعر ($)',
                     gridcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                     zerolinecolor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
                 },
@@ -405,7 +405,7 @@
             
             // Show loading state
             runBtn.disabled = true;
-            runBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Running Analysis...';
+            runBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>تشغيل التحليل...';
             loading.style.display = 'block';
             error.style.display = 'none';
             results.style.display = 'none';
@@ -425,7 +425,7 @@
             .then(data => {
                 loading.style.display = 'none';
                 runBtn.disabled = false;
-                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">Run Backtest Analysis</span>';
+                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">تشغيل تحليل الاختبار التراجعي</span>';
                 
                 if (data.success) {
                     displayBacktestResults(data.metrics);
@@ -436,8 +436,8 @@
             .catch(err => {
                 loading.style.display = 'none';
                 runBtn.disabled = false;
-                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">Run Backtest Analysis</span>';
-                showBacktestError('Network error occurred', 'Please try again in a moment.');
+                runBtn.innerHTML = '<span class="btn-icon">🚀</span><span class="btn-text">تشغيل تحليل الاختبار التراجعي</span>';
+                showBacktestError('حدث خطأ في الشبكة', 'يرجى المحاولة مرة أخرى.');
                 console.error('Backtest error:', err);
             });
         }
@@ -457,11 +457,11 @@
             const resultsHTML = `
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
-                        <h5>📊 Analysis Results</h5>
-                        <small class="text-muted">Performance over ${metrics.duration_label}</small>
+                        <h5>📊 نتائج التحليل</h5>
+                        <small class="text-muted">الأداء خلال ${metrics.duration_label}</small>
                     </div>
                     <button class="btn btn-sm btn-outline-custom" type="button" data-bs-toggle="collapse" data-bs-target="#backtestSection" aria-expanded="true" aria-controls="backtestSection">
-                        <span class="backtest-toggle-text">Hide</span>
+                        <span class="backtest-toggle-text">إخفاء</span>
                     </button>
                 </div>
                 
@@ -471,25 +471,25 @@
                         <div class="col-md-3">
                             <div class="backtest-metric-card">
                                 <div class="metric-value">${metrics.total_predictions}</div>
-                                <div class="metric-label">Total Predictions</div>
+                                <div class="metric-label">إجمالي التوقعات</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="backtest-metric-card">
                                 <div class="metric-value">$${metrics.mae.toFixed(2)}</div>
-                                <div class="metric-label">Avg Error (MAE)</div>
+                                <div class="metric-label">متوسط الخطأ (MAE)</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="backtest-metric-card">
                                 <div class="metric-value">${metrics.directional_accuracy.toFixed(1)}%</div>
-                                <div class="metric-label">Direction Accuracy</div>
+                                <div class="metric-label">دقة الاتجاه</div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="backtest-metric-card">
                                 <div class="metric-value">$${metrics.rmse.toFixed(2)}</div>
-                                <div class="metric-label">RMSE</div>
+                                <div class="metric-label">الجذر التربيعي للخطأ</div>
                             </div>
                         </div>
                     </div>
@@ -497,7 +497,7 @@
                     <!-- Hit Rates -->
                     <div class="row mb-4">
                         <div class="col-12">
-                            <h5>🎯 Accuracy Hit Rates</h5>
+                            <h5>🎯 معدلات دقة الإصابة</h5>
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="hit-rate-card">
