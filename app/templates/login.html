@@ -1,13 +1,13 @@
 
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Stock Analytics Pro</title>
+    <title>تسجيل الدخول - منصة تحليل الأسهم المهنية</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <meta name="description" content="Login to your professional stock analytics account for advanced market insights and portfolio tracking.">
+    <meta name="description" content="سجل دخولك إلى حساب تحليل الأسهم المهني للحصول على رؤى السوق المتقدمة وتتبع المحفظة.">
 </head>
 <body>
     <div class="app-container">
@@ -31,45 +31,45 @@
             <div class="content-box animate-fade-in" style="max-width: 480px;">
                 <div class="auth-container text-center">
                     <div class="mb-4">
-                        <h1 class="mb-2">Welcome Back</h1>
-                        <p class="text-muted auth-text-description">Sign in to your professional analytics account</p>
+                        <h1 class="mb-2">مرحباً بعودتك</h1>
+                        <p class="text-muted auth-text-description">سجل دخولك إلى حساب التحليلات المهني</p>
                     </div>
                     
                     {% if error %}
                     <div class="alert alert-danger animate-slide-in">
-                        <strong>Error:</strong> {{ error }}
+                        <strong>خطأ:</strong> {{ error }}
                     </div>
                     {% endif %}
                     
                     <form method="POST" action="{{ url_for('login') }}" class="auth-form">
                         <div class="mb-3">
-                            <input type="text" class="form-control form-control-lg" name="username" placeholder="Username" required>
+                            <input type="text" class="form-control form-control-lg" name="username" placeholder="اسم المستخدم" required>
                         </div>
                         <div class="mb-4">
-                            <input type="password" class="form-control form-control-lg" name="password" placeholder="Password" required>
+                            <input type="password" class="form-control form-control-lg" name="password" placeholder="كلمة المرور" required>
                         </div>
                         <button type="submit" class="btn-primary w-100 btn-lg mb-4">
-                            🔐 Sign In to Dashboard
+                            🔐 تسجيل الدخول إلى لوحة التحكم
                         </button>
                     </form>
                     
                     <div class="auth-links">
                         <p class="text-muted mb-3">
-                            Don't have an account? 
-                            <a href="{{ url_for('signup') }}" class="fw-bold" style="color: var(--accent);">Create Account</a>
+                            لا تملك حساباً؟ 
+                            <a href="{{ url_for('signup') }}" class="fw-bold" style="color: var(--accent);">إنشاء حساب</a>
                         </p>
                         <a href="{{ url_for('index') }}" class="btn-secondary">
-                            ← Back to Home
+                            ← العودة إلى الرئيسية
                         </a>
                     </div>
 
                     <!-- Professional Features Preview -->
                     <div class="mt-5 pt-4" style="border-top: 1px solid var(--glass-border);">
-                        <p class="text-xs text-muted mb-3">Access Professional Features:</p>
+                        <p class="text-xs text-muted mb-3">الوصول إلى الميزات المهنية:</p>
                         <div class="d-flex justify-content-center gap-4 text-xs text-muted">
-                            <span>📊 Portfolio Tracking</span>
-                            <span>📈 Advanced Analytics</span>  
-                            <span>🎯 Personalized Insights</span>
+                            <span>📊 تتبع المحفظة</span>
+                            <span>📈 التحليلات المتقدمة</span>  
+                            <span>🎯 الرؤى الشخصية</span>
                         </div>
                     </div>
                 </div>

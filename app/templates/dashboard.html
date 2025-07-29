@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="ar" dir="rtl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Dashboard - Stock Analytics Platform</title>
+    <title>لوحة التحكم المهنية - منصة تحليل الأسهم</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <meta name="description" content="Professional stock analytics dashboard with portfolio tracking, advanced analytics, and real-time market insights.">
+    <meta name="description" content="لوحة تحكم تحليل الأسهم المهنية مع تتبع المحفظة والتحليلات المتقدمة ورؤى السوق في الوقت الفعلي.">
     
     <style>
         /* Paper Trading Enhanced Styles */
@@ -549,7 +549,7 @@
         <!-- Professional Navigation Header -->
         <div class="nav-header">
             <div class="nav-container">
-                <a href="{{ url_for('index') }}" class="logo">Stock Analytics Pro</a>
+                <a href="{{ url_for('index') }}" class="logo">منصة تحليل الأسهم المهنية</a>
                 <div class="nav-links">
                     <span class="user-welcome">👤 {{ current_user.username }}</span>
                     <a href="{{ url_for('financial_literacy') }}" class="btn-secondary btn-sm">📚 Education</a>
@@ -582,30 +582,30 @@
                 <!-- Dashboard Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="mb-2">Professional Dashboard</h1>
-                        <p class="text-muted mb-0 dashboard-welcome-text">Welcome back, {{ current_user.username }}! Your comprehensive analytics platform.</p>
+                        <h1 class="mb-2">لوحة التحكم المهنية</h1>
+                        <p class="text-muted mb-0 dashboard-welcome-text">مرحباً بعودتك، {{ current_user.username }}! منصة التحليلات الشاملة الخاصة بك.</p>
                     </div>
                 </div>
-                <!-- Portfolio Summary Stats -->
+                <!-- ملخص إحصائيات المحفظة -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card animate-slide-in">
                         <div class="stat-value">${{ "%.2f"|format(summary.total_value) }}</div>
-                        <div class="stat-label">Total Portfolio Value</div>
+                        <div class="stat-label">إجمالي قيمة المحفظة</div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
                         <div class="stat-value">${{ "%.2f"|format(summary.total_cost) }}</div>
-                        <div class="stat-label">Total Investment</div>
+                        <div class="stat-label">إجمالي الاستثمار</div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
                         <div class="stat-value {{ 'positive' if summary.total_profit_loss > 0 else 'negative' }}">${{ "%.2f"|format(summary.total_profit_loss) }}</div>
-                        <div class="stat-label">Profit/Loss</div>
+                        <div class="stat-label">الربح/الخسارة</div>
                         <div class="stat-change {{ 'positive' if summary.total_return_percent > 0 else 'negative' }}">
                             {{ "%.2f"|format(summary.total_return_percent) }}%
                         </div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.3s;">
                         <div class="stat-value">{{ portfolio|length }}</div>
-                        <div class="stat-label">Active Positions</div>
+                        <div class="stat-label">المراكز النشطة</div>
                     </div>
                 </div>
 
@@ -615,9 +615,9 @@
                         <div class="card">
                             <div class="card-header">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <h3 class="card-title">📊 Portfolio Holdings</h3>
+                                    <h3 class="card-title">📊 حيازات المحفظة</h3>
                                     <button class="btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addPortfolioModal">
-                                        + Add Stock
+                                        + إضافة سهم
                                     </button>
                                 </div>
                             </div>
@@ -626,13 +626,13 @@
                         <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                             <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
                                 <tr>
-                                    <th style="color: var(--text-primary);">Symbol</th>
-                                    <th style="color: var(--text-primary);">Shares</th>
-                                    <th style="color: var(--text-primary);">Buy Price</th>
-                                    <th style="color: var(--text-primary);">Current</th>
-                                    <th style="color: var(--text-primary);">Value</th>
-                                    <th style="color: var(--text-primary);">P/L</th>
-                                    <th style="color: var(--text-primary);">Change</th>
+                                    <th style="color: var(--text-primary);">الرمز</th>
+                                    <th style="color: var(--text-primary);">الأسهم</th>
+                                    <th style="color: var(--text-primary);">سعر الشراء</th>
+                                    <th style="color: var(--text-primary);">الحالي</th>
+                                    <th style="color: var(--text-primary);">القيمة</th>
+                                    <th style="color: var(--text-primary);">ر/خ</th>
+                                    <th style="color: var(--text-primary);">التغير</th>
                                     <th style="color: var(--text-primary);"></th>
                                 </tr>
                             </thead>
@@ -652,7 +652,7 @@
                                     </td>
                                     <td>
                                         <a href="{{ url_for('remove_from_portfolio', item_id=item.id) }}" 
-                                           class="btn btn-outline-danger btn-sm">Remove</a>
+                                           class="btn btn-outline-danger btn-sm">إزالة</a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -770,8 +770,8 @@
                 <div class="metrics-card">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
                         <div class="mb-3 mb-md-0">
-                            <h2 class="mb-1">🚀 Advanced Analytics</h2>
-                            <p class="text-muted dashboard-description mb-0">Professional quantitative analysis tools for informed investment decisions</p>
+                            <h2 class="mb-1">🚀 التحليلات المتقدمة</h2>
+                            <p class="text-muted dashboard-description mb-0">أدوات التحليل الكمي المهنية لاتخاذ قرارات استثمارية مدروسة</p>
                         </div>
                         <div class="d-flex flex-wrap gap-3" role="group">
                             <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#monteCarloModal">
