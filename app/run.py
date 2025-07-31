@@ -3,8 +3,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 import os
 from app.utils.stock_scoring import StockScoring
 from app.utils.news_api import news_api
-from app.utils.monte_carlo import monte_carlo_simulator
-from app.utils.backtesting import backtesting_framework
+from app.utils.risk_analysis import risk_analyzer
 from app.utils.options_pricing import options_pricing
 from app.utils.value_at_risk import var_analyzer
 from app.utils.time_series_forecasting import ts_forecaster
@@ -1366,15 +1365,12 @@ def compare_stocks():
     
     return jsonify(data)
 
-@app.route('/monte_carlo_simulation', methods=['POST'])
+@app.route('/fundamental_risk_analysis', methods=['POST'])
 @login_required
-def monte_carlo_simulation():
-    """Handle Monte Carlo simulation requests"""
+def fundamental_risk_analysis():
+    """Handle fundamental risk analysis requests"""
     try:
         symbol = request.form.get('symbol', '').strip().upper()
-        days = int(request.form.get('days', 30))
-        simulations = int(request.form.get('simulations', 1000))
-        investment_amount = float(request.form.get('investment_amount', 10000))
         
         if not symbol:
             return jsonify({'error': 'Please provide a stock symbol'})
@@ -1382,13 +1378,31 @@ def monte_carlo_simulation():
         if not is_valid_ticker(symbol):
             return jsonify({'error': 'Invalid ticker symbol'})
         
-        # Limit parameters for performance
-        days = min(max(days, 1), 365)  # 1 to 365 days
-        simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
-        investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
+        # Get financial inputs
+        try:
+            working_capital = float(request.form.get('working_capital', ''))
+            retained_earnings = float(request.form.get('retained_earnings', ''))
+            ebit = float(request.form.get('ebit', ''))
+            market_cap = float(request.form.get('market_cap', ''))
+            total_assets = float(request.form.get('total_assets', ''))
+            total_liabilities = float(request.form.get('total_liabilities', ''))
+            sales = float(request.form.get('sales', ''))
+            interest_expense = float(request.form.get('interest_expense', ''))
+        except (ValueError, TypeError):
+            return jsonify({'error': 'All financial inputs must be valid numbers'})
         
-        # Run risk analysis
-        results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
+        # Run fundamental risk analysis
+        results = risk_analyzer.fundamental_risk_analysis(
+            symbol=symbol,
+            working_capital=working_capital,
+            retained_earnings=retained_earnings,
+            ebit=ebit,
+            market_cap=market_cap,
+            total_assets=total_assets,
+            total_liabilities=total_liabilities,
+            sales=sales,
+            interest_expense=interest_expense
+        )
         
         if "error" in results:
             return jsonify(results)
@@ -1398,19 +1412,16 @@ def monte_carlo_simulation():
             'results': results
         })
         
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
     except Exception as e:
-        return jsonify({'error': f'Simulation failed: {str(e)}'})
+        return jsonify({'error': f'Fundamental risk analysis failed: {str(e)}'})
 
-@app.route('/backtesting', methods=['POST'])
+@app.route('/technical_risk_analysis', methods=['POST'])
 @login_required
-def backtesting():
-    """Handle backtesting requests"""
+def technical_risk_analysis():
+    """Handle technical risk analysis requests"""
     try:
         symbol = request.form.get('symbol', '').strip().upper()
-        strategy = request.form.get('strategy', 'moving_average_crossover')
-        initial_capital = float(request.form.get('initial_capital', 10000))
+        support_level = request.form.get('support_level', '').strip()
         
         if not symbol:
             return jsonify({'error': 'Please provide a stock symbol'})
@@ -1418,23 +1429,21 @@ def backtesting():
         if not is_valid_ticker(symbol):
             return jsonify({'error': 'Invalid ticker symbol'})
         
-        # Limit initial capital
-        initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
+        # Support level is optional, but validate if provided
+        support_value = None
+        if support_level:
+            try:
+                support_value = float(support_level)
+                if support_value <= 0:
+                    return jsonify({'error': 'Support level must be positive'})
+            except ValueError:
+                return jsonify({'error': 'Support level must be a valid number'})
         
-        # Valid strategies
-        valid_strategies = [
-            'buy_and_hold',
-            'moving_average_crossover',
-            'rsi_strategy',
-            'macd_strategy',
-            'bollinger_bands'
-        ]
-        
-        if strategy not in valid_strategies:
-            return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
-        
-        # Run backtest
-        results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
+        # Run technical risk analysis
+        results = risk_analyzer.technical_risk_analysis(
+            symbol=symbol,
+            support_level=support_value
+        )
         
         if "error" in results:
             return jsonify(results)
@@ -1444,10 +1453,60 @@ def backtesting():
             'results': results
         })
         
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
     except Exception as e:
-        return jsonify({'error': f'Backtesting failed: {str(e)}'})
+        return jsonify({'error': f'Technical risk analysis failed: {str(e)}'})
+
+@app.route('/comprehensive_risk_analysis', methods=['POST'])
+@login_required
+def comprehensive_risk_analysis():
+    """Handle comprehensive risk analysis requests (both fundamental and technical)"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Collect all parameters
+        params = {'symbol': symbol}
+        
+        # Fundamental analysis parameters (optional)
+        fundamental_fields = ['working_capital', 'retained_earnings', 'ebit', 'market_cap', 
+                            'total_assets', 'total_liabilities', 'sales', 'interest_expense']
+        
+        for field in fundamental_fields:
+            value = request.form.get(field, '').strip()
+            if value:
+                try:
+                    params[field] = float(value)
+                except ValueError:
+                    return jsonify({'error': f'{field.replace("_", " ").title()} must be a valid number'})
+        
+        # Technical analysis parameters (optional)
+        support_level = request.form.get('support_level', '').strip()
+        if support_level:
+            try:
+                params['support_level'] = float(support_level)
+                if params['support_level'] <= 0:
+                    return jsonify({'error': 'Support level must be positive'})
+            except ValueError:
+                return jsonify({'error': 'Support level must be a valid number'})
+        
+        # Run comprehensive risk analysis
+        results = risk_analyzer.comprehensive_risk_analysis(**params)
+        
+        if "error" in results:
+            return jsonify(results)
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Comprehensive risk analysis failed: {str(e)}'})
 
 @app.route('/value_at_risk', methods=['POST'])
 @login_required
