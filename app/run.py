@@ -1156,20 +1156,30 @@ def mark_notification_read(notification_id):
 @login_required
 def paper_buy():
     try:
-        symbol = request.form['symbol'].upper()
+        symbol = request.form['symbol'].strip().upper()
         shares = float(request.form['shares'])
         price = float(request.form['price'])
         
+        # Improved validation with specific error messages
+        if not symbol:
+            flash('Please enter a stock symbol')
+            return redirect(url_for('dashboard'))
+        
+        # Basic symbol format validation
+        if not symbol.isalpha() or len(symbol) < 1 or len(symbol) > 5:
+            flash(f'Invalid stock symbol format: "{symbol}". Please enter 1-5 letters only.')
+            return redirect(url_for('dashboard'))
+        
         if not is_valid_ticker(symbol):
-            flash('Invalid ticker symbol')
+            flash(f'Stock symbol "{symbol}" not found. Please check the symbol and try again.')
             return redirect(url_for('dashboard'))
         
         if shares <= 0:
-            flash('Shares must be positive')
+            flash('Number of shares must be positive')
             return redirect(url_for('dashboard'))
             
         if price <= 0:
-            flash('Price must be positive')
+            flash('Share price must be positive')
             return redirect(url_for('dashboard'))
         
         total_cost = shares * price
@@ -1177,7 +1187,7 @@ def paper_buy():
         # Check cash balance
         cash_balance = get_or_create_paper_cash_balance(current_user.id)
         if cash_balance.cash_balance < total_cost:
-            flash('Insufficient virtual cash')
+            flash(f'Insufficient virtual cash. Available: ${cash_balance.cash_balance:.2f}, Required: ${total_cost:.2f}')
             return redirect(url_for('dashboard'))
         
         # Execute transaction
@@ -1199,10 +1209,10 @@ def paper_buy():
         update_paper_portfolio(current_user.id, symbol, shares, price, 'BUY')
         
         db.commit()
-        flash(f'Successfully bought {shares} shares of {symbol} at ${price:.2f}')
+        flash(f'✅ Successfully bought {shares} shares of {symbol} at ${price:.2f}', 'success')
         
-    except ValueError:
-        flash('Invalid input values')
+    except ValueError as e:
+        flash('Invalid input values. Please check your numbers and try again.')
     except Exception as e:
         flash(f'Error executing buy order: {str(e)}')
     
@@ -1212,16 +1222,21 @@ def paper_buy():
 @login_required
 def paper_sell():
     try:
-        symbol = request.form['symbol'].upper()
+        symbol = request.form['symbol'].strip().upper()
         shares = float(request.form['shares'])
         price = float(request.form['price'])
         
+        # Improved validation with specific error messages
+        if not symbol:
+            flash('Please enter a stock symbol')
+            return redirect(url_for('dashboard'))
+        
         if shares <= 0:
-            flash('Shares must be positive')
+            flash('Number of shares must be positive')
             return redirect(url_for('dashboard'))
             
         if price <= 0:
-            flash('Price must be positive')
+            flash('Share price must be positive')
             return redirect(url_for('dashboard'))
         
         # Check if user has enough shares
@@ -1230,8 +1245,12 @@ def paper_sell():
             stock_symbol=symbol
         ).first()
         
-        if not position or position.shares < shares:
-            flash('Insufficient shares to sell')
+        if not position:
+            flash(f'You do not own any shares of {symbol}')
+            return redirect(url_for('dashboard'))
+        
+        if position.shares < shares:
+            flash(f'Insufficient shares to sell. You own {position.shares} shares of {symbol}, but tried to sell {shares}')
             return redirect(url_for('dashboard'))
         
         total_proceeds = shares * price
@@ -1258,10 +1277,10 @@ def paper_sell():
             return redirect(url_for('dashboard'))
         
         db.commit()
-        flash(f'Successfully sold {shares} shares of {symbol} at ${price:.2f}')
+        flash(f'✅ Successfully sold {shares} shares of {symbol} at ${price:.2f}', 'success')
         
-    except ValueError:
-        flash('Invalid input values')
+    except ValueError as e:
+        flash('Invalid input values. Please check your numbers and try again.')
     except Exception as e:
         flash(f'Error executing sell order: {str(e)}')
     

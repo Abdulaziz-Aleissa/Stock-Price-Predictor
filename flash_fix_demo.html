@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Message Fix Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .flash-message { 
+            background: linear-gradient(135deg, #ff7b7b, #ff5757); 
+            color: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 10px 0;
+            animation: slideIn 0.3s ease-out;
+        }
+        .success-message { 
+            background: linear-gradient(135deg, #4CAF50, #45a049); 
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .demo-section { background: #2a2a2a; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .before-after { display: flex; gap: 20px; }
+        .before, .after { flex: 1; }
+        .validation-input { 
+            width: 100%; 
+            padding: 10px; 
+            border: 2px solid #555; 
+            background: #333; 
+            color: #fff; 
+            border-radius: 5px;
+        }
+        .invalid { border-color: #ff5757 !important; background: #ffebee; }
+        .valid { border-color: #4CAF50 !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Paper Trading Flash Message Fix</h1>
+        
+        <div class="demo-section">
+            <h3>✅ Fix Summary</h3>
+            <p><strong>Issue:</strong> Invalid ticker symbols in paper trading (like "sheveuesba") just redirected without showing error messages.</p>
+            <p><strong>Solution:</strong> Added proper flash message handling with client-side validation and user-friendly error messages.</p>
+        </div>
+
+        <div class="demo-section">
+            <div class="before-after">
+                <div class="before">
+                    <h4>❌ Before Fix</h4>
+                    <ul>
+                        <li>Silent failures</li>
+                        <li>No error feedback</li>
+                        <li>User confusion</li>
+                        <li>Poor UX</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h4>✅ After Fix</h4>
+                    <ul>
+                        <li>Clear error messages</li>
+                        <li>Real-time validation</li>
+                        <li>Better user guidance</li>
+                        <li>Improved UX</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h4>Live Demo - Try Invalid Symbols:</h4>
+            <input type="text" id="symbolInput" class="validation-input" 
+                   placeholder="Try typing 'sheveuesba' or other invalid symbols" 
+                   maxlength="5">
+            <div style="margin-top: 10px;">
+                <button onclick="showError()">Test Invalid Symbol Error</button>
+                <button onclick="showSuccess()">Test Success Message</button>
+            </div>
+        </div>
+
+        <!-- Flash messages appear here -->
+        <div id="flashContainer"></div>
+    </div>
+
+    <script>
+        const symbolInput = document.getElementById('symbolInput');
+        const flashContainer = document.getElementById('flashContainer');
+        
+        symbolInput.addEventListener('input', function() {
+            const value = this.value.toUpperCase();
+            this.value = value;
+            
+            if (value.length > 0 && !/^[A-Z]{1,5}$/.test(value)) {
+                this.className = 'validation-input invalid';
+                if (value === 'SHEVEUESBA' || value.length > 5) {
+                    setTimeout(() => showError(), 500);
+                }
+            } else if (value.length > 0) {
+                this.className = 'validation-input valid';
+            } else {
+                this.className = 'validation-input';
+            }
+        });
+
+        function showError() {
+            showFlashMessage('Stock symbol "sheveuesba" not found. Please check the symbol and try again.', false);
+        }
+
+        function showSuccess() {
+            showFlashMessage('Successfully bought 10 shares of AAPL at $150.00', true);
+        }
+
+        function showFlashMessage(message, isSuccess) {
+            const flash = document.createElement('div');
+            flash.className = 'flash-message' + (isSuccess ? ' success-message' : '');
+            flash.innerHTML = `<strong>${isSuccess ? '✅ Success' : '⚠️ Notice'}:</strong> ${message}`;
+            
+            flashContainer.appendChild(flash);
+            
+            setTimeout(() => {
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 300);
+            }, 4000);
+        }
+
+        // Show initial demo
+        setTimeout(() => showError(), 1000);
+    </script>
+</body>
+</html>

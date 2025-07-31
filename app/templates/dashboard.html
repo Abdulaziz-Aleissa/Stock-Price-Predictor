@@ -503,6 +503,48 @@
             border-left: 4px solid #dc3545;
         }
 
+        /* Flash Messages */
+        .flash-messages-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 400px;
+        }
+
+        .flash-message {
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Auto-hide flash messages after 5 seconds */
+        .flash-message {
+            animation: slideInRight 0.3s ease-out, fadeOut 0.5s ease-out 4.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .trading-stats-grid {
@@ -525,6 +567,14 @@
             .holdings-table th,
             .holdings-table td {
                 padding: 12px 8px;
+            }
+
+            .flash-messages-container {
+                position: fixed;
+                top: 70px;
+                left: 10px;
+                right: 10px;
+                max-width: none;
             }
         }
     </style>
@@ -561,6 +611,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages-container animate-fade-in">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'success' if category == 'success' else 'warning' }} alert-dismissible flash-message" role="alert">
+                {% if category == 'success' %}
+                <strong>✅ Success:</strong> {{ message }}
+                {% else %}
+                <strong>⚠️ Notice:</strong> {{ message }}
+                {% endif %}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
 
         <!-- Notifications -->
         {% if notifications %}
@@ -2170,21 +2238,45 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ url_for('paper_buy') }}" method="POST">
+                    <form action="{{ url_for('paper_buy') }}" method="POST" id="paperBuyForm">
                         <div class="mb-3">
                             <label class="form-label">Stock Symbol</label>
-                            <input type="text" class="form-control" name="symbol" id="buyStockSymbol" placeholder="e.g., AAPL" required>
+                            <input type="text" class="form-control" name="symbol" id="buyStockSymbol" 
+                                   placeholder="e.g., AAPL" 
+                                   pattern="[A-Za-z]{1,5}" 
+                                   maxlength="5"
+                                   title="Enter 1-5 letters only"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a valid stock symbol (1-5 letters only).
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Number of Shares</label>
-                            <input type="number" class="form-control" name="shares" placeholder="Enter shares" step="0.01" min="0.01" required>
+                            <input type="number" class="form-control" name="shares" 
+                                   placeholder="Enter shares" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="10000"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a positive number of shares.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Purchase Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" name="price" id="buyPurchasePrice" placeholder="Price per share" step="0.01" min="0.01" required>
+                                <input type="number" class="form-control" name="price" id="buyPurchasePrice" 
+                                       placeholder="Price per share" 
+                                       step="0.01" 
+                                       min="0.01" 
+                                       max="10000"
+                                       required>
                                 <button type="button" class="btn btn-outline-secondary" id="getCurrentPriceBuy">Get Current</button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a positive price per share.
                             </div>
                             <small class="form-text text-muted">Default is current market price. You can modify for practice scenarios.</small>
                         </div>
@@ -2210,7 +2302,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ url_for('paper_sell') }}" method="POST">
+                    <form action="{{ url_for('paper_sell') }}" method="POST" id="paperSellForm">
                         <div class="mb-3">
                             <label class="form-label">Stock Symbol</label>
                             <select class="form-control" name="symbol" id="sellStockSymbol" required>
@@ -2219,17 +2311,36 @@
                                 <option value="{{ item.symbol }}">{{ item.symbol }} ({{ "%.2f"|format(item.shares) }} shares @ ${{ "%.2f"|format(item.average_price) }})</option>
                                 {% endfor %}
                             </select>
+                            <div class="invalid-feedback">
+                                Please select a stock to sell.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Number of Shares</label>
-                            <input type="number" class="form-control" name="shares" placeholder="Enter shares to sell" step="0.01" min="0.01" required>
+                            <input type="number" class="form-control" name="shares" 
+                                   placeholder="Enter shares to sell" 
+                                   step="0.01" 
+                                   min="0.01" 
+                                   max="10000"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a positive number of shares.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Sell Price</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" class="form-control" name="price" id="sellPrice" placeholder="Price per share" step="0.01" min="0.01" required>
+                                <input type="number" class="form-control" name="price" id="sellPrice" 
+                                       placeholder="Price per share" 
+                                       step="0.01" 
+                                       min="0.01" 
+                                       max="10000"
+                                       required>
                                 <button type="button" class="btn btn-outline-secondary" id="getCurrentPriceSell">Get Current</button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please enter a positive sell price.
                             </div>
                             <small class="form-text text-muted">Default is current market price. You can modify for practice scenarios.</small>
                         </div>
@@ -2389,6 +2500,183 @@
             // If symbol is selected but price is not, try to get current price
             if (symbolSelect.value && !priceInput.value) {
                 document.getElementById('getCurrentPriceSell').click();
+            }
+        });
+
+        // Auto-hide flash messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            
+            flashMessages.forEach(function(message) {
+                // Auto-hide after 5 seconds
+                setTimeout(function() {
+                    if (message && message.parentNode) {
+                        const alert = new bootstrap.Alert(message);
+                        alert.close();
+                    }
+                }, 5000);
+            });
+        });
+
+        // Enhanced validation for paper trading forms
+        function validateTickerSymbol(input) {
+            const symbol = input.value.trim().toUpperCase();
+            
+            // Basic validation: only letters, 1-5 characters
+            const isValid = /^[A-Z]{1,5}$/.test(symbol);
+            
+            if (!isValid && symbol.length > 0) {
+                input.style.borderColor = '#dc3545';
+                input.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
+                input.classList.add('is-invalid');
+            } else {
+                input.style.borderColor = '';
+                input.style.boxShadow = '';
+                input.classList.remove('is-invalid');
+                if (symbol.length > 0) {
+                    input.classList.add('is-valid');
+                }
+            }
+            
+            return isValid;
+        }
+
+        // Add real-time validation to ticker inputs and form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const tickerInputs = document.querySelectorAll('#buyStockSymbol');
+            
+            tickerInputs.forEach(function(input) {
+                input.addEventListener('input', function() {
+                    validateTickerSymbol(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value.trim()) {
+                        this.value = this.value.trim().toUpperCase();
+                        validateTickerSymbol(this);
+                    }
+                });
+            });
+
+            // Form validation for buy form
+            const buyForm = document.getElementById('paperBuyForm');
+            if (buyForm) {
+                buyForm.addEventListener('submit', function(e) {
+                    const symbolInput = document.getElementById('buyStockSymbol');
+                    const sharesInput = buyForm.querySelector('input[name="shares"]');
+                    const priceInput = buyForm.querySelector('input[name="price"]');
+                    
+                    let isValid = true;
+                    
+                    // Validate symbol
+                    if (!validateTickerSymbol(symbolInput)) {
+                        e.preventDefault();
+                        isValid = false;
+                        symbolInput.focus();
+                    }
+                    
+                    // Validate shares
+                    if (parseFloat(sharesInput.value) <= 0) {
+                        e.preventDefault();
+                        isValid = false;
+                        sharesInput.classList.add('is-invalid');
+                        if (isValid) sharesInput.focus();
+                    } else {
+                        sharesInput.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate price
+                    if (parseFloat(priceInput.value) <= 0) {
+                        e.preventDefault();
+                        isValid = false;
+                        priceInput.classList.add('is-invalid');
+                        if (isValid) priceInput.focus();
+                    } else {
+                        priceInput.classList.remove('is-invalid');
+                    }
+                    
+                    if (!isValid) {
+                        // Show a user-friendly error message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger mt-3';
+                        alertDiv.innerHTML = '<strong>⚠️ Validation Error:</strong> Please correct the highlighted fields and try again.';
+                        
+                        // Remove any existing error messages
+                        const existingError = buyForm.querySelector('.alert-danger');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        buyForm.appendChild(alertDiv);
+                        
+                        // Auto-remove after 5 seconds
+                        setTimeout(() => {
+                            alertDiv.remove();
+                        }, 5000);
+                    }
+                });
+            }
+
+            // Form validation for sell form
+            const sellForm = document.getElementById('paperSellForm');
+            if (sellForm) {
+                sellForm.addEventListener('submit', function(e) {
+                    const symbolSelect = document.getElementById('sellStockSymbol');
+                    const sharesInput = sellForm.querySelector('input[name="shares"]');
+                    const priceInput = sellForm.querySelector('input[name="price"]');
+                    
+                    let isValid = true;
+                    
+                    // Validate symbol selection
+                    if (!symbolSelect.value) {
+                        e.preventDefault();
+                        isValid = false;
+                        symbolSelect.classList.add('is-invalid');
+                        symbolSelect.focus();
+                    } else {
+                        symbolSelect.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate shares
+                    if (parseFloat(sharesInput.value) <= 0) {
+                        e.preventDefault();
+                        isValid = false;
+                        sharesInput.classList.add('is-invalid');
+                        if (isValid) sharesInput.focus();
+                    } else {
+                        sharesInput.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate price
+                    if (parseFloat(priceInput.value) <= 0) {
+                        e.preventDefault();
+                        isValid = false;
+                        priceInput.classList.add('is-invalid');
+                        if (isValid) priceInput.focus();
+                    } else {
+                        priceInput.classList.remove('is-invalid');
+                    }
+                    
+                    if (!isValid) {
+                        // Show a user-friendly error message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-danger mt-3';
+                        alertDiv.innerHTML = '<strong>⚠️ Validation Error:</strong> Please correct the highlighted fields and try again.';
+                        
+                        // Remove any existing error messages
+                        const existingError = sellForm.querySelector('.alert-danger');
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        
+                        sellForm.appendChild(alertDiv);
+                        
+                        // Auto-remove after 5 seconds
+                        setTimeout(() => {
+                            alertDiv.remove();
+                        }, 5000);
+                    }
+                });
             }
         });
     </script>
