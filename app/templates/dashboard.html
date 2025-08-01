@@ -929,27 +929,22 @@
                             <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#varAnalysisModal">
                                 ⚠️ Value at Risk
                             </button>
-                            <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
+                            <!-- <button class="btn btn-custom btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#timeSeriesModal">
                                 📈 Time Series
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                     <div class="alert alert-info mb-3">
                         <strong>💡 Advanced Risk Analysis Tools:</strong> Comprehensive suite of quantitative analytics for professional-grade investment analysis and risk management.
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class=" mb-3">
                             <div class="analytics-feature">
                                 <h5>⚠️ Value at Risk (VaR)</h5>
                                 <p><strong>Risk Assessment:</strong> Quantify potential losses using Historical, Parametric, and Monte Carlo VaR methods with Expected Shortfall analysis</p>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="analytics-feature">
-                                <h5>📈 Time Series Forecasting</h5>
-                                <p><strong>Predictive Analytics:</strong> Advanced ARIMA and GARCH models for price and volatility forecasting with statistical validation</p>
-                            </div>
-                        </div>
+                     
                     </div>
                 </div>
                 
@@ -1389,7 +1384,7 @@
     </div>
 
     <!-- Time Series Forecasting Modal -->
-    <div class="modal fade" id="timeSeriesModal" tabindex="-1">
+    <!-- <div class="modal fade" id="timeSeriesModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1424,10 +1419,7 @@
                                         <input class="form-check-input" type="checkbox" name="include_price_forecast" checked>
                                         <label class="form-check-label">Price Forecasting (ARIMA)</label>
                                     </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="include_volatility_forecast" checked>
-                                        <label class="form-check-label">Volatility Forecasting (GARCH)</label>
-                                    </div>
+                                  
                                 </div>
                             </div>
                         </div>
@@ -1470,7 +1462,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
