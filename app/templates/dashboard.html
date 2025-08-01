@@ -545,6 +545,49 @@
             }
         }
 
+        /* Tab Styling for Watchlist & Alerts */
+        .nav-tabs {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-tabs .nav-link {
+            border: 1px solid transparent;
+            border-radius: 8px 8px 0 0;
+            color: var(--text-secondary);
+            background: transparent;
+            margin-bottom: -1px;
+            padding: 12px 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: var(--accent-color);
+            background: var(--card-bg);
+            border-color: var(--border-color) var(--border-color) var(--card-bg);
+        }
+
+        .tab-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .btn-group .btn-custom {
+            margin-left: 4px;
+        }
+
+        .btn-group .btn-custom:first-child {
+            margin-left: 0;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .trading-stats-grid {
@@ -575,6 +618,16 @@
                 left: 10px;
                 right: 10px;
                 max-width: none;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .btn-group .btn-custom {
+                margin-left: 0;
+                width: 100%;
             }
         }
     </style>
@@ -730,92 +783,123 @@
                 </div>
             </div>
 
-            <!-- Watchlist Section -->
+            <!-- Combined Watchlist & Price Alerts Section -->
             <div class="col-md-6">
                 <div class="metrics-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>Watchlist</h2>
-                        <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#addWatchlistModal">
-                            Add Stock
-                        </button>
+                        <h2>📋 Watchlist & Alerts</h2>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#addWatchlistModal">
+                                📈 Add Stock
+                            </button>
+                            <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#addAlertModal">
+                                🔔 Add Alert
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="table-responsive">
-                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
-                                <tr>
-                                    <th style="color: var(--text-primary);">Symbol</th>
-                                    <th style="color: var(--text-primary);">Target</th>
-                                    <th style="color: var(--text-primary);">Current</th>
-                                    <th style="color: var(--text-primary);">Distance</th>
-                                    <th style="color: var(--text-primary);"></th>
-                                </tr>
-                            </thead>
-                            <tbody style="color: var(--text-secondary);">
-                                {% for item in watchlist %}
-                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
-                                    <td style="color: var(--text-primary);">{{ item.symbol }}</td>
-                                    <td>${{ "%.2f"|format(item.target_price) }}</td>
-                                    <td>${{ "%.2f"|format(item.current_price) }}</td>
-                                    <td class="{{ 'positive-change' if item.current_price >= item.target_price else 'negative-change' }}">
-                                        {{ "%.1f"|format(item.percent_to_target) }}%
-                                    </td>
-                                    <td>
-                                        <a href="{{ url_for('remove_from_watchlist', item_id=item.id) }}" 
-                                           class="btn btn-outline-danger btn-sm">Remove</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Price Alerts Section -->
-            <div class="col-md-12 mt-4">
-                <div class="metrics-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>Price Alerts</h2>
-                        <button class="btn btn-custom btn-sm" data-bs-toggle="modal" data-bs-target="#addAlertModal">
-                            Add Alert
-                        </button>
-                    </div>
+                    <!-- Tabs for Watchlist and Alerts -->
+                    <ul class="nav nav-tabs" id="watchlistAlertTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="watchlist-tab" data-bs-toggle="tab" data-bs-target="#watchlist-content" type="button" role="tab">
+                                📈 Watchlist ({{ watchlist|length }})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts-content" type="button" role="tab">
+                                🔔 Price Alerts ({{ alerts|length }})
+                            </button>
+                        </li>
+                    </ul>
                     
-                    <div class="table-responsive">
-                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
-                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
-                                <tr>
-                                    <th style="color: var(--text-primary);">Symbol</th>
-                                    <th style="color: var(--text-primary);">Condition</th>
-                                    <th style="color: var(--text-primary);">Target Price</th>
-                                    <th style="color: var(--text-primary);">Current Price</th>
-                                    <th style="color: var(--text-primary);">Status</th>
-                                    <th style="color: var(--text-primary);"></th>
-                                </tr>
-                            </thead>
-                            <tbody style="color: var(--text-secondary);">
-                                {% for alert in alerts %}
-                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
-                                    <td style="color: var(--text-primary);">{{ alert.symbol }}</td>
-                                    <td>Goes {{ alert.condition }}</td>
-                                    <td>${{ "%.2f"|format(alert.target_price) }}</td>
-                                    <td>${{ "%.2f"|format(alert.current_price) }}</td>
-                                    <td>
-                                        {% if alert.is_active %}
-                                        <span class="badge bg-success">Active</span>
-                                        {% else %}
-                                        <span class="badge bg-secondary">Triggered</span>
+                    <div class="tab-content" id="watchlistAlertTabsContent">
+                        <!-- Watchlist Tab Content -->
+                        <div class="tab-pane fade show active" id="watchlist-content" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                                    <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
+                                        <tr>
+                                            <th style="color: var(--text-primary);">Symbol</th>
+                                            <th style="color: var(--text-primary);">Target</th>
+                                            <th style="color: var(--text-primary);">Current</th>
+                                            <th style="color: var(--text-primary);">Distance</th>
+                                            <th style="color: var(--text-primary);"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="color: var(--text-secondary);">
+                                        {% for item in watchlist %}
+                                        <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                            <td style="color: var(--text-primary);">{{ item.symbol }}</td>
+                                            <td>${{ "%.2f"|format(item.target_price) }}</td>
+                                            <td>${{ "%.2f"|format(item.current_price) }}</td>
+                                            <td class="{{ 'positive-change' if item.current_price >= item.target_price else 'negative-change' }}">
+                                                {{ "%.1f"|format(item.percent_to_target) }}%
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('remove_from_watchlist', item_id=item.id) }}" 
+                                                   class="btn btn-outline-danger btn-sm">Remove</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% if not watchlist %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-4">
+                                                <i class="fas fa-eye-slash fa-2x mb-2"></i><br>
+                                                No stocks in watchlist. <a href="#" data-bs-toggle="modal" data-bs-target="#addWatchlistModal">Add your first stock</a>
+                                            </td>
+                                        </tr>
                                         {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{{ url_for('remove_alert', alert_id=alert.id) }}" 
-                                           class="btn btn-outline-danger btn-sm">Remove</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Price Alerts Tab Content -->
+                        <div class="tab-pane fade" id="alerts-content" role="tabpanel">
+                            <div class="table-responsive mt-3">
+                                <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                                    <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
+                                        <tr>
+                                            <th style="color: var(--text-primary);">Symbol</th>
+                                            <th style="color: var(--text-primary);">Condition</th>
+                                            <th style="color: var(--text-primary);">Target Price</th>
+                                            <th style="color: var(--text-primary);">Current Price</th>
+                                            <th style="color: var(--text-primary);">Status</th>
+                                            <th style="color: var(--text-primary);"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="color: var(--text-secondary);">
+                                        {% for alert in alerts %}
+                                        <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                            <td style="color: var(--text-primary);">{{ alert.symbol }}</td>
+                                            <td>Goes {{ alert.condition }}</td>
+                                            <td>${{ "%.2f"|format(alert.target_price) }}</td>
+                                            <td>${{ "%.2f"|format(alert.current_price) }}</td>
+                                            <td>
+                                                {% if alert.is_active %}
+                                                <span class="badge bg-success">Active</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">Triggered</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('remove_alert', alert_id=alert.id) }}" 
+                                                   class="btn btn-outline-danger btn-sm">Remove</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% if not alerts %}
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <i class="fas fa-bell-slash fa-2x mb-2"></i><br>
+                                                No price alerts set. <a href="#" data-bs-toggle="modal" data-bs-target="#addAlertModal">Create your first alert</a>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
