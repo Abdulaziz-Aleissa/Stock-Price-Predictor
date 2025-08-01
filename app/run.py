@@ -1333,6 +1333,111 @@ def compare_stocks():
     
     return jsonify(data)
 
+@app.route('/fetch_financial_data', methods=['POST'])
+@login_required
+def fetch_financial_data():
+    """Fetch financial data for a given stock symbol"""
+    try:
+        symbol = request.form.get('symbol', '').strip().upper()
+        
+        if not symbol:
+            return jsonify({'error': 'Please provide a stock symbol'})
+        
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'})
+        
+        # Fetch financial data using yfinance
+        try:
+            stock = yf.Ticker(symbol)
+            info = stock.info
+            balance_sheet = stock.balance_sheet
+            financials = stock.financials
+            
+            # Extract financial metrics with fallbacks
+            financial_data = {}
+            
+            # Try to get data from info first, then from balance sheet/financials
+            # Working Capital = Current Assets - Current Liabilities
+            current_assets = info.get('totalCurrentAssets') or (
+                balance_sheet.iloc[balance_sheet.index.get_loc('Current Assets'), 0] 
+                if not balance_sheet.empty and 'Current Assets' in balance_sheet.index 
+                else None
+            )
+            current_liabilities = info.get('totalCurrentLiabilities') or (
+                balance_sheet.iloc[balance_sheet.index.get_loc('Current Liabilities'), 0] 
+                if not balance_sheet.empty and 'Current Liabilities' in balance_sheet.index 
+                else None
+            )
+            
+            if current_assets and current_liabilities:
+                financial_data['working_capital'] = current_assets - current_liabilities
+            else:
+                financial_data['working_capital'] = None
+            
+            # Retained Earnings
+            financial_data['retained_earnings'] = info.get('retainedEarnings') or (
+                balance_sheet.iloc[balance_sheet.index.get_loc('Retained Earnings'), 0] 
+                if not balance_sheet.empty and 'Retained Earnings' in balance_sheet.index 
+                else None
+            )
+            
+            # EBIT (Earnings Before Interest and Tax)
+            financial_data['ebit'] = info.get('ebitda') or (
+                financials.iloc[financials.index.get_loc('EBIT'), 0] 
+                if not financials.empty and 'EBIT' in financials.index 
+                else None
+            )
+            
+            # Market Cap
+            financial_data['market_cap'] = info.get('marketCap')
+            
+            # Total Assets
+            financial_data['total_assets'] = info.get('totalAssets') or (
+                balance_sheet.iloc[balance_sheet.index.get_loc('Total Assets'), 0] 
+                if not balance_sheet.empty and 'Total Assets' in balance_sheet.index 
+                else None
+            )
+            
+            # Total Liabilities
+            financial_data['total_liabilities'] = info.get('totalLiab') or (
+                balance_sheet.iloc[balance_sheet.index.get_loc('Total Liabilities Net Minority Interest'), 0] 
+                if not balance_sheet.empty and 'Total Liabilities Net Minority Interest' in balance_sheet.index 
+                else None
+            )
+            
+            # Sales/Revenue
+            financial_data['sales'] = info.get('totalRevenue') or (
+                financials.iloc[financials.index.get_loc('Total Revenue'), 0] 
+                if not financials.empty and 'Total Revenue' in financials.index 
+                else None
+            )
+            
+            # Interest Expense
+            financial_data['interest_expense'] = info.get('interestExpense') or (
+                financials.iloc[financials.index.get_loc('Interest Expense'), 0] 
+                if not financials.empty and 'Interest Expense' in financials.index 
+                else None
+            )
+            
+            # Convert to millions for display (values are typically in full amounts)
+            for key, value in financial_data.items():
+                if value is not None:
+                    financial_data[key] = round(value / 1_000_000, 2)  # Convert to millions
+            
+            return jsonify({
+                'success': True,
+                'symbol': symbol,
+                'financial_data': financial_data,
+                'company_name': info.get('longName', symbol)
+            })
+            
+        except Exception as e:
+            logger.error(f"Error fetching financial data for {symbol}: {str(e)}")
+            return jsonify({'error': f'Could not fetch financial data for {symbol}. Please try again or enter data manually.'})
+        
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'})
+
 @app.route('/fundamental_risk_analysis', methods=['POST'])
 @login_required
 def fundamental_risk_analysis():

@@ -1223,77 +1223,123 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="fundamentalRiskForm">
-                        <div class="row">
-                            <div class="col-md-6">
+                    <!-- Step 1: Stock Symbol and Find Button -->
+                    <div id="symbolStep">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
                                 <div class="mb-3">
                                     <label class="form-label">Stock Symbol</label>
-                                    <input type="text" class="form-control" name="symbol" placeholder="e.g., AAPL" required>
+                                    <input type="text" class="form-control" id="fundamentalSymbol" placeholder="e.g., AAPL" required>
+                                    <div class="form-text">Enter a stock symbol to automatically fetch financial data</div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Working Capital (millions $)</label>
-                                    <input type="number" class="form-control" name="working_capital" placeholder="e.g., 2500" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Retained Earnings (millions $)</label>
-                                    <input type="number" class="form-control" name="retained_earnings" placeholder="e.g., 15000" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">EBIT (millions $)</label>
-                                    <input type="number" class="form-control" name="ebit" placeholder="e.g., 8500" required>
-                                </div>
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-custom w-100 mb-3" id="findFinancialDataBtn">
+                                    <span class="spinner-border spinner-border-sm d-none" id="findDataSpinner"></span>
+                                    📊 Find Data
+                                </button>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Market Cap (millions $)</label>
-                                    <input type="number" class="form-control" name="market_cap" placeholder="e.g., 180000" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Total Assets (millions $)</label>
-                                    <input type="number" class="form-control" name="total_assets" placeholder="e.g., 35000" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Total Liabilities (millions $)</label>
-                                    <input type="number" class="form-control" name="total_liabilities" placeholder="e.g., 20000" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Sales/Revenue (millions $)</label>
-                                    <input type="number" class="form-control" name="sales" placeholder="e.g., 25000" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Interest Expense (millions $)</label>
-                                    <input type="number" class="form-control" name="interest_expense" placeholder="e.g., 150" required>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-custom w-100">
-                            <span class="spinner-border spinner-border-sm d-none" id="fundamentalRiskSpinner"></span>
-                            Run Fundamental Risk Analysis
-                        </button>
-                    </form>
+                        <div id="fetchError" class="alert alert-danger" style="display: none;"></div>
+                    </div>
                     
+                    <!-- Step 2: Display Financial Data with Tooltips -->
+                    <div id="financialDataStep" style="display: none;">
+                        <div class="alert alert-success">
+                            <strong>✅ Financial data found for <span id="companyName"></span></strong><br>
+                            <small>Review the data below and hover over labels for explanations. You can edit any values if needed.</small>
+                        </div>
+                        
+                        <form id="fundamentalRiskForm">
+                            <input type="hidden" name="symbol" id="hiddenSymbol">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Working Capital = Current Assets - Current Liabilities. Measures company's short-term financial health and operational efficiency.">
+                                            💰 Working Capital (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="working_capital" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Retained Earnings are the cumulative net earnings that have been kept in the company rather than paid out as dividends.">
+                                            🏦 Retained Earnings (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="retained_earnings" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="EBIT (Earnings Before Interest and Tax) measures a company's profitability before interest and tax expenses.">
+                                            📈 EBIT (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="ebit" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Market Capitalization is the total value of all company shares in the stock market.">
+                                            🏢 Market Cap (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="market_cap" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Total Assets represents everything the company owns that has value, including cash, inventory, equipment, and property.">
+                                            🏗️ Total Assets (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="total_assets" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Total Liabilities represents all financial obligations and debts the company owes to others.">
+                                            📋 Total Liabilities (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="total_liabilities" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Sales/Revenue is the total amount of money generated from the company's core business operations.">
+                                            💵 Sales/Revenue (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="sales" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                               title="Interest Expense is the cost of borrowing money, including interest paid on loans, bonds, and other debt.">
+                                            💸 Interest Expense (millions $) <i class="text-info">ℹ️</i>
+                                        </label>
+                                        <input type="number" class="form-control" name="interest_expense" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-custom w-100">
+                                <span class="spinner-border spinner-border-sm d-none" id="fundamentalRiskSpinner"></span>
+                                🔍 Run Fundamental Risk Analysis
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Results Section -->
                     <div id="fundamentalRiskResults" class="mt-4" style="display: none;">
                         <hr>
                         <div class="row">
@@ -1725,6 +1771,99 @@
         }
     });
 
+    // Find Financial Data Button Handler
+    document.getElementById('findFinancialDataBtn').addEventListener('click', function() {
+        const symbol = document.getElementById('fundamentalSymbol').value.trim().toUpperCase();
+        const spinner = document.getElementById('findDataSpinner');
+        const errorDiv = document.getElementById('fetchError');
+        const financialDataStep = document.getElementById('financialDataStep');
+        
+        if (!symbol) {
+            errorDiv.textContent = 'Please enter a stock symbol';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        // Show loading state
+        spinner.classList.remove('d-none');
+        errorDiv.style.display = 'none';
+        this.disabled = true;
+        
+        const formData = new FormData();
+        formData.append('symbol', symbol);
+        
+        fetch('/fetch_financial_data', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            spinner.classList.add('d-none');
+            this.disabled = false;
+            
+            if (data.error) {
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Populate financial data fields
+            populateFinancialData(data);
+            
+            // Show the financial data step
+            financialDataStep.style.display = 'block';
+            
+            // Initialize tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            tooltipTriggerList.forEach(tooltipTriggerEl => {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        })
+        .catch(error => {
+            spinner.classList.add('d-none');
+            this.disabled = false;
+            errorDiv.textContent = 'An error occurred while fetching financial data. Please try again.';
+            errorDiv.style.display = 'block';
+            console.error('Error:', error);
+        });
+    });
+
+    function populateFinancialData(data) {
+        const { symbol, financial_data, company_name } = data;
+        
+        // Update company name display
+        document.getElementById('companyName').textContent = company_name;
+        document.getElementById('hiddenSymbol').value = symbol;
+        
+        // Populate form fields with fetched data
+        const form = document.getElementById('fundamentalRiskForm');
+        
+        if (financial_data.working_capital !== null) {
+            form.querySelector('[name="working_capital"]').value = financial_data.working_capital;
+        }
+        if (financial_data.retained_earnings !== null) {
+            form.querySelector('[name="retained_earnings"]').value = financial_data.retained_earnings;
+        }
+        if (financial_data.ebit !== null) {
+            form.querySelector('[name="ebit"]').value = financial_data.ebit;
+        }
+        if (financial_data.market_cap !== null) {
+            form.querySelector('[name="market_cap"]').value = financial_data.market_cap;
+        }
+        if (financial_data.total_assets !== null) {
+            form.querySelector('[name="total_assets"]').value = financial_data.total_assets;
+        }
+        if (financial_data.total_liabilities !== null) {
+            form.querySelector('[name="total_liabilities"]').value = financial_data.total_liabilities;
+        }
+        if (financial_data.sales !== null) {
+            form.querySelector('[name="sales"]').value = financial_data.sales;
+        }
+        if (financial_data.interest_expense !== null) {
+            form.querySelector('[name="interest_expense"]').value = financial_data.interest_expense;
+        }
+    }
+
     // Fundamental Risk Analysis Form Handler
     document.getElementById('fundamentalRiskForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -1762,6 +1901,25 @@
             errorDiv.style.display = 'block';
             console.error('Error:', error);
         });
+    });
+
+    // Reset modal when it's opened
+    document.getElementById('fundamentalRiskModal').addEventListener('show.bs.modal', function() {
+        // Reset to step 1
+        document.getElementById('symbolStep').style.display = 'block';
+        document.getElementById('financialDataStep').style.display = 'none';
+        document.getElementById('fundamentalRiskResults').style.display = 'none';
+        document.getElementById('fetchError').style.display = 'none';
+        document.getElementById('fundamentalRiskError').style.display = 'none';
+        
+        // Clear form
+        document.getElementById('fundamentalSymbol').value = '';
+        document.getElementById('fundamentalRiskForm').reset();
+        
+        // Reset spinners and buttons
+        document.getElementById('findDataSpinner').classList.add('d-none');
+        document.getElementById('fundamentalRiskSpinner').classList.add('d-none');
+        document.getElementById('findFinancialDataBtn').disabled = false;
     });
 
     // Technical Risk Analysis Form Handler
