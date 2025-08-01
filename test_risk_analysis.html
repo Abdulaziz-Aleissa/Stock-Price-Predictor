@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Risk Analysis Testing Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Risk Analysis Testing Interface</h1>
+        <p style="text-align: center; color: #666;">Test the new fundamental and technical risk analysis functionality</p>
+        
+        <div class="grid">
+            <!-- Fundamental Risk Analysis -->
+            <div class="section">
+                <h2>🏛️ Fundamental Risk Analysis</h2>
+                <p><strong>Calculates:</strong> Altman Z-Score + Interest Coverage Ratio</p>
+                
+                <form id="fundamentalForm">
+                    <div class="form-group">
+                        <label for="fund_symbol">Stock Symbol:</label>
+                        <input type="text" id="fund_symbol" name="symbol" placeholder="e.g., AAPL" required>
+                    </div>
+                    
+                    <h3>Financial Data (in millions USD):</h3>
+                    
+                    <div class="form-group">
+                        <label for="working_capital">Working Capital:</label>
+                        <input type="number" id="working_capital" name="working_capital" step="0.01" placeholder="e.g., 10000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="retained_earnings">Retained Earnings:</label>
+                        <input type="number" id="retained_earnings" name="retained_earnings" step="0.01" placeholder="e.g., 50000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ebit">EBIT (Earnings Before Interest & Tax):</label>
+                        <input type="number" id="ebit" name="ebit" step="0.01" placeholder="e.g., 25000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="market_cap">Market Cap:</label>
+                        <input type="number" id="market_cap" name="market_cap" step="0.01" placeholder="e.g., 300000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="total_assets">Total Assets:</label>
+                        <input type="number" id="total_assets" name="total_assets" step="0.01" placeholder="e.g., 100000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="total_liabilities">Total Liabilities:</label>
+                        <input type="number" id="total_liabilities" name="total_liabilities" step="0.01" placeholder="e.g., 60000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sales">Sales/Revenue:</label>
+                        <input type="number" id="sales" name="sales" step="0.01" placeholder="e.g., 80000" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="interest_expense">Interest Expense:</label>
+                        <input type="number" id="interest_expense" name="interest_expense" step="0.01" placeholder="e.g., 1000" required>
+                    </div>
+                    
+                    <button type="submit">Analyze Fundamental Risk</button>
+                </form>
+                
+                <div id="fundamentalResults" class="results" style="display: none;"></div>
+            </div>
+            
+            <!-- Technical Risk Analysis -->
+            <div class="section">
+                <h2>📊 Technical Risk Analysis</h2>
+                <p><strong>Calculates:</strong> ATR + Support Zone Risk</p>
+                
+                <form id="technicalForm">
+                    <div class="form-group">
+                        <label for="tech_symbol">Stock Symbol:</label>
+                        <input type="text" id="tech_symbol" name="symbol" placeholder="e.g., AAPL" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="support_level">Support Level (Optional):</label>
+                        <input type="number" id="support_level" name="support_level" step="0.01" placeholder="e.g., 180.00">
+                        <small style="color: #666;">Leave empty to use 6-month low as estimate</small>
+                    </div>
+                    
+                    <button type="submit">Analyze Technical Risk</button>
+                </form>
+                
+                <div id="technicalResults" class="results" style="display: none;"></div>
+            </div>
+        </div>
+        
+        <!-- Comprehensive Analysis -->
+        <div class="section">
+            <h2>🔬 Comprehensive Risk Analysis</h2>
+            <p><strong>Combines:</strong> Both Fundamental and Technical Analysis</p>
+            
+            <form id="comprehensiveForm">
+                <div class="form-group">
+                    <label for="comp_symbol">Stock Symbol:</label>
+                    <input type="text" id="comp_symbol" name="symbol" placeholder="e.g., AAPL" required>
+                </div>
+                
+                <h3>Optional Fundamental Data (leave blank to skip):</h3>
+                <div class="grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="comp_working_capital">Working Capital:</label>
+                            <input type="number" id="comp_working_capital" name="working_capital" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_retained_earnings">Retained Earnings:</label>
+                            <input type="number" id="comp_retained_earnings" name="retained_earnings" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_ebit">EBIT:</label>
+                            <input type="number" id="comp_ebit" name="ebit" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_market_cap">Market Cap:</label>
+                            <input type="number" id="comp_market_cap" name="market_cap" step="0.01">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="comp_total_assets">Total Assets:</label>
+                            <input type="number" id="comp_total_assets" name="total_assets" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_total_liabilities">Total Liabilities:</label>
+                            <input type="number" id="comp_total_liabilities" name="total_liabilities" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_sales">Sales:</label>
+                            <input type="number" id="comp_sales" name="sales" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comp_interest_expense">Interest Expense:</label>
+                            <input type="number" id="comp_interest_expense" name="interest_expense" step="0.01">
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Optional Technical Data:</h3>
+                <div class="form-group">
+                    <label for="comp_support_level">Support Level:</label>
+                    <input type="number" id="comp_support_level" name="support_level" step="0.01">
+                </div>
+                
+                <button type="submit">Run Comprehensive Analysis</button>
+            </form>
+            
+            <div id="comprehensiveResults" class="results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Fundamental Risk Analysis
+        document.getElementById('fundamentalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultsDiv = document.getElementById('fundamentalResults');
+            
+            try {
+                const response = await fetch('/fundamental_risk_analysis', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultsDiv.className = 'results success';
+                    resultsDiv.innerHTML = formatFundamentalResults(result.results);
+                } else {
+                    resultsDiv.className = 'results error';
+                    resultsDiv.innerHTML = 'Error: ' + result.error;
+                }
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                resultsDiv.className = 'results error';
+                resultsDiv.innerHTML = 'Network error: ' + error.message;
+                resultsDiv.style.display = 'block';
+            }
+        });
+
+        // Technical Risk Analysis
+        document.getElementById('technicalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultsDiv = document.getElementById('technicalResults');
+            
+            try {
+                const response = await fetch('/technical_risk_analysis', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultsDiv.className = 'results success';
+                    resultsDiv.innerHTML = formatTechnicalResults(result.results);
+                } else {
+                    resultsDiv.className = 'results error';
+                    resultsDiv.innerHTML = 'Error: ' + result.error;
+                }
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                resultsDiv.className = 'results error';
+                resultsDiv.innerHTML = 'Network error: ' + error.message;
+                resultsDiv.style.display = 'block';
+            }
+        });
+
+        // Comprehensive Risk Analysis
+        document.getElementById('comprehensiveForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const resultsDiv = document.getElementById('comprehensiveResults');
+            
+            try {
+                const response = await fetch('/comprehensive_risk_analysis', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultsDiv.className = 'results success';
+                    resultsDiv.innerHTML = formatComprehensiveResults(result.results);
+                } else {
+                    resultsDiv.className = 'results error';
+                    resultsDiv.innerHTML = 'Error: ' + result.error;
+                }
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                resultsDiv.className = 'results error';
+                resultsDiv.innerHTML = 'Network error: ' + error.message;
+                resultsDiv.style.display = 'block';
+            }
+        });
+
+        function formatFundamentalResults(results) {
+            return `
+=== FUNDAMENTAL RISK ANALYSIS ===
+Symbol: ${results.symbol}
+
+🏛️ ALTMAN Z-SCORE ANALYSIS:
+   Z-Score: ${results.altman_z_score.value}
+   Risk Level: ${results.altman_z_score.risk_level}
+   Interpretation: ${results.altman_z_score.interpretation}
+
+📊 INTEREST COVERAGE ANALYSIS:
+   Ratio: ${results.interest_coverage_ratio.value}
+   Calculation: ${results.interest_coverage_ratio.calculation}
+   Risk Level: ${results.interest_coverage_ratio.risk_level}
+   Interpretation: ${results.interest_coverage_ratio.interpretation}
+
+🎯 OVERALL ASSESSMENT:
+   Risk Level: ${results.overall_assessment.risk_level}
+   ${results.overall_assessment.interpretation}
+   Score: ${results.overall_assessment.score}/3.0
+
+📋 INPUT SUMMARY:
+   Working Capital: ${results.inputs_summary.working_capital}
+   Retained Earnings: ${results.inputs_summary.retained_earnings}
+   EBIT: ${results.inputs_summary.ebit}
+   Market Cap: ${results.inputs_summary.market_cap}
+   Total Assets: ${results.inputs_summary.total_assets}
+   Total Liabilities: ${results.inputs_summary.total_liabilities}
+   Sales: ${results.inputs_summary.sales}
+   Interest Expense: ${results.inputs_summary.interest_expense}
+            `;
+        }
+
+        function formatTechnicalResults(results) {
+            return `
+=== TECHNICAL RISK ANALYSIS ===
+Symbol: ${results.symbol}
+
+💰 CURRENT MARKET DATA:
+   Current Price: $${results.current_price}
+   Support Level: $${results.support_level.value} (${results.support_level.source})
+
+📈 ATR ANALYSIS (14-day):
+   ATR Value: $${results.atr_analysis.atr_14_day}
+   ATR Percentage: ${results.atr_analysis.atr_percentage}%
+   Volatility Assessment: ${results.atr_analysis.volatility_assessment}
+
+⚠️ RISK METRICS:
+   Downside Risk: $${results.risk_metrics.downside_risk_dollars} (${results.risk_metrics.downside_risk_percentage}%)
+   ATR Risk Units: ${results.risk_metrics.atr_risk_units}
+   Estimated Risk Days: ${results.risk_metrics.estimated_risk_days}
+   Risk Level: ${results.risk_metrics.risk_level}
+   ${results.risk_metrics.interpretation}
+
+📊 VOLATILITY METRICS:
+   Daily Volatility: ${results.volatility_metrics.daily_volatility}%
+   Annualized Volatility: ${results.volatility_metrics.annualized_volatility}%
+
+📅 ANALYSIS PERIOD:
+   From: ${results.analysis_period.start_date}
+   To: ${results.analysis_period.end_date}
+   Trading Days: ${results.analysis_period.trading_days}
+            `;
+        }
+
+        function formatComprehensiveResults(results) {
+            let output = `=== COMPREHENSIVE RISK ANALYSIS ===
+Symbol: ${results.symbol}
+Analysis Date: ${results.analysis_date}
+
+`;
+
+            if (results.fundamental_analysis && results.fundamental_analysis.success) {
+                output += formatFundamentalResults(results.fundamental_analysis) + '\n\n';
+            } else if (results.fundamental_analysis && results.fundamental_analysis.error) {
+                output += `❌ FUNDAMENTAL ANALYSIS FAILED: ${results.fundamental_analysis.error}\n\n`;
+            } else {
+                output += `⚠️ FUNDAMENTAL ANALYSIS SKIPPED: Insufficient data provided\n\n`;
+            }
+
+            if (results.technical_analysis && results.technical_analysis.success) {
+                output += formatTechnicalResults(results.technical_analysis);
+            } else if (results.technical_analysis && results.technical_analysis.error) {
+                output += `❌ TECHNICAL ANALYSIS FAILED: ${results.technical_analysis.error}`;
+            }
+
+            return output;
+        }
+    </script>
+</body>
+</html>

@@ -3,8 +3,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 import os
 from app.utils.stock_scoring import StockScoring
 from app.utils.news_api import news_api
-from app.utils.monte_carlo import monte_carlo_simulator
-from app.utils.backtesting import backtesting_framework
+
 from app.utils.options_pricing import options_pricing
 from app.utils.value_at_risk import var_analyzer
 from app.utils.time_series_forecasting import ts_forecaster
@@ -838,7 +837,6 @@ def predict():
         logger.error(f"Error in prediction: {str(e)}")
         return render_template('error.html', error=str(e))
 
-
 @app.route('/run_backtest', methods=['POST'])
 def run_backtest():
     """Handle backtest requests with user-selected duration"""
@@ -891,6 +889,9 @@ def run_backtest():
     except Exception as e:
         logger.error(f"Error in run_backtest: {str(e)}")
         return jsonify({'error': f'Backtest calculation failed: {str(e)}'}), 500
+
+
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -1157,20 +1158,30 @@ def mark_notification_read(notification_id):
 @login_required
 def paper_buy():
     try:
-        symbol = request.form['symbol'].upper()
+        symbol = request.form['symbol'].strip().upper()
         shares = float(request.form['shares'])
         price = float(request.form['price'])
         
+        # Improved validation with specific error messages
+        if not symbol:
+            flash('Please enter a stock symbol')
+            return redirect(url_for('dashboard'))
+        
+        # Basic symbol format validation
+        if not symbol.isalpha() or len(symbol) < 1 or len(symbol) > 5:
+            flash(f'Invalid stock symbol format: "{symbol}". Please enter 1-5 letters only.')
+            return redirect(url_for('dashboard'))
+        
         if not is_valid_ticker(symbol):
-            flash('Invalid ticker symbol')
+            flash(f'Stock symbol "{symbol}" not found. Please check the symbol and try again.')
             return redirect(url_for('dashboard'))
         
         if shares <= 0:
-            flash('Shares must be positive')
+            flash('Number of shares must be positive')
             return redirect(url_for('dashboard'))
             
         if price <= 0:
-            flash('Price must be positive')
+            flash('Share price must be positive')
             return redirect(url_for('dashboard'))
         
         total_cost = shares * price
@@ -1178,7 +1189,7 @@ def paper_buy():
         # Check cash balance
         cash_balance = get_or_create_paper_cash_balance(current_user.id)
         if cash_balance.cash_balance < total_cost:
-            flash('Insufficient virtual cash')
+            flash(f'Insufficient virtual cash. Available: ${cash_balance.cash_balance:.2f}, Required: ${total_cost:.2f}')
             return redirect(url_for('dashboard'))
         
         # Execute transaction
@@ -1200,10 +1211,10 @@ def paper_buy():
         update_paper_portfolio(current_user.id, symbol, shares, price, 'BUY')
         
         db.commit()
-        flash(f'Successfully bought {shares} shares of {symbol} at ${price:.2f}')
+        flash(f'✅ Successfully bought {shares} shares of {symbol} at ${price:.2f}', 'success')
         
-    except ValueError:
-        flash('Invalid input values')
+    except ValueError as e:
+        flash('Invalid input values. Please check your numbers and try again.')
     except Exception as e:
         flash(f'Error executing buy order: {str(e)}')
     
@@ -1213,16 +1224,21 @@ def paper_buy():
 @login_required
 def paper_sell():
     try:
-        symbol = request.form['symbol'].upper()
+        symbol = request.form['symbol'].strip().upper()
         shares = float(request.form['shares'])
         price = float(request.form['price'])
         
+        # Improved validation with specific error messages
+        if not symbol:
+            flash('Please enter a stock symbol')
+            return redirect(url_for('dashboard'))
+        
         if shares <= 0:
-            flash('Shares must be positive')
+            flash('Number of shares must be positive')
             return redirect(url_for('dashboard'))
             
         if price <= 0:
-            flash('Price must be positive')
+            flash('Share price must be positive')
             return redirect(url_for('dashboard'))
         
         # Check if user has enough shares
@@ -1231,8 +1247,12 @@ def paper_sell():
             stock_symbol=symbol
         ).first()
         
-        if not position or position.shares < shares:
-            flash('Insufficient shares to sell')
+        if not position:
+            flash(f'You do not own any shares of {symbol}')
+            return redirect(url_for('dashboard'))
+        
+        if position.shares < shares:
+            flash(f'Insufficient shares to sell. You own {position.shares} shares of {symbol}, but tried to sell {shares}')
             return redirect(url_for('dashboard'))
         
         total_proceeds = shares * price
@@ -1259,10 +1279,10 @@ def paper_sell():
             return redirect(url_for('dashboard'))
         
         db.commit()
-        flash(f'Successfully sold {shares} shares of {symbol} at ${price:.2f}')
+        flash(f'✅ Successfully sold {shares} shares of {symbol} at ${price:.2f}', 'success')
         
-    except ValueError:
-        flash('Invalid input values')
+    except ValueError as e:
+        flash('Invalid input values. Please check your numbers and try again.')
     except Exception as e:
         flash(f'Error executing sell order: {str(e)}')
     
@@ -1366,88 +1386,12 @@ def compare_stocks():
     
     return jsonify(data)
 
-@app.route('/monte_carlo_simulation', methods=['POST'])
-@login_required
-def monte_carlo_simulation():
-    """Handle Monte Carlo simulation requests"""
-    try:
-        symbol = request.form.get('symbol', '').strip().upper()
-        days = int(request.form.get('days', 30))
-        simulations = int(request.form.get('simulations', 1000))
-        investment_amount = float(request.form.get('investment_amount', 10000))
-        
-        if not symbol:
-            return jsonify({'error': 'Please provide a stock symbol'})
-        
-        if not is_valid_ticker(symbol):
-            return jsonify({'error': 'Invalid ticker symbol'})
-        
-        # Limit parameters for performance
-        days = min(max(days, 1), 365)  # 1 to 365 days
-        simulations = min(max(simulations, 100), 10000)  # 100 to 10,000 simulations
-        investment_amount = min(max(investment_amount, 100), 1000000)  # $100 to $1M
-        
-        # Run risk analysis
-        results = monte_carlo_simulator.risk_analysis(symbol, investment_amount)
-        
-        if "error" in results:
-            return jsonify(results)
-        
-        return jsonify({
-            'success': True,
-            'results': results
-        })
-        
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
-    except Exception as e:
-        return jsonify({'error': f'Simulation failed: {str(e)}'})
 
-@app.route('/backtesting', methods=['POST'])
-@login_required
-def backtesting():
-    """Handle backtesting requests"""
-    try:
-        symbol = request.form.get('symbol', '').strip().upper()
-        strategy = request.form.get('strategy', 'moving_average_crossover')
-        initial_capital = float(request.form.get('initial_capital', 10000))
-        
-        if not symbol:
-            return jsonify({'error': 'Please provide a stock symbol'})
-        
-        if not is_valid_ticker(symbol):
-            return jsonify({'error': 'Invalid ticker symbol'})
-        
-        # Limit initial capital
-        initial_capital = min(max(initial_capital, 1000), 1000000)  # $1K to $1M
-        
-        # Valid strategies
-        valid_strategies = [
-            'buy_and_hold',
-            'moving_average_crossover',
-            'rsi_strategy',
-            'macd_strategy',
-            'bollinger_bands'
-        ]
-        
-        if strategy not in valid_strategies:
-            return jsonify({'error': f'Invalid strategy. Choose from: {", ".join(valid_strategies)}'})
-        
-        # Run backtest
-        results = backtesting_framework.backtest_strategy(symbol, strategy, initial_capital)
-        
-        if "error" in results:
-            return jsonify(results)
-        
-        return jsonify({
-            'success': True,
-            'results': results
-        })
-        
-    except ValueError as e:
-        return jsonify({'error': 'Invalid input parameters'})
-    except Exception as e:
-        return jsonify({'error': f'Backtesting failed: {str(e)}'})
+
+
+
+
+
 
 @app.route('/value_at_risk', methods=['POST'])
 @login_required
