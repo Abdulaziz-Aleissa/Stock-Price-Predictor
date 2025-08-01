@@ -1804,6 +1804,22 @@
             if (data.error) {
                 errorDiv.textContent = data.error;
                 errorDiv.style.display = 'block';
+                
+                // If it's a network error, show the manual form anyway for user convenience
+                if (data.network_error || data.show_manual_form) {
+                    // Pre-populate symbol and company name, show empty form for manual entry
+                    document.getElementById('companyName').textContent = symbolInput.value.toUpperCase();
+                    document.getElementById('hiddenSymbol').value = symbolInput.value.toUpperCase();
+                    
+                    // Show the financial data step with empty fields for manual entry
+                    financialDataStep.style.display = 'block';
+                    
+                    // Initialize tooltips
+                    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                    tooltipTriggerList.forEach(tooltipTriggerEl => {
+                        new bootstrap.Tooltip(tooltipTriggerEl);
+                    });
+                }
                 return;
             }
             

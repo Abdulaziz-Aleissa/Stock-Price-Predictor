@@ -1433,7 +1433,17 @@ def fetch_financial_data():
             
         except Exception as e:
             logger.error(f"Error fetching financial data for {symbol}: {str(e)}")
-            return jsonify({'error': f'Could not fetch financial data for {symbol}. Please try again or enter data manually.'})
+            
+            # Check for network connectivity issues
+            error_str = str(e).lower()
+            if any(keyword in error_str for keyword in ['dns', 'resolve host', 'connection', 'network', 'timeout']):
+                return jsonify({
+                    'error': f'Unable to connect to financial data provider. This may be due to network restrictions. Please enter the financial data manually using the form below.',
+                    'network_error': True,
+                    'show_manual_form': True
+                })
+            else:
+                return jsonify({'error': f'Could not fetch financial data for {symbol}. Please try again or enter data manually.'})
         
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'})
