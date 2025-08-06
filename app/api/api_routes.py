@@ -12,9 +12,10 @@ from app.components.portfolio_summary import portfolio_summary_calculator
 from app.components.watchlist_alerts import watchlist_alerts_manager
 from app.data.yfinance_data import yfinance_data
 from app.database.db_operations import db_operations
-from app.utils.options_pricing import options_pricing
-from app.utils.value_at_risk import var_analyzer
-from app.utils.time_series_forecasting import ts_forecaster
+from app.components.options_module import OptionsManager
+from app.components.risk_module import RiskManager
+from app.components.forecast_module import ForecastManager
+from app.components.compare_module import compare_manager
 from models.train_classifier import evaluate_model, load_data as load_db_data
 from sklearn.ensemble import GradientBoostingRegressor
 from datetime import datetime, timedelta
@@ -36,6 +37,10 @@ class APIRoutes:
         self.data_fetcher = yfinance_data
         self.db_ops = db_operations
         self.auth_routes = auth_routes
+        self.options_manager = OptionsManager()
+        self.risk_manager = RiskManager()
+        self.forecast_manager = ForecastManager()
+        self.compare_manager = compare_manager
     
     # Authentication routes
     def signup_route(self):
@@ -443,6 +448,133 @@ class APIRoutes:
         except Exception as e:
             logger.error(f"Error calculating backtest metrics: {str(e)}")
             return {'error': f'Backtest calculation failed: {str(e)}'}
+    
+    # Advanced Analytics Routes
+    def compare_stocks_route(self):
+        """Handle stock comparison requests"""
+        try:
+            symbol1 = request.form.get('symbol1', '').strip().upper()
+            symbol2 = request.form.get('symbol2', '').strip().upper()
+            timeframe = request.form.get('timeframe', '1y')
+            
+            if not symbol1 or not symbol2:
+                return jsonify({'error': 'Both stock symbols are required'}), 400
+            
+            comparison_data = self.compare_manager.compare_stocks(symbol1, symbol2, timeframe)
+            
+            if comparison_data:
+                return jsonify(comparison_data)
+            else:
+                return jsonify({'error': 'Unable to compare stocks. Please check symbols and try again.'}), 400
+                
+        except Exception as e:
+            logger.error(f"Error in compare_stocks: {str(e)}")
+            return jsonify({'error': f'Stock comparison failed: {str(e)}'}), 500
+    
+    def value_at_risk_route(self):
+        """Handle Value at Risk analysis requests"""
+        try:
+            symbol = request.form.get('symbol', '').strip().upper()
+            confidence_level = float(request.form.get('confidence_level', 0.95))
+            time_horizon = int(request.form.get('time_horizon', 1))
+            
+            if not symbol:
+                return jsonify({'error': 'Stock symbol is required'}), 400
+            
+            if not (0 < confidence_level < 1):
+                return jsonify({'error': 'Confidence level must be between 0 and 1'}), 400
+                
+            var_result = self.risk_manager.calculate_individual_var(
+                symbol, confidence_level, time_horizon
+            )
+            
+            if var_result:
+                return jsonify(var_result)
+            else:
+                return jsonify({'error': 'Unable to calculate VaR. Please check symbol and try again.'}), 400
+                
+        except ValueError as e:
+            return jsonify({'error': 'Invalid input parameters'}), 400
+        except Exception as e:
+            logger.error(f"Error in value_at_risk: {str(e)}")
+            return jsonify({'error': f'VaR analysis failed: {str(e)}'}), 500
+    
+    def time_series_forecasting_route(self):
+        """Handle time series forecasting requests"""
+        try:
+            symbol = request.form.get('symbol', '').strip().upper()
+            forecast_days = int(request.form.get('forecast_days', 30))
+            model_type = request.form.get('model_type', 'arima')
+            
+            if not symbol:
+                return jsonify({'error': 'Stock symbol is required'}), 400
+            
+            if forecast_days <= 0 or forecast_days > 365:
+                return jsonify({'error': 'Forecast days must be between 1 and 365'}), 400
+            
+            forecast_result = self.forecast_manager.generate_price_forecast(
+                symbol, forecast_days, model_type
+            )
+            
+            if forecast_result:
+                return jsonify(forecast_result)
+            else:
+                return jsonify({'error': 'Unable to generate forecast. Please check symbol and try again.'}), 400
+                
+        except ValueError as e:
+            return jsonify({'error': 'Invalid input parameters'}), 400
+        except Exception as e:
+            logger.error(f"Error in time_series_forecasting: {str(e)}")
+            return jsonify({'error': f'Time series forecasting failed: {str(e)}'}), 500
+    
+    def options_pricing_route(self):
+        """Handle options pricing requests"""
+        try:
+            symbol = request.form.get('symbol', '').strip().upper()
+            strike_price = float(request.form.get('strike_price', 0))
+            time_to_expiry = float(request.form.get('time_to_expiry', 30)) / 365  # Convert days to years
+            risk_free_rate = float(request.form.get('risk_free_rate', 0.02))
+            volatility = float(request.form.get('volatility', 0.2))
+            option_type = request.form.get('option_type', 'call').lower()
+            
+            if not symbol:
+                return jsonify({'error': 'Stock symbol is required'}), 400
+            
+            # Get current stock price
+            current_price = self.data_fetcher.get_current_price(symbol)
+            if not current_price:
+                return jsonify({'error': 'Unable to fetch current stock price'}), 400
+            
+            spot_price = float(current_price)
+            
+            # Calculate Black-Scholes price
+            bs_result = self.options_manager.calculate_black_scholes(
+                spot_price, strike_price, time_to_expiry, risk_free_rate, volatility, option_type
+            )
+            
+            # Calculate Greeks
+            greeks_result = self.options_manager.calculate_greeks(
+                spot_price, strike_price, time_to_expiry, risk_free_rate, volatility, option_type
+            )
+            
+            if bs_result and greeks_result:
+                return jsonify({
+                    'symbol': symbol,
+                    'current_price': spot_price,
+                    'strike_price': strike_price,
+                    'time_to_expiry_days': int(time_to_expiry * 365),
+                    'option_type': option_type,
+                    'black_scholes': bs_result,
+                    'greeks': greeks_result
+                })
+            else:
+                return jsonify({'error': 'Unable to calculate options pricing'}), 400
+                
+        except ValueError as e:
+            return jsonify({'error': 'Invalid input parameters'}), 400
+        except Exception as e:
+            logger.error(f"Error in options_pricing: {str(e)}")
+            return jsonify({'error': f'Options pricing failed: {str(e)}'}), 500
 
 
 # Global instance to be used across the application

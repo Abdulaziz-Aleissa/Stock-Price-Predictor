@@ -202,6 +202,34 @@ def get_stock_price(symbol):
 # For example: compare_stocks, value_at_risk, time_series_forecasting, options_pricing
 # These would be implemented in api_routes.py following the same pattern
 
+# Advanced Analytics Routes
+@app.route('/compare_stocks', methods=['POST'])
+@login_required
+def compare_stocks():
+    """Handle stock comparison requests"""
+    return api_routes.compare_stocks_route()
+
+
+@app.route('/value_at_risk', methods=['POST'])
+@login_required
+def value_at_risk():
+    """Handle Value at Risk analysis requests"""
+    return api_routes.value_at_risk_route()
+
+
+@app.route('/time_series_forecasting', methods=['POST'])
+@login_required
+def time_series_forecasting():
+    """Handle time series forecasting requests"""
+    return api_routes.time_series_forecasting_route()
+
+
+@app.route('/options_pricing', methods=['POST'])
+@login_required
+def options_pricing():
+    """Handle options pricing requests"""
+    return api_routes.options_pricing_route()
+
 
 # Error handlers
 @app.errorhandler(404)
