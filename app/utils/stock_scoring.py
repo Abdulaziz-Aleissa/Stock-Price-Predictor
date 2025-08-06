@@ -87,7 +87,6 @@ class StockScoring:
             return metrics
 
         except Exception as e:
-            print(f"Error fetching data for {symbol}: {str(e)}")
             return {}
 
     def _calculate_rsi(self, prices: pd.Series, period: int = 14) -> Optional[float]:
