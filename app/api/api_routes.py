@@ -130,33 +130,33 @@ class APIRoutes:
     def predict_route(self):
         """Handle prediction requests"""
         try:
-            stock_ticker = request.form.get('stock_ticker', '').strip().upper()
+            stock_ticker = request.form.get('ticker', '').strip().upper()  # Changed from 'stock_ticker' to 'ticker'
             
             if not stock_ticker:
-                return jsonify({'error': 'Please provide a stock ticker'})
+                return render_template('error.html', error='Please provide a stock ticker')
             
             if not self.data_fetcher.is_valid_ticker(stock_ticker):
-                return jsonify({'error': 'Invalid ticker symbol'})
+                return render_template('error.html', error=f'Invalid ticker symbol: {stock_ticker}')
             
             # Get market context
             market_context = self.data_fetcher.get_market_context(stock_ticker)
             if not market_context:
-                return jsonify({'error': 'Unable to fetch market data'})
+                return render_template('error.html', error='Unable to fetch market data')
             
             # Load and prepare data for prediction
             data = load_db_data()
             if data is None or data.empty:
-                return jsonify({'error': 'Unable to load training data'})
+                return render_template('error.html', error='Unable to load training data')
             
             # Get stock data for prediction
             stock_data = self.data_fetcher.get_historical_data(stock_ticker, period="2y")
             if stock_data is None or stock_data.empty:
-                return jsonify({'error': 'Unable to fetch stock data'})
+                return render_template('error.html', error='Unable to fetch stock data')
             
             # Prepare features for prediction
             features = self._prepare_prediction_features(stock_data, market_context)
             if features is None:
-                return jsonify({'error': 'Unable to prepare prediction features'})
+                return render_template('error.html', error='Unable to prepare prediction features')
             
             # Load model and make prediction
             try:
@@ -175,22 +175,39 @@ class APIRoutes:
                 price_change_pct = ((prediction - current_price) / current_price) * 100
                 self.db_ops.store_prediction(stock_ticker, prediction, current_price, price_change_pct, metrics)
                 
-                return jsonify({
-                    'success': True,
-                    'prediction': prediction,
-                    'current_price': current_price,
-                    'price_change_pct': price_change_pct,
-                    'market_context': market_context,
-                    'metrics': metrics
-                })
+                # Get additional data for template
+                dates = stock_data.index.strftime('%Y-%m-%d').tolist()
+                actual_prices = stock_data['Close'].tolist()
+                predicted_prices = [prediction] * len(actual_prices)  # Simplified for now
+                
+                return render_template(
+                    'go.html',
+                    ticker=stock_ticker,
+                    prediction=round(prediction, 2),
+                    current_price=round(current_price, 2),
+                    price_change_pct=round(price_change_pct, 2),
+                    dates=dates,
+                    actual_prices=actual_prices,
+                    predicted_prices=predicted_prices,
+                    market_context=market_context,
+                    current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    confidence_metrics={
+                        'r2_score': f"{metrics.get('r2', 0):.3f}",
+                        'mae': f"${metrics.get('mae', 0):.2f}",
+                        'rmse': f"${metrics.get('rmse', 0):.2f}"
+                    },
+                    news_articles=[],  # Can be populated later
+                    news_summary="",   # Can be populated later
+                    news_error_message=""
+                )
                 
             except Exception as model_error:
                 logger.error(f"Model prediction error: {str(model_error)}")
-                return jsonify({'error': 'Prediction model failed'})
+                return render_template('error.html', error='Prediction model failed')
             
         except Exception as e:
             logger.error(f"Prediction route error: {str(e)}")
-            return jsonify({'error': f'Prediction failed: {str(e)}'})
+            return render_template('error.html', error=str(e))
     
     def run_backtest_route(self):
         """Handle backtest requests"""
@@ -331,40 +348,84 @@ class APIRoutes:
     def paper_buy_route(self):
         """Handle paper buy requests"""
         if not current_user.is_authenticated:
-            return jsonify({'success': False, 'message': 'User not authenticated'})
+            return redirect(url_for('login'))
         
         try:
-            symbol = request.form.get('symbol', '').upper()
+            symbol = request.form.get('symbol', '').strip().upper()
             shares = float(request.form.get('shares', 0))
+            price = float(request.form.get('price', 0))
             
-            if not symbol or shares <= 0:
-                return jsonify({'success': False, 'message': 'Invalid input parameters'})
+            if not symbol:
+                flash('Please enter a stock symbol')
+                return redirect(url_for('dashboard'))
+            
+            if shares <= 0:
+                flash('Please enter a valid number of shares')
+                return redirect(url_for('dashboard'))
+            
+            if price <= 0:
+                flash('Please enter a valid price')
+                return redirect(url_for('dashboard'))
+            
+            # Validate ticker
+            if not self.data_fetcher.is_valid_ticker(symbol):
+                flash(f'Stock symbol "{symbol}" not found. Please check the symbol and try again.')
+                return redirect(url_for('dashboard'))
             
             result = self.portfolio_holdings.execute_paper_buy(current_user.id, symbol, shares)
-            return jsonify(result)
+            
+            if result.get('success'):
+                flash(f'Successfully bought {shares} shares of {symbol}')
+            else:
+                flash(f'Failed to buy shares: {result.get("message", "Unknown error")}')
+            
+            return redirect(url_for('dashboard'))
             
         except Exception as e:
             logger.error(f"Paper buy error: {str(e)}")
-            return jsonify({'success': False, 'message': 'Transaction failed'})
+            flash('Error executing buy order')
+            return redirect(url_for('dashboard'))
     
     def paper_sell_route(self):
         """Handle paper sell requests"""
         if not current_user.is_authenticated:
-            return jsonify({'success': False, 'message': 'User not authenticated'})
+            return redirect(url_for('login'))
         
         try:
-            symbol = request.form.get('symbol', '').upper()
+            symbol = request.form.get('symbol', '').strip().upper()
             shares = float(request.form.get('shares', 0))
+            price = float(request.form.get('price', 0))
             
-            if not symbol or shares <= 0:
-                return jsonify({'success': False, 'message': 'Invalid input parameters'})
+            if not symbol:
+                flash('Please enter a stock symbol')
+                return redirect(url_for('dashboard'))
+            
+            if shares <= 0:
+                flash('Please enter a valid number of shares')
+                return redirect(url_for('dashboard'))
+            
+            if price <= 0:
+                flash('Please enter a valid price')
+                return redirect(url_for('dashboard'))
+            
+            # Validate ticker
+            if not self.data_fetcher.is_valid_ticker(symbol):
+                flash(f'Stock symbol "{symbol}" not found. Please check the symbol and try again.')
+                return redirect(url_for('dashboard'))
             
             result = self.portfolio_holdings.execute_paper_sell(current_user.id, symbol, shares)
-            return jsonify(result)
+            
+            if result.get('success'):
+                flash(f'Successfully sold {shares} shares of {symbol}')
+            else:
+                flash(f'Failed to sell shares: {result.get("message", "Unknown error")}')
+            
+            return redirect(url_for('dashboard'))
             
         except Exception as e:
             logger.error(f"Paper sell error: {str(e)}")
-            return jsonify({'success': False, 'message': 'Transaction failed'})
+            flash('Error executing sell order')
+            return redirect(url_for('dashboard'))
     
     def paper_transactions_route(self):
         """Handle paper transactions requests"""
