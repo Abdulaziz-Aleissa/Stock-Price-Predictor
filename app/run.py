@@ -9,7 +9,7 @@ from app.utils.value_at_risk import var_analyzer
 from app.utils.time_series_forecasting import ts_forecaster
 import pandas as pd
 import numpy as np
-from data.process_data import load_data, clean_data, save_data,calculate_technical_indicators
+from data.process_data import load_data, clean_data, save_data
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import joblib
@@ -23,28 +23,17 @@ from sqlalchemy.orm import sessionmaker
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
-import os
 from models.train_classifier import (
     load_data as load_db_data,  # This imports load_data from train_classifier as load_db_data
-    evaluate_model,
-    build_model
+    evaluate_model
 )
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.impute import SimpleImputer
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-
-
-
-
-
-
-
-app = Flask(__name__, 
+app = Flask(__name__,
            static_url_path='/static',
            template_folder='templates',
            static_folder='static')
@@ -166,31 +155,7 @@ def update_paper_portfolio(user_id, symbol, shares, price, transaction_type):
     db.commit()
     return True
 
-# def get_market_context(ticker):
-#     try:
-#         stock = yf.Ticker(ticker)
-#         info = stock.info
-#         return {]
-#             'current_price': info.get('regularMarketPrice', 'N/A'),
-#             'day_high': info.get('dayHigh', 'N/A'),
-#             'day_low': info.get('dayLow', 'N/A'),
-#             'volume': info.get('volume', 0),
-#             'pe_ratio': info.get('forwardPE', 'N/A'),
-#             'pb_ratio': info.get('priceToBook', 'N/A'),
-#             'ev_ebitda': info.get('enterpriseToEbitda', 'N/A'),
-#             'roe': info.get('returnOnEquity', 'N/A'),
-#             #calculate the rsi of the 14 day period
-           
 
-
-#             'dividend_yield': info.get('dividendYield', 'N/A'),
-#             'market_cap': info.get('marketCap', 'N/A'),
-#             'year_high': info.get('fiftyTwoWeekHigh', 'N/A'),
-#             'year_low': info.get('fiftyTwoWeekLow', 'N/A')
-#         }
-#     except:
-#         return None
-    
 
 
 def get_market_context(ticker):
@@ -890,10 +855,6 @@ def run_backtest():
         logger.error(f"Error in run_backtest: {str(e)}")
         return jsonify({'error': f'Backtest calculation failed: {str(e)}'}), 500
 
-
-
-
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -1385,13 +1346,6 @@ def compare_stocks():
     }
     
     return jsonify(data)
-
-
-
-
-
-
-
 
 @app.route('/value_at_risk', methods=['POST'])
 @login_required
