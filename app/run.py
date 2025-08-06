@@ -7,7 +7,7 @@ Main application file using modular architecture
 from flask import Flask, render_template
 import os
 import logging
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import atexit
