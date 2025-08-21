@@ -1,6 +1,10 @@
 
 /* Professional Design System Variables */
 :root {
+    /* Accent RGB for alpha usage */
+    --accent-rgb: 59, 130, 246;
+    --success-rgb: 34, 197, 94;
+    
     /* Core Branding */
     --primary-50: #eff6ff;
     --primary-100: #dbeafe;
@@ -2109,6 +2113,308 @@ p {
     .backtest-chart {
         min-height: 200px;
         padding: 0.5rem;
+    }
+}
+
+/* ================================
+   Interactive Stock Dashboard Styles
+   ================================ */
+
+/* Dashboard Controls */
+.dashboard-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dashboard-controls .form-check {
+    margin: 0;
+}
+
+.dashboard-controls .form-check-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-left: 0.5rem;
+}
+
+/* Interactive Stock Search Section */
+.interactive-stock-section {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.stock-search-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.stock-search-container {
+    max-width: 600px;
+}
+
+.stock-search-container .input-group-text {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.stock-search-container .form-control {
+    background: var(--bg-tertiary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.stock-search-container .form-control:focus {
+    background: var(--bg-tertiary);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--accent-rgb), 0.25);
+    color: var(--text-primary);
+}
+
+.search-hints {
+    margin-top: 8px;
+}
+
+/* Stock Overview Cards */
+.stock-overview-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.stock-overview-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.stock-overview-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stock-overview-card:hover::before {
+    opacity: 1;
+}
+
+.stock-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.stock-symbol h4 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.company-name {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stock-price {
+    margin-bottom: 20px;
+}
+
+.current-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.price-change {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.price-change.positive {
+    color: var(--success-color);
+}
+
+.price-change.negative {
+    color: var(--danger-500);
+}
+
+.stock-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stock-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.stock-actions .btn {
+    flex: 1;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+}
+
+/* Stock Charts Section */
+.stock-charts-section {
+    margin-top: 32px;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.chart-header h5 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.chart-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.chart-controls .btn {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    border-radius: 6px;
+}
+
+.chart-controls .btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.stock-chart {
+    min-height: 400px;
+    background: transparent;
+}
+
+/* Loading States */
+#loadingIndicator {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+#loadingIndicator .spinner-border {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .stock-search-container {
+        max-width: 100%;
+    }
+    
+    .stock-metrics {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .stock-actions {
+        flex-direction: column;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .current-price {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .interactive-stock-section {
+        padding: 16px;
+    }
+    
+    .stock-search-card {
+        padding: 16px;
+    }
+    
+    .stock-overview-card {
+        padding: 16px;
+    }
+    
+    .chart-card {
+        padding: 16px;
+    }
+    
+    .stock-chart {
+        min-height: 300px;
     }
 }
 }

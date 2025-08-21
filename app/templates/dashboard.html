@@ -706,6 +706,69 @@
                         <h1 class="mb-2">Professional Dashboard</h1>
                         <p class="text-muted mb-0 dashboard-welcome-text">Welcome back, {{ current_user.username }}! Your comprehensive analytics platform.</p>
                     </div>
+                    <div class="dashboard-controls">
+                        <button id="dashboardRefreshBtn" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" id="autoRefreshToggle">
+                            <label class="form-check-label" for="autoRefreshToggle">Auto-refresh</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Container for Dashboard Messages -->
+                <div id="dashboardAlerts"></div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="text-center py-3" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <div class="mt-2">Loading stock data...</div>
+                </div>
+
+                <!-- Interactive Stock Search Section -->
+                <div class="interactive-stock-section mb-5">
+                    <div class="stock-search-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3><i class="fas fa-search"></i> Stock Analysis Dashboard</h3>
+                            <small class="text-muted">Add stocks to analyze with real-time data and charts</small>
+                        </div>
+                        
+                        <div class="stock-search-container">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="fas fa-chart-line"></i></span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="stockSearchInput" 
+                                       placeholder="Enter stock symbol (e.g., AAPL, GOOGL, MSFT)"
+                                       maxlength="5">
+                                <button class="btn btn-primary" type="button" id="addStockBtn">
+                                    <i class="fas fa-plus"></i> Add Stock
+                                </button>
+                            </div>
+                            <div class="search-hints">
+                                <small class="text-muted">
+                                    <i class="fas fa-lightbulb"></i> 
+                                    Popular stocks: AAPL, GOOGL, MSFT, AMZN, TSLA, NVDA, META, NFLX
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stock Overview Cards -->
+                    <div class="row" id="stockOverviewCards">
+                        <!-- Stock cards will be dynamically added here -->
+                    </div>
+
+                    <!-- Stock Charts Section -->
+                    <div class="stock-charts-section mt-4">
+                        <h4 class="mb-3"><i class="fas fa-chart-area"></i> Interactive Price Charts</h4>
+                        <div class="row" id="stockChartsSection">
+                            <!-- Charts will be dynamically added here -->
+                        </div>
+                    </div>
                 </div>
                 <!-- Portfolio Summary Stats -->
                 <div class="stats-grid mb-4">
@@ -2514,6 +2577,9 @@
             }
         });
     </script>
+
+    <!-- Interactive Dashboard Script -->
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
 </body>
 </html>

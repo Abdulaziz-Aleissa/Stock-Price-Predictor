@@ -1493,6 +1493,145 @@ def options_pricing_route():
     except Exception as e:
         return jsonify({'error': f'Options pricing failed: {str(e)}'})
 
+# Interactive Dashboard API Endpoints
+@app.route('/api/stock-overview/<symbol>')
+@login_required
+def stock_overview_api(symbol):
+    """API endpoint to get comprehensive stock overview data"""
+    try:
+        symbol = symbol.upper()
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'}), 400
+        
+        stock = yf.Ticker(symbol)
+        info = stock.info
+        
+        # Get current price and market data
+        current_price = get_current_price(symbol)
+        if not current_price:
+            return jsonify({'error': 'Unable to fetch current price'}), 500
+            
+        # Calculate daily change
+        hist = stock.history(period="2d")
+        daily_change = 0
+        daily_change_percent = 0
+        if len(hist) >= 2:
+            yesterday_close = hist['Close'].iloc[-2]
+            daily_change = current_price - yesterday_close
+            daily_change_percent = (daily_change / yesterday_close) * 100
+        
+        overview_data = {
+            'symbol': symbol,
+            'longName': info.get('longName', symbol),
+            'sector': info.get('sector', 'N/A'),
+            'industry': info.get('industry', 'N/A'),
+            'regularMarketPrice': current_price,
+            'regularMarketChange': daily_change,
+            'regularMarketChangePercent': daily_change_percent,
+            'marketCap': info.get('marketCap'),
+            'volume': info.get('volume', 0),
+            'averageVolume': info.get('averageVolume'),
+            'forwardPE': info.get('forwardPE'),
+            'trailingPE': info.get('trailingPE'),
+            'priceToBook': info.get('priceToBook'),
+            'dividendYield': info.get('dividendYield'),
+            'fiftyTwoWeekHigh': info.get('fiftyTwoWeekHigh'),
+            'fiftyTwoWeekLow': info.get('fiftyTwoWeekLow'),
+            'dayHigh': info.get('dayHigh'),
+            'dayLow': info.get('dayLow'),
+            'beta': info.get('beta'),
+            'bookValue': info.get('bookValue'),
+            'priceToSales': info.get('priceToSales'),
+            'enterpriseValue': info.get('enterpriseValue'),
+            'profitMargins': info.get('profitMargins'),
+            'returnOnEquity': info.get('returnOnEquity'),
+            'description': info.get('longBusinessSummary', 'No description available')
+        }
+        
+        return jsonify(overview_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting stock overview for {symbol}: {str(e)}")
+        return jsonify({'error': 'Failed to fetch stock overview'}), 500
+
+@app.route('/api/stock-history/<symbol>')
+@login_required
+def stock_history_api(symbol):
+    """API endpoint to get historical stock data with technical indicators"""
+    try:
+        symbol = symbol.upper()
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'}), 400
+        
+        period = request.args.get('period', '6mo')  # Default to 6 months
+        
+        stock = yf.Ticker(symbol)
+        hist = stock.history(period=period)
+        
+        if hist.empty:
+            return jsonify({'error': 'No historical data available'}), 404
+        
+        # Calculate technical indicators
+        from data.process_data import calculate_technical_indicators
+        hist_with_indicators = calculate_technical_indicators(hist)
+        
+        # Prepare data for frontend
+        history_data = {
+            'symbol': symbol,
+            'dates': hist_with_indicators.index.strftime('%Y-%m-%d').tolist(),
+            'prices': hist_with_indicators['Close'].tolist(),
+            'volumes': hist_with_indicators['Volume'].tolist(),
+            'highs': hist_with_indicators['High'].tolist(),
+            'lows': hist_with_indicators['Low'].tolist(),
+            'opens': hist_with_indicators['Open'].tolist(),
+            'sma20': hist_with_indicators['SMA_20'].bfill().tolist(),
+            'sma50': hist_with_indicators['SMA_50'].bfill().tolist(),
+            'rsi': hist_with_indicators['RSI'].fillna(0).tolist(),
+            'macd': hist_with_indicators['MACD'].fillna(0).tolist(),
+            'macd_signal': hist_with_indicators['MACD_Signal'].fillna(0).tolist(),
+            'upper_bb': hist_with_indicators['Upper_BB'].bfill().tolist(),
+            'lower_bb': hist_with_indicators['Lower_BB'].bfill().tolist()
+        }
+        
+        return jsonify(history_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting stock history for {symbol}: {str(e)}")
+        return jsonify({'error': 'Failed to fetch stock history'}), 500
+
+@app.route('/api/stock-news/<symbol>')
+@login_required
+def stock_news_api(symbol):
+    """API endpoint to get news for a specific stock"""
+    try:
+        symbol = symbol.upper()
+        if not is_valid_ticker(symbol):
+            return jsonify({'error': 'Invalid ticker symbol'}), 400
+        
+        # Use existing news API
+        news_articles = news_api.get_stock_news(symbol, limit=10)
+        news_summary = news_api.get_news_summary(symbol)
+        
+        return jsonify({
+            'articles': [
+                {
+                    'title': article.title,
+                    'summary': article.summary,
+                    'url': article.url,
+                    'source': article.source,
+                    'published_date': article.published_date.isoformat() if article.published_date else None,
+                    'sentiment_label': article.sentiment.label,
+                    'sentiment_score': article.sentiment.score
+                }
+                for article in news_articles
+            ],
+            'summary': news_summary
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting news for {symbol}: {str(e)}")
+        return jsonify({'error': 'Failed to fetch news'}), 500
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('error.html', error='Page not found'), 404
