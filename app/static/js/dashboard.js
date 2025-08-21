@@ -395,12 +395,13 @@ class StockDashboard {
     }
 
     loadDefaultStocks() {
-        // Load some popular stocks by default
-        const defaultStocks = ['AAPL', 'GOOGL', 'MSFT'];
-        defaultStocks.forEach(symbol => {
-            this.selectedTickers.add(symbol);
-            this.loadStockData(symbol).catch(console.error);
-        });
+        // Load some popular stocks by default for demo
+        // Commented out to avoid initial API errors in demo environment
+        // const defaultStocks = ['AAPL', 'GOOGL', 'MSFT'];
+        // defaultStocks.forEach(symbol => {
+        //     this.selectedTickers.add(symbol);
+        //     this.loadStockData(symbol).catch(console.error);
+        // });
     }
 
     initializeCharts() {

@@ -1493,60 +1493,115 @@ def options_pricing_route():
     except Exception as e:
         return jsonify({'error': f'Options pricing failed: {str(e)}'})
 
-# Interactive Dashboard API Endpoints
+# Interactive Dashboard API Endpoints (Mock Data for Demo)
 @app.route('/api/stock-overview/<symbol>')
 @login_required
 def stock_overview_api(symbol):
-    """API endpoint to get comprehensive stock overview data"""
+    """API endpoint to get comprehensive stock overview data (Mock Data)"""
     try:
         symbol = symbol.upper()
         if not is_valid_ticker(symbol):
             return jsonify({'error': 'Invalid ticker symbol'}), 400
         
-        stock = yf.Ticker(symbol)
-        info = stock.info
-        
-        # Get current price and market data
-        current_price = get_current_price(symbol)
-        if not current_price:
-            return jsonify({'error': 'Unable to fetch current price'}), 500
-            
-        # Calculate daily change
-        hist = stock.history(period="2d")
-        daily_change = 0
-        daily_change_percent = 0
-        if len(hist) >= 2:
-            yesterday_close = hist['Close'].iloc[-2]
-            daily_change = current_price - yesterday_close
-            daily_change_percent = (daily_change / yesterday_close) * 100
-        
-        overview_data = {
-            'symbol': symbol,
-            'longName': info.get('longName', symbol),
-            'sector': info.get('sector', 'N/A'),
-            'industry': info.get('industry', 'N/A'),
-            'regularMarketPrice': current_price,
-            'regularMarketChange': daily_change,
-            'regularMarketChangePercent': daily_change_percent,
-            'marketCap': info.get('marketCap'),
-            'volume': info.get('volume', 0),
-            'averageVolume': info.get('averageVolume'),
-            'forwardPE': info.get('forwardPE'),
-            'trailingPE': info.get('trailingPE'),
-            'priceToBook': info.get('priceToBook'),
-            'dividendYield': info.get('dividendYield'),
-            'fiftyTwoWeekHigh': info.get('fiftyTwoWeekHigh'),
-            'fiftyTwoWeekLow': info.get('fiftyTwoWeekLow'),
-            'dayHigh': info.get('dayHigh'),
-            'dayLow': info.get('dayLow'),
-            'beta': info.get('beta'),
-            'bookValue': info.get('bookValue'),
-            'priceToSales': info.get('priceToSales'),
-            'enterpriseValue': info.get('enterpriseValue'),
-            'profitMargins': info.get('profitMargins'),
-            'returnOnEquity': info.get('returnOnEquity'),
-            'description': info.get('longBusinessSummary', 'No description available')
+        # Mock data for demonstration
+        mock_data = {
+            'AAPL': {
+                'symbol': 'AAPL',
+                'longName': 'Apple Inc.',
+                'sector': 'Technology',
+                'industry': 'Consumer Electronics',
+                'regularMarketPrice': 178.54,
+                'regularMarketChange': 2.34,
+                'regularMarketChangePercent': 1.33,
+                'marketCap': 2876543210000,
+                'volume': 54321000,
+                'averageVolume': 56789000,
+                'forwardPE': 28.5,
+                'trailingPE': 31.2,
+                'priceToBook': 8.9,
+                'dividendYield': 0.0045,
+                'fiftyTwoWeekHigh': 198.23,
+                'fiftyTwoWeekLow': 164.08,
+                'dayHigh': 179.12,
+                'dayLow': 177.89,
+                'beta': 1.21,
+                'bookValue': 20.15,
+                'description': 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide.'
+            },
+            'GOOGL': {
+                'symbol': 'GOOGL',
+                'longName': 'Alphabet Inc.',
+                'sector': 'Communication Services',
+                'industry': 'Internet Content & Information',
+                'regularMarketPrice': 134.76,
+                'regularMarketChange': -0.89,
+                'regularMarketChangePercent': -0.66,
+                'marketCap': 1687654321000,
+                'volume': 23456000,
+                'averageVolume': 25678000,
+                'forwardPE': 21.4,
+                'trailingPE': 24.1,
+                'priceToBook': 5.2,
+                'dividendYield': None,
+                'fiftyTwoWeekHigh': 151.55,
+                'fiftyTwoWeekLow': 121.46,
+                'dayHigh': 135.89,
+                'dayLow': 133.45,
+                'beta': 1.05,
+                'bookValue': 25.89,
+                'description': 'Alphabet Inc. provides online advertising services in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America.'
+            },
+            'MSFT': {
+                'symbol': 'MSFT',
+                'longName': 'Microsoft Corporation',
+                'sector': 'Technology',
+                'industry': 'Software—Infrastructure',
+                'regularMarketPrice': 412.34,
+                'regularMarketChange': 5.67,
+                'regularMarketChangePercent': 1.39,
+                'marketCap': 3098765432100,
+                'volume': 18765000,
+                'averageVolume': 20123000,
+                'forwardPE': 31.8,
+                'trailingPE': 35.2,
+                'priceToBook': 12.7,
+                'dividendYield': 0.0067,
+                'fiftyTwoWeekHigh': 468.35,
+                'fiftyTwoWeekLow': 362.90,
+                'dayHigh': 415.67,
+                'dayLow': 409.12,
+                'beta': 0.89,
+                'bookValue': 32.45,
+                'description': 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide.'
+            }
         }
+        
+        # Default mock data for other symbols
+        default_data = {
+            'symbol': symbol,
+            'longName': f'{symbol} Corporation',
+            'sector': 'Technology',
+            'industry': 'Software',
+            'regularMarketPrice': 100.00,
+            'regularMarketChange': 1.50,
+            'regularMarketChangePercent': 1.52,
+            'marketCap': 50000000000,
+            'volume': 1000000,
+            'averageVolume': 1200000,
+            'forwardPE': 25.0,
+            'trailingPE': 28.0,
+            'priceToBook': 6.0,
+            'dividendYield': 0.02,
+            'fiftyTwoWeekHigh': 120.00,
+            'fiftyTwoWeekLow': 80.00,
+            'dayHigh': 101.50,
+            'dayLow': 99.25,
+            'beta': 1.0,
+            'bookValue': 16.67,
+            'description': f'{symbol} Corporation is a leading technology company.'
+        }
+        
+        overview_data = mock_data.get(symbol, default_data)
         
         return jsonify(overview_data)
         
@@ -1557,7 +1612,7 @@ def stock_overview_api(symbol):
 @app.route('/api/stock-history/<symbol>')
 @login_required
 def stock_history_api(symbol):
-    """API endpoint to get historical stock data with technical indicators"""
+    """API endpoint to get historical stock data with technical indicators (Mock Data)"""
     try:
         symbol = symbol.upper()
         if not is_valid_ticker(symbol):
@@ -1565,32 +1620,93 @@ def stock_history_api(symbol):
         
         period = request.args.get('period', '6mo')  # Default to 6 months
         
-        stock = yf.Ticker(symbol)
-        hist = stock.history(period=period)
+        # Generate mock historical data
+        import numpy as np
+        from datetime import datetime, timedelta
         
-        if hist.empty:
-            return jsonify({'error': 'No historical data available'}), 404
+        # Number of days based on period
+        days_map = {'1mo': 30, '3mo': 90, '6mo': 180, '1y': 365}
+        days = days_map.get(period, 180)
+        
+        # Generate dates
+        end_date = datetime.now()
+        dates = [(end_date - timedelta(days=i)).strftime('%Y-%m-%d') for i in range(days, 0, -1)]
+        
+        # Base prices for different stocks
+        base_prices = {'AAPL': 170, 'GOOGL': 130, 'MSFT': 400}
+        base_price = base_prices.get(symbol, 100)
+        
+        # Generate realistic price movement
+        np.random.seed(hash(symbol) % 1000)  # Consistent seed for same symbol
+        returns = np.random.normal(0.0008, 0.02, days)  # Daily returns
+        prices = [base_price]
+        
+        for i in range(1, days):
+            new_price = prices[-1] * (1 + returns[i])
+            prices.append(max(new_price, 1.0))  # Ensure positive prices
+        
+        # Generate volume data
+        base_volume = 25000000
+        volumes = [base_volume + np.random.randint(-5000000, 5000000) for _ in range(days)]
         
         # Calculate technical indicators
-        from data.process_data import calculate_technical_indicators
-        hist_with_indicators = calculate_technical_indicators(hist)
+        def sma(data, window):
+            return [np.mean(data[max(0, i-window+1):i+1]) for i in range(len(data))]
         
-        # Prepare data for frontend
+        def rsi(prices, window=14):
+            deltas = np.diff(prices)
+            seed = deltas[:window]
+            up = seed[seed >= 0].sum() / window
+            down = -seed[seed < 0].sum() / window
+            rs = up / down if down != 0 else 0
+            rsi_values = [100 - 100 / (1 + rs)]
+            
+            for i in range(window, len(deltas)):
+                delta = deltas[i]
+                if delta > 0:
+                    upval = delta
+                    downval = 0
+                else:
+                    upval = 0
+                    downval = -delta
+                
+                up = (up * (window - 1) + upval) / window
+                down = (down * (window - 1) + downval) / window
+                rs = up / down if down != 0 else 0
+                rsi_values.append(100 - 100 / (1 + rs))
+            
+            return [50] * (window - 1) + rsi_values  # Pad with neutral RSI
+        
+        sma20 = sma(prices, 20)
+        sma50 = sma(prices, 50)
+        rsi_values = rsi(prices)
+        
+        # Simple MACD calculation
+        ema12 = prices  # Simplified
+        ema26 = sma(prices, 26)
+        macd = [ema12[i] - ema26[i] for i in range(len(prices))]
+        macd_signal = sma(macd, 9)
+        
+        # Bollinger Bands
+        std20 = [np.std(prices[max(0, i-19):i+1]) for i in range(len(prices))]
+        upper_bb = [sma20[i] + 2 * std20[i] for i in range(len(prices))]
+        lower_bb = [sma20[i] - 2 * std20[i] for i in range(len(prices))]
+        
         history_data = {
             'symbol': symbol,
-            'dates': hist_with_indicators.index.strftime('%Y-%m-%d').tolist(),
-            'prices': hist_with_indicators['Close'].tolist(),
-            'volumes': hist_with_indicators['Volume'].tolist(),
-            'highs': hist_with_indicators['High'].tolist(),
-            'lows': hist_with_indicators['Low'].tolist(),
-            'opens': hist_with_indicators['Open'].tolist(),
-            'sma20': hist_with_indicators['SMA_20'].bfill().tolist(),
-            'sma50': hist_with_indicators['SMA_50'].bfill().tolist(),
-            'rsi': hist_with_indicators['RSI'].fillna(0).tolist(),
-            'macd': hist_with_indicators['MACD'].fillna(0).tolist(),
-            'macd_signal': hist_with_indicators['MACD_Signal'].fillna(0).tolist(),
-            'upper_bb': hist_with_indicators['Upper_BB'].bfill().tolist(),
-            'lower_bb': hist_with_indicators['Lower_BB'].bfill().tolist()
+            'dates': dates,
+            'prices': prices,
+            'volumes': volumes,
+            'highs': [p * 1.01 for p in prices],  # Mock high prices
+            'lows': [p * 0.99 for p in prices],   # Mock low prices
+            'opens': prices,  # Simplified
+            'sma20': sma20,
+            'sma50': sma50,
+            'rsi': rsi_values,
+            'macd': macd,
+            'macd_signal': macd_signal,
+            'upper_bb': upper_bb,
+            'lower_bb': lower_bb
         }
         
         return jsonify(history_data)
@@ -1602,30 +1718,54 @@ def stock_history_api(symbol):
 @app.route('/api/stock-news/<symbol>')
 @login_required
 def stock_news_api(symbol):
-    """API endpoint to get news for a specific stock"""
+    """API endpoint to get news for a specific stock (Mock Data)"""
     try:
         symbol = symbol.upper()
         if not is_valid_ticker(symbol):
             return jsonify({'error': 'Invalid ticker symbol'}), 400
         
-        # Use existing news API
-        news_articles = news_api.get_stock_news(symbol, limit=10)
-        news_summary = news_api.get_news_summary(symbol)
+        # Mock news data
+        mock_articles = [
+            {
+                'title': f'{symbol} Reports Strong Q3 Earnings',
+                'summary': f'{symbol} exceeded analyst expectations with strong revenue growth and improved margins.',
+                'url': 'https://example.com/news1',
+                'source': 'Financial Times',
+                'published_date': '2024-08-20T10:30:00Z',
+                'sentiment_label': 'Bullish',
+                'sentiment_score': 0.75
+            },
+            {
+                'title': f'{symbol} Announces New Product Line',
+                'summary': f'{symbol} unveiled innovative products that could drive future growth.',
+                'url': 'https://example.com/news2',
+                'source': 'MarketWatch',
+                'published_date': '2024-08-19T14:15:00Z',
+                'sentiment_label': 'Bullish',
+                'sentiment_score': 0.62
+            },
+            {
+                'title': f'Analysts Upgrade {symbol} Rating',
+                'summary': f'Major investment firms raised their price targets for {symbol} stock.',
+                'url': 'https://example.com/news3',
+                'source': 'Bloomberg',
+                'published_date': '2024-08-18T09:45:00Z',
+                'sentiment_label': 'Bullish',
+                'sentiment_score': 0.68
+            }
+        ]
+        
+        mock_summary = {
+            'total_articles': 3,
+            'bullish_count': 3,
+            'bearish_count': 0,
+            'neutral_count': 0,
+            'average_sentiment': 0.68
+        }
         
         return jsonify({
-            'articles': [
-                {
-                    'title': article.title,
-                    'summary': article.summary,
-                    'url': article.url,
-                    'source': article.source,
-                    'published_date': article.published_date.isoformat() if article.published_date else None,
-                    'sentiment_label': article.sentiment.label,
-                    'sentiment_score': article.sentiment.score
-                }
-                for article in news_articles
-            ],
-            'summary': news_summary
+            'articles': mock_articles,
+            'summary': mock_summary
         })
         
     except Exception as e:
