@@ -101,5 +101,26 @@ class PredictionHistory(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+class SoldOrder(Base):
+    __tablename__ = 'sold_orders'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_symbol = Column(String(10))
+    shares = Column(Float)
+    purchase_price = Column(Float)  # Original purchase price
+    sell_price = Column(Float)  # Price at which stock was sold
+    profit_loss = Column(Float)  # (sell_price - purchase_price) * shares
+    sell_date = Column(DateTime, default=datetime.now)
+    purchase_date = Column(DateTime)  # Original purchase date
+
+class InvestmentBalance(Base):
+    __tablename__ = 'investment_balances'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), unique=True)
+    initial_amount = Column(Float, default=10000.0)  # Default $10,000
+    available_amount = Column(Float, default=10000.0)  # Current available amount
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
 engine = create_engine('sqlite:///stock_predictor.db')
 Base.metadata.create_all(engine)

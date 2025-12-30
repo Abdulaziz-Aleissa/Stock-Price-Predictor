@@ -714,19 +714,48 @@
                         <div class="stat-label">Total Portfolio Value</div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.1s;">
-                        <div class="stat-value">${{ "%.2f"|format(summary.total_cost) }}</div>
-                        <div class="stat-label">Total Investment</div>
+                        <div class="stat-value">${{ "%.2f"|format(investment_balance.available_amount) }}</div>
+                        <div class="stat-label">Available Investment</div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.2s;">
-                        <div class="stat-value {{ 'positive' if summary.total_profit_loss > 0 else 'negative' }}">${{ "%.2f"|format(summary.total_profit_loss) }}</div>
-                        <div class="stat-label">Profit/Loss</div>
-                        <div class="stat-change {{ 'positive' if summary.total_return_percent > 0 else 'negative' }}">
-                            {{ "%.2f"|format(summary.total_return_percent) }}%
-                        </div>
+                        <div class="stat-value {{ 'positive' if total_realized_pl > 0 else 'negative' }}">${{ "%.2f"|format(total_realized_pl) }}</div>
+                        <div class="stat-label">Total Realized P/L</div>
                     </div>
                     <div class="stat-card animate-slide-in" style="animation-delay: 0.3s;">
                         <div class="stat-value">{{ portfolio|length }}</div>
                         <div class="stat-label">Active Positions</div>
+                    </div>
+                </div>
+
+                <!-- Investment Amount Card -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title">💰 Investment Amount</h3>
+                                    <button class="btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#updateInvestmentModal">
+                                        Update Amount
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="stat-label">Initial Investment</div>
+                                        <div class="stat-value">${{ "%.2f"|format(investment_balance.initial_amount) }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="stat-label">Available Balance</div>
+                                        <div class="stat-value">${{ "%.2f"|format(investment_balance.available_amount) }}</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="stat-label">Invested Amount</div>
+                                        <div class="stat-value">${{ "%.2f"|format(investment_balance.initial_amount - investment_balance.available_amount) }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -772,11 +801,65 @@
                                         {{ "%.2f"|format(item.change_percent) }}%
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('remove_from_portfolio', item_id=item.id) }}" 
-                                           class="btn btn-outline-danger btn-sm">Remove</a>
+                                        <button class="btn btn-success btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#sellStockModal"
+                                                data-item-id="{{ item.id }}"
+                                                data-symbol="{{ item.symbol }}"
+                                                data-shares="{{ item.shares }}"
+                                                data-purchase-price="{{ item.purchase_price }}"
+                                                onclick="populateSellModal(this)">
+                                            Sold
+                                        </button>
                                     </td>
                                 </tr>
                                 {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sold Orders Section -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💼 Sold Orders</h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                            <thead style="background: var(--bg-tertiary); color: var(--text-primary);">
+                                <tr>
+                                    <th style="color: var(--text-primary);">Symbol</th>
+                                    <th style="color: var(--text-primary);">Shares</th>
+                                    <th style="color: var(--text-primary);">Buy Price</th>
+                                    <th style="color: var(--text-primary);">Sell Price</th>
+                                    <th style="color: var(--text-primary);">P/L</th>
+                                    <th style="color: var(--text-primary);">Sell Date</th>
+                                </tr>
+                            </thead>
+                            <tbody style="color: var(--text-secondary);">
+                                {% for order in sold_orders %}
+                                <tr style="background: var(--card-bg); border-color: var(--border-color);">
+                                    <td style="color: var(--text-primary);">{{ order.symbol }}</td>
+                                    <td>{{ "%.2f"|format(order.shares) }}</td>
+                                    <td>${{ "%.2f"|format(order.purchase_price) }}</td>
+                                    <td>${{ "%.2f"|format(order.sell_price) }}</td>
+                                    <td class="{{ 'positive-change' if order.profit_loss > 0 else 'negative-change' }}">
+                                        ${{ "%.2f"|format(order.profit_loss) }}
+                                    </td>
+                                    <td>{{ order.sell_date.strftime('%Y-%m-%d') }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% if not sold_orders %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-receipt fa-2x mb-2"></i><br>
+                                        No sold orders yet. When you sell stocks from your portfolio, they will appear here.
+                                    </td>
+                                </tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
@@ -1133,6 +1216,93 @@
                             <input type="number" class="form-control" name="purchase_price" placeholder="Purchase Price" step="0.01" required>
                         </div>
                         <button type="submit" class="btn btn-custom w-100">Add to Portfolio</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Stock Modal -->
+    <div class="modal fade" id="sellStockModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sell Stock</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('sell_from_portfolio') }}" method="POST" id="sellStockForm">
+                        <input type="hidden" name="item_id" id="sell_item_id">
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Stock Symbol</label>
+                            <input type="text" class="form-control" id="sell_symbol" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Shares Available</label>
+                            <input type="text" class="form-control" id="sell_available_shares" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Purchase Price</label>
+                            <input type="text" class="form-control" id="sell_purchase_price_display" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Shares to Sell</label>
+                            <input type="number" class="form-control" name="shares" id="sell_shares" 
+                                   placeholder="Enter number of shares to sell" step="0.01" min="0.01" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Sell Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="sell_price" id="sell_price" 
+                                       placeholder="Enter sell price per share" step="0.01" min="0.01" required>
+                                <button type="button" class="btn btn-outline-secondary" id="getCurrentPriceForSell">Get Current</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info" id="estimatedPL" style="display: none;">
+                            <strong>Estimated P/L:</strong> <span id="plAmount">$0.00</span>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">Confirm Sale</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Investment Amount Modal -->
+    <div class="modal fade" id="updateInvestmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Investment Amount</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('update_investment_amount') }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Initial Investment Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="investment_amount" 
+                                       value="{{ investment_balance.initial_amount }}"
+                                       placeholder="Enter investment amount" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="form-text">Current: ${{ "%.2f"|format(investment_balance.initial_amount) }}</div>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Note:</strong> This will adjust your available balance proportionally. 
+                            Your current available balance: ${{ "%.2f"|format(investment_balance.available_amount) }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-custom w-100">Update Investment Amount</button>
                     </form>
                 </div>
             </div>
@@ -2060,6 +2230,83 @@
             }
         }, 500);
     });
+
+    // Populate Sell Stock Modal
+    function populateSellModal(button) {
+        const itemId = button.getAttribute('data-item-id');
+        const symbol = button.getAttribute('data-symbol');
+        const shares = button.getAttribute('data-shares');
+        const purchasePrice = button.getAttribute('data-purchase-price');
+        
+        document.getElementById('sell_item_id').value = itemId;
+        document.getElementById('sell_symbol').value = symbol;
+        document.getElementById('sell_available_shares').value = shares;
+        document.getElementById('sell_purchase_price_display').value = '$' + parseFloat(purchasePrice).toFixed(2);
+        
+        // Reset the form fields
+        document.getElementById('sell_shares').value = '';
+        document.getElementById('sell_price').value = '';
+        document.getElementById('estimatedPL').style.display = 'none';
+    }
+
+    // Get current price for sell modal
+    document.getElementById('getCurrentPriceForSell').addEventListener('click', async function() {
+        const symbol = document.getElementById('sell_symbol').value;
+        
+        if (!symbol) {
+            alert('No stock selected');
+            return;
+        }
+        
+        // Show loading state
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        this.disabled = true;
+        
+        try {
+            const response = await fetch(`/get_stock_price/${symbol.toUpperCase()}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                document.getElementById('sell_price').value = data.price.toFixed(2);
+                calculateEstimatedPL();
+            } else {
+                alert('Unable to fetch current price. Please enter manually.');
+            }
+        } catch (error) {
+            console.error('Error fetching price:', error);
+            alert('Error fetching price. Please enter manually.');
+        }
+        
+        // Reset button state
+        this.innerHTML = 'Get Current';
+        this.disabled = false;
+    });
+
+    // Calculate estimated P/L
+    function calculateEstimatedPL() {
+        const sharesInput = document.getElementById('sell_shares');
+        const priceInput = document.getElementById('sell_price');
+        const purchasePriceText = document.getElementById('sell_purchase_price_display').value;
+        const plDiv = document.getElementById('estimatedPL');
+        const plAmount = document.getElementById('plAmount');
+        
+        const shares = parseFloat(sharesInput.value);
+        const sellPrice = parseFloat(priceInput.value);
+        const purchasePrice = parseFloat(purchasePriceText.replace('$', ''));
+        
+        if (!isNaN(shares) && !isNaN(sellPrice) && !isNaN(purchasePrice) && shares > 0 && sellPrice > 0) {
+            const pl = (sellPrice - purchasePrice) * shares;
+            plAmount.textContent = '$' + pl.toFixed(2);
+            plAmount.className = pl >= 0 ? 'positive-change' : 'negative-change';
+            plDiv.style.display = 'block';
+        } else {
+            plDiv.style.display = 'none';
+        }
+    }
+
+    // Add event listeners for P/L calculation
+    document.getElementById('sell_shares').addEventListener('input', calculateEstimatedPL);
+    document.getElementById('sell_price').addEventListener('input', calculateEstimatedPL);
 
     </script>
 
