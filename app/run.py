@@ -18,7 +18,7 @@ import yfinance as yf
 from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperTransaction, PaperCashBalance, PredictionHistory, engine
+from models.database import User, Portfolio, Watchlist, PriceAlert, Notification, PaperPortfolio, PaperTransaction, PaperCashBalance, PredictionHistory, SoldOrder, InvestmentBalance, engine
 from sqlalchemy.orm import sessionmaker
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -119,6 +119,15 @@ def get_or_create_paper_cash_balance(user_id):
         db.add(cash_balance)
         db.commit()
     return cash_balance
+
+def get_or_create_investment_balance(user_id):
+    """Get or create investment balance for user with default $10,000"""
+    investment_balance = db.query(InvestmentBalance).filter_by(user_id=user_id).first()
+    if not investment_balance:
+        investment_balance = InvestmentBalance(user_id=user_id, initial_amount=10000.0, available_amount=10000.0)
+        db.add(investment_balance)
+        db.commit()
+    return investment_balance
 
 def update_paper_portfolio(user_id, symbol, shares, price, transaction_type):
     """Update paper portfolio position after a transaction"""
@@ -906,6 +915,12 @@ def dashboard():
     watchlist = db.query(Watchlist).filter_by(user_id=current_user.id).all()
     alerts = db.query(PriceAlert).filter_by(user_id=current_user.id).all()
     
+    # Get sold orders
+    sold_orders = db.query(SoldOrder).filter_by(user_id=current_user.id).order_by(SoldOrder.sell_date.desc()).all()
+    
+    # Get investment balance
+    investment_balance = get_or_create_investment_balance(current_user.id)
+    
     portfolio_data = []
     total_value = 0
     total_cost = 0
@@ -927,8 +942,24 @@ def dashboard():
                 'current_price': current_price,
                 'profit_loss': profit_loss,
                 'position_value': position_value,
-                'change_percent': ((current_price - item.purchase_price) / item.purchase_price * 100)
+                'change_percent': ((current_price - item.purchase_price) / item.purchase_price * 100),
+                'purchase_date': item.purchase_date
             })
+    
+    # Calculate sold orders data with P/L
+    sold_orders_data = []
+    total_realized_pl = 0
+    for order in sold_orders:
+        sold_orders_data.append({
+            'symbol': order.stock_symbol,
+            'shares': order.shares,
+            'purchase_price': order.purchase_price,
+            'sell_price': order.sell_price,
+            'profit_loss': order.profit_loss,
+            'sell_date': order.sell_date,
+            'purchase_date': order.purchase_date
+        })
+        total_realized_pl += order.profit_loss
     
     watchlist_data = []
     for item in watchlist:
@@ -1011,7 +1042,10 @@ def dashboard():
                          notifications=notifications,
                          summary=portfolio_summary,
                          paper_portfolio=paper_portfolio_data,
-                         paper_summary=paper_summary)
+                         paper_summary=paper_summary,
+                         sold_orders=sold_orders_data,
+                         total_realized_pl=total_realized_pl,
+                         investment_balance=investment_balance)
 
 @app.route('/add_to_portfolio', methods=['POST'])
 @login_required
@@ -1019,6 +1053,21 @@ def add_to_portfolio():
     symbol = request.form['symbol'].upper()
     shares = float(request.form['shares'])
     purchase_price = float(request.form['purchase_price'])
+    
+    # Calculate total cost
+    total_cost = shares * purchase_price
+    
+    # Get investment balance
+    investment_balance = get_or_create_investment_balance(current_user.id)
+    
+    # Check if user has enough available funds
+    if investment_balance.available_amount < total_cost:
+        flash(f'Insufficient funds. Available: ${investment_balance.available_amount:.2f}, Required: ${total_cost:.2f}')
+        return redirect(url_for('dashboard'))
+    
+    # Deduct from available investment amount
+    investment_balance.available_amount -= total_cost
+    investment_balance.updated_at = datetime.now()
     
     portfolio_item = Portfolio(
         user_id=current_user.id,
@@ -1031,6 +1080,7 @@ def add_to_portfolio():
     db.add(portfolio_item)
     db.commit()
     
+    flash(f'Successfully added {shares} shares of {symbol} to portfolio')
     return redirect(url_for('dashboard'))
 
 @app.route('/add_to_watchlist', methods=['POST'])
@@ -1085,6 +1135,67 @@ def remove_from_portfolio(item_id):
     if item:
         db.delete(item)
         db.commit()
+    return redirect(url_for('dashboard'))
+
+@app.route('/sell_from_portfolio', methods=['POST'])
+@login_required
+def sell_from_portfolio():
+    """Handle selling stocks from portfolio with P/L calculation"""
+    try:
+        item_id = int(request.form['item_id'])
+        shares_to_sell = float(request.form['shares'])
+        sell_price = float(request.form['sell_price'])
+        
+        # Get the portfolio item
+        portfolio_item = db.query(Portfolio).filter_by(id=item_id, user_id=current_user.id).first()
+        
+        if not portfolio_item:
+            flash('Portfolio item not found')
+            return redirect(url_for('dashboard'))
+        
+        # Validate shares
+        if shares_to_sell <= 0 or shares_to_sell > portfolio_item.shares:
+            flash(f'Invalid number of shares. You own {portfolio_item.shares} shares.')
+            return redirect(url_for('dashboard'))
+        
+        # Calculate profit/loss
+        profit_loss = (sell_price - portfolio_item.purchase_price) * shares_to_sell
+        
+        # Create sold order record
+        sold_order = SoldOrder(
+            user_id=current_user.id,
+            stock_symbol=portfolio_item.stock_symbol,
+            shares=shares_to_sell,
+            purchase_price=portfolio_item.purchase_price,
+            sell_price=sell_price,
+            profit_loss=profit_loss,
+            sell_date=datetime.now(),
+            purchase_date=portfolio_item.purchase_date
+        )
+        db.add(sold_order)
+        
+        # Update investment balance
+        investment_balance = get_or_create_investment_balance(current_user.id)
+        investment_balance.available_amount += shares_to_sell * sell_price
+        investment_balance.updated_at = datetime.now()
+        
+        # Update or remove portfolio item
+        if shares_to_sell == portfolio_item.shares:
+            # Selling all shares, remove from portfolio
+            db.delete(portfolio_item)
+        else:
+            # Selling partial shares, update portfolio
+            portfolio_item.shares -= shares_to_sell
+        
+        db.commit()
+        
+        flash(f'Successfully sold {shares_to_sell} shares of {portfolio_item.stock_symbol} with P/L: ${profit_loss:.2f}', 'success')
+        
+    except ValueError as e:
+        flash('Invalid input values')
+    except Exception as e:
+        flash(f'Error selling stock: {str(e)}')
+    
     return redirect(url_for('dashboard'))
 
 @app.route('/remove_from_watchlist/<int:item_id>')
@@ -1308,6 +1419,37 @@ def reset_paper_portfolio():
         
     except Exception as e:
         flash(f'Error resetting portfolio: {str(e)}')
+    
+    return redirect(url_for('dashboard'))
+
+@app.route('/update_investment_amount', methods=['POST'])
+@login_required
+def update_investment_amount():
+    """Update the initial investment amount"""
+    try:
+        new_amount = float(request.form['investment_amount'])
+        
+        if new_amount <= 0:
+            flash('Investment amount must be positive')
+            return redirect(url_for('dashboard'))
+        
+        investment_balance = get_or_create_investment_balance(current_user.id)
+        
+        # Calculate the difference to adjust available amount
+        difference = new_amount - investment_balance.initial_amount
+        
+        investment_balance.initial_amount = new_amount
+        investment_balance.available_amount += difference
+        investment_balance.updated_at = datetime.now()
+        
+        db.commit()
+        
+        flash(f'Investment amount updated to ${new_amount:.2f}', 'success')
+        
+    except ValueError:
+        flash('Invalid investment amount')
+    except Exception as e:
+        flash(f'Error updating investment amount: {str(e)}')
     
     return redirect(url_for('dashboard'))
 
